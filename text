@@ -1,11 +1,31 @@
-ITRD邀請您參加已排程的Zoom會議。
+如果要在南區完全複製北部的DEV CICD環境
+比造每個系統用一台VM
+可能要再新增四台南區測試環境的 VM (建議配置)
 
-主題: CICD內部討論會議
-時間: 2024年4月19日 14:00 台北
+第一台 Nexus：
+主機名稱：itdc-nexus
+OS：ubuntu 22.04
+CPU：16
+DISK SIZE：200GB
+RAM：16G
 
-加入 Zoom 會議
-https://zoom.us/j/92618879686?pwd=cXUxMmNkYVVvcXNWU0xPajRZWnZzZz09
+第二台 Sonarqube：
+主機名稱：itdc-sonarqube
+OS：ubuntu 22.04
+CPU：8
+DISK SIZE：200GB
+RAM：16G
 
-會議ID: 926 1887 9686
-密碼: 9273Ga&H
+第三台 Harbor：
+主機名稱：itdc-harbor
+OS：ubuntu 22.04
+CPU：4
+DISK SIZE：200GB
+RAM：8G
 
+第四台 Jenkins：
+主機名稱：itdc-jenkins
+OS：ubuntu 22.04
+CPU：8
+DISK SIZE：200GB
+RAM：8G
