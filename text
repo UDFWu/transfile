@@ -1,41 +1,33 @@
-如果要在南區完全複製北部的DEV CICD環境
-比造每個系統用一台VM
-可能要再新增四台南區測試環境的 VM (建議配置)
+export class CompanyUserSelectDialogComponent {
+    public itemList: any[] = [];
+    public itemId!: string;
+    public checkFailed: boolean = false;
+    public actionInfo: ActionInfo = new ActionInfo();
 
-第一台 Nexus：
-主機名稱：itdc-nexus
-OS：ubuntu 22.04
-CPU：16
-DISK SIZE：200GB
-RAM：16G
+    constructor(
+        public restApi: RestApiService,
+        public dialogRef: MatDialogRef<CompanyUserSelectDialogComponent>,
+        @Inject(MAT_DIALOG_DATA) public dataType: string
+    ) { }
 
-第二台 Sonarqube：
-主機名稱：itdc-sonarqube
-OS：ubuntu 22.04
-CPU：8
-DISK SIZE：200GB
-RAM：16G
+openDialog(){
+    
+    const dialogRef = this.dialogService.openCompanyUserSelectDialog("CompanyUser");
+    dialogRef.afterClosed().subscribe(result => {
+      if (!!result) { //如果沒有選擇人員不往下做
+        this._columnData.colValue = result.id;
+        this.selectUserName(this._columnData.colValue);
+      }
+    });
 
-第三台 Harbor：
-主機名稱：itdc-harbor
-OS：ubuntu 22.04
-CPU：4
-DISK SIZE：200GB
-RAM：8G
+  }
 
-第四台 Jenkins：
-主機名稱：itdc-jenkins
-OS：ubuntu 22.04
-CPU：8
-DISK SIZE：200GB
-RAM：8G
+openCompanyUserSelectDialog(dataType: string): MatDialogRef<CompanyUserSelectDialogComponent> {
+    //disableClose: true 禁用背景點擊關閉
+    const this.dialog.open(CompanyUserSelectDialogComponent,{
+      dataType: dataType,
+      dadisableClose: true
+    });
+  }
 
-===請將以下資訊通知與會人員===
-主題: CICD 專案會議
-時間: 2024年5月6日 13:30 台北
-
-加入 Zoom 會議
-https://zoom.us/j/95425193258?pwd=ZkdobkQ4Z2ZBNlZ6OGU5WHlLbTExZz09
-
-會議ID: 954 2519 3258
-密碼: 7941An&J
+Overload 1 of 3, '(component: ComponentType<CompanyUserSelectDialogComponent>, config?: MatDialogConfig<any> | undefined): MatDialogRef<...>', gave the following error.
