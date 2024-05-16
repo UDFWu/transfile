@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 export class CompanyUserSelectDialogComponent {
     public itemList: any[] = [];
     public itemId!: string;
@@ -31,3 +32,18 @@ openCompanyUserSelectDialog(dataType: string): MatDialogRef<CompanyUserSelectDia
   }
 
 Overload 1 of 3, '(component: ComponentType<CompanyUserSelectDialogComponent>, config?: MatDialogConfig<any> | undefined): MatDialogRef<...>', gave the following error.
+=======
+<<<<<<< HEAD
+===請將以下資訊通知與會人員===
+主題: CICD 專案會議
+時間: 2024年5月15日 14:00 台北
+
+加入 Zoom 會議
+https://zoom.us/j/94176553313?pwd=dDczL3BzUUI0OGs5Um5hWnQ1R0w5QT09
+
+會議ID: 941 7655 3313
+密碼: F^rY1835
+=======
+
+>>>>>>> a2de2641627deab9601818dcb574db6825557877
+>>>>>>> d58ce8769a8302db936e45c3af8f775a9fab50d5
