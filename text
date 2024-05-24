@@ -1,49 +1,29 @@
-<<<<<<< HEAD
-export class CompanyUserSelectDialogComponent {
-    public itemList: any[] = [];
-    public itemId!: string;
-    public checkFailed: boolean = false;
-    public actionInfo: ActionInfo = new ActionInfo();
+getCompanyList() {
+        (this.restApi.post(URL_ENUM.COMPANY_CONTROLLER.GET_COMPANY_LIST,
+            {
+                actionInfo: this.actionInfo,
+                body: {}
+            }
+        )).subscribe((data: any) => {
+            this.companyList = data;
+            this.companyList = this.companyList.map(company => {
+                company.label = company.companyId + ' ' + company.companyName;    
+                return company;
+            });
+        });
+        
+    }
 
-    constructor(
-        public restApi: RestApiService,
-        public dialogRef: MatDialogRef<CompanyUserSelectDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public dataType: string
-    ) { }
-
-openDialog(){
-    
-    const dialogRef = this.dialogService.openCompanyUserSelectDialog("CompanyUser");
-    dialogRef.afterClosed().subscribe(result => {
-      if (!!result) { //如果沒有選擇人員不往下做
-        this._columnData.colValue = result.id;
-        this.selectUserName(this._columnData.colValue);
-      }
-    });
-
-  }
-
-openCompanyUserSelectDialog(dataType: string): MatDialogRef<CompanyUserSelectDialogComponent> {
-    //disableClose: true 禁用背景點擊關閉
-    const this.dialog.open(CompanyUserSelectDialogComponent,{
-      dataType: dataType,
-      dadisableClose: true
-    });
-  }
-
-Overload 1 of 3, '(component: ComponentType<CompanyUserSelectDialogComponent>, config?: MatDialogConfig<any> | undefined): MatDialogRef<...>', gave the following error.
-=======
-<<<<<<< HEAD
-===請將以下資訊通知與會人員===
-主題: CICD 專案會議
-時間: 2024年5月15日 14:00 台北
-
-加入 Zoom 會議
-https://zoom.us/j/94176553313?pwd=dDczL3BzUUI0OGs5Um5hWnQ1R0w5QT09
-
-會議ID: 941 7655 3313
-密碼: F^rY1835
-=======
-
->>>>>>> a2de2641627deab9601818dcb574db6825557877
->>>>>>> d58ce8769a8302db936e45c3af8f775a9fab50d5
+<div *ngIf="this.data.dataType === 'Company'">
+    <div class="h3 fw-bold mt-4 ms-4">
+        查詢合作公司
+    </div>
+    <div class="modal-body mt-0 mx-5 mt-1 mb-5" style="width: 500px; height: 300px;">
+        <ng-select [(ngModel)]="company" [notFoundText]="'未找到匹配項目'" [ngClass]="{'is-invalid': checkFailed}"
+            [items]="companyList" bindLabel="label" bindValue="companyId">
+        </ng-select>
+        <div class="invalid-feedback">
+            必填欄位未填!
+        </div>
+    </div>
+</div>
