@@ -1,29 +1,68 @@
-getCompanyList() {
-        (this.restApi.post(URL_ENUM.COMPANY_CONTROLLER.GET_COMPANY_LIST,
-            {
-                actionInfo: this.actionInfo,
-                body: {}
-            }
-        )).subscribe((data: any) => {
-            this.companyList = data;
-            this.companyList = this.companyList.map(company => {
-                company.label = company.companyId + ' ' + company.companyName;    
-                return company;
-            });
-        });
-        
-    }
+   
+   @Override
+    public ResponseDto<List<FormDataDto<FormDataPo>>> getHistoryForm(ActionInfo actionInfo, HistoryFormDto historyFormDto) {
+        // 取得擁有最高查詢權限的群組人員
+        String groupId = flowGroupRelationDao.findQueryGroupIdByformId(historyFormDto.getFormId());
+        List<String> groupMember = groupServiceImpl.getGroupMembers(groupId);
 
-<div *ngIf="this.data.dataType === 'Company'">
-    <div class="h3 fw-bold mt-4 ms-4">
-        查詢合作公司
-    </div>
-    <div class="modal-body mt-0 mx-5 mt-1 mb-5" style="width: 500px; height: 300px;">
-        <ng-select [(ngModel)]="company" [notFoundText]="'未找到匹配項目'" [ngClass]="{'is-invalid': checkFailed}"
-            [items]="companyList" bindLabel="label" bindValue="companyId">
-        </ng-select>
-        <div class="invalid-feedback">
-            必填欄位未填!
-        </div>
-    </div>
-</div>
+        // 建立分頁工具
+        Pageable pageable = PageRequest.of(actionInfo.getCurrentPage() - 1, actionInfo.getPageSize());
+        List<String> instanceIds;
+        int totalDataSize = 0;
+        // 若有最高查詢權限，使用findByInstanceId()查詢所有人的資料；若無，只能查自己的資料
+        if (groupMember.contains(actionInfo.getUserId())) {
+            instanceIds = processControllerDao.findInstanceIds(historyFormDto.getFormId(),
+                    historyFormDto.getStartDate(), historyFormDto.getEndDate(), pageable);
+            totalDataSize = processControllerDao.countHistoryFormByFormId(historyFormDto.getFormId(), historyFormDto.getStartDate(),
+                    historyFormDto.getEndDate());
+        } else {
+            instanceIds = processControllerDao.findMyselfInstanceIds(historyFormDto.getFormId(),
+                    historyFormDto.getStartDate(), historyFormDto.getEndDate(), actionInfo.getUserId(), pageable);
+            totalDataSize = processControllerDao.countHistoryFormByUserId(historyFormDto.getFormId(), historyFormDto.getStartDate(),
+                    historyFormDto.getEndDate(), actionInfo.getUserId());
+        }
+
+        // 依照Comunda 案件編號(instanceId)查詢對應表單的formData資料
+        List<FormDataDto<FormDataPo>> dataList = new ArrayList<>();
+        FunctionCodePo functionCode = functionCodeDao.findByFormId(historyFormDto.getFormId());
+        for (String instanceId : instanceIds) {
+            List<FormDataPo> formDatas;
+            List<SignatureDataPo> signatureDatas;
+
+            formDatas = formDataDao.findByInstanceId(instanceId);
+            signatureDatas = signatureDataDao.findByInstanceId(instanceId);
+
+            FormDataDto<FormDataPo> formDataDto = new FormDataDto<>();
+            formDataDto.setFormId(functionCode.getFormId());
+            formDataDto.setFlowType(functionCode.getFlowType());
+            formDataDto.setFlowName(functionCode.getFlowName());
+            formDataDto.setColumnDataList(formDatas);
+            formDataDto.setSignatureList(signatureDatas);
+            dataList.add(formDataDto);
+        }
+
+        // 將查詢後取得的資料放入ResponseDto<List<FormDataDto<FormDataPo>>>回傳
+        ResponseDto<List<FormDataDto<FormDataPo>>> result = new ResponseDto<>();
+        actionInfo.setTotalDataSize(totalDataSize);
+        actionInfo.setFormId(historyFormDto.getFormId());
+        result.setActionInfo(actionInfo);
+        result.setBody(dataList);
+
+        return result;
+    }
+   ------------------------------------------------------------------------------------------------------------
+    @Query("SELECT pc.instanceId FROM ProcessControllerPo pc WHERE formId = :formId AND createdTime >= :startDate AND createdTime <= :endDate AND caseStatus = 'Complete' ORDER BY processControllerSeq")
+    List<String> findInstanceIds(@Param("formId") String formId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate, Pageable pageable);
+
+
+    @Query("SELECT pc.instanceId FROM ProcessControllerPo pc WHERE formId = :formId AND createdTime >= :startDate AND createdTime <= :endDate AND createdUserId = :userId AND caseStatus = 'Complete' ORDER BY processControllerSeq")
+    List<String> findMyselfInstanceIds(@Param("formId") String formId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate, @Param("userId") String userId, Pageable pageable);
+
+
+    @Query("SELECT COUNT(pc) FROM ProcessControllerPo pc WHERE formId = :formId AND createdTime >= :startDate AND updatedTime <= :endDate AND caseStatus = 'Complete'")
+    Integer countHistoryFormByFormId(@Param("formId") String formId, @Param("startDate") Timestamp startDate,
+            @Param("endDate") Timestamp endDate);
+
+    @Query("SELECT COUNT(pc) FROM ProcessControllerPo pc WHERE formId = :formId AND createdTime >= :startDate AND updatedTime <= :endDate AND createdUserId = :userId AND caseStatus = 'Complete'")
+    Integer countHistoryFormByUserId(@Param("formId") String formId, @Param("startDate") Timestamp startDate,
+            @Param("endDate") Timestamp endDate, @Param("userId") String userId);
