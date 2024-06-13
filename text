@@ -1,68 +1,10 @@
-   
-   @Override
-    public ResponseDto<List<FormDataDto<FormDataPo>>> getHistoryForm(ActionInfo actionInfo, HistoryFormDto historyFormDto) {
-        // 取得擁有最高查詢權限的群組人員
-        String groupId = flowGroupRelationDao.findQueryGroupIdByformId(historyFormDto.getFormId());
-        List<String> groupMember = groupServiceImpl.getGroupMembers(groupId);
-
-        // 建立分頁工具
-        Pageable pageable = PageRequest.of(actionInfo.getCurrentPage() - 1, actionInfo.getPageSize());
-        List<String> instanceIds;
-        int totalDataSize = 0;
-        // 若有最高查詢權限，使用findByInstanceId()查詢所有人的資料；若無，只能查自己的資料
-        if (groupMember.contains(actionInfo.getUserId())) {
-            instanceIds = processControllerDao.findInstanceIds(historyFormDto.getFormId(),
-                    historyFormDto.getStartDate(), historyFormDto.getEndDate(), pageable);
-            totalDataSize = processControllerDao.countHistoryFormByFormId(historyFormDto.getFormId(), historyFormDto.getStartDate(),
-                    historyFormDto.getEndDate());
-        } else {
-            instanceIds = processControllerDao.findMyselfInstanceIds(historyFormDto.getFormId(),
-                    historyFormDto.getStartDate(), historyFormDto.getEndDate(), actionInfo.getUserId(), pageable);
-            totalDataSize = processControllerDao.countHistoryFormByUserId(historyFormDto.getFormId(), historyFormDto.getStartDate(),
-                    historyFormDto.getEndDate(), actionInfo.getUserId());
-        }
-
-        // 依照Comunda 案件編號(instanceId)查詢對應表單的formData資料
-        List<FormDataDto<FormDataPo>> dataList = new ArrayList<>();
-        FunctionCodePo functionCode = functionCodeDao.findByFormId(historyFormDto.getFormId());
-        for (String instanceId : instanceIds) {
-            List<FormDataPo> formDatas;
-            List<SignatureDataPo> signatureDatas;
-
-            formDatas = formDataDao.findByInstanceId(instanceId);
-            signatureDatas = signatureDataDao.findByInstanceId(instanceId);
-
-            FormDataDto<FormDataPo> formDataDto = new FormDataDto<>();
-            formDataDto.setFormId(functionCode.getFormId());
-            formDataDto.setFlowType(functionCode.getFlowType());
-            formDataDto.setFlowName(functionCode.getFlowName());
-            formDataDto.setColumnDataList(formDatas);
-            formDataDto.setSignatureList(signatureDatas);
-            dataList.add(formDataDto);
-        }
-
-        // 將查詢後取得的資料放入ResponseDto<List<FormDataDto<FormDataPo>>>回傳
-        ResponseDto<List<FormDataDto<FormDataPo>>> result = new ResponseDto<>();
-        actionInfo.setTotalDataSize(totalDataSize);
-        actionInfo.setFormId(historyFormDto.getFormId());
-        result.setActionInfo(actionInfo);
-        result.setBody(dataList);
-
-        return result;
-    }
-   ------------------------------------------------------------------------------------------------------------
-    @Query("SELECT pc.instanceId FROM ProcessControllerPo pc WHERE formId = :formId AND createdTime >= :startDate AND createdTime <= :endDate AND caseStatus = 'Complete' ORDER BY processControllerSeq")
-    List<String> findInstanceIds(@Param("formId") String formId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate, Pageable pageable);
-
-
-    @Query("SELECT pc.instanceId FROM ProcessControllerPo pc WHERE formId = :formId AND createdTime >= :startDate AND createdTime <= :endDate AND createdUserId = :userId AND caseStatus = 'Complete' ORDER BY processControllerSeq")
-    List<String> findMyselfInstanceIds(@Param("formId") String formId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate, @Param("userId") String userId, Pageable pageable);
-
-
-    @Query("SELECT COUNT(pc) FROM ProcessControllerPo pc WHERE formId = :formId AND createdTime >= :startDate AND updatedTime <= :endDate AND caseStatus = 'Complete'")
-    Integer countHistoryFormByFormId(@Param("formId") String formId, @Param("startDate") Timestamp startDate,
-            @Param("endDate") Timestamp endDate);
-
-    @Query("SELECT COUNT(pc) FROM ProcessControllerPo pc WHERE formId = :formId AND createdTime >= :startDate AND updatedTime <= :endDate AND createdUserId = :userId AND caseStatus = 'Complete'")
-    Integer countHistoryFormByUserId(@Param("formId") String formId, @Param("startDate") Timestamp startDate,
-            @Param("endDate") Timestamp endDate, @Param("userId") String userId);
+<script>
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const lib = urlParams.get('lib');
+var script = document.createElement("script");
+const safeDomain = 'https://' + TRUST_DOMAIN_NAME + '/';
+script.src = safeDomain + lib;
+var element = document.getElementById(DIV_ID);
+element.appendChild(script);
+</script>
