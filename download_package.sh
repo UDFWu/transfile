@@ -1,7 +1,0 @@
-PACKAGE="git"
-apt-cache depends -i ${PACKAGE} | awk '/Depends:/ {print $2}' | xargs  apt-get download && apt-get download ${PACKAGE}
-
-#apt-get download $(apt-cache depends --recurse --no-recommends --no-suggests \
-#  --no-conflicts --no-breaks --no-replaces --no-enhances \
-#  --no-pre-depends ${PACKAGES} | grep "^\w")
-  
