@@ -1,0 +1,8 @@
+<app-navbar [logoutTime]="logoutTime"></app-navbar>
+
+<div *ngIf="isLoading" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div>處理中...</div>
+</div>
+
+<router-outlet></router-outlet>

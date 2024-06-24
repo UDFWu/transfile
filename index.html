@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scsb CICD-form</title>
+  <style>
+    html {
+      display: none;
+    }
+  </style>
+  <script>
+    if (self === top) {
+      document.documentElement.style.display = 'block';
+    }
+    else {
+      top.location = encodeURI(self.location);
+    }
+  </script>
+</head>
+
+<body class="bg-body-tertiary mat-typography">
+  <app-root></app-root>
+</body>
+
+</html>
