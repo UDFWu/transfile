@@ -12,53 +12,42 @@
   </style>
   <script>
     (function() {
-      // 立即執行函數以避免污染全局命名空間
-
-      function isValidUrl(url) {
-        try {
-          new URL(url);
-          return true;
-        } catch {
-          return false;
-        }
-      }
+      var allowedDomains = ['http://10.10.32.10', 'http://localhost'];
 
       function sanitizeUrl(url) {
-        // 移除所有可能導致 XSS 的字符
-        return url.replace(/[^\w-_.]/g, '');
+        var sanitized = url.trim().toLowerCase();
+        return allowedDomains.find(domain => sanitized.startsWith(domain)) || '';
       }
-
-      var allowedDomains = ['http://10.10.32.10/', 'http://localhost/'];
 
       function checkAndRedirect() {
         if (self === top) {
           document.documentElement.style.display = 'block';
         } else {
-          var currentLocation = self.location.toString();
+          var currentLocation = sanitizeUrl(self.location.href);
           
-          if (!isValidUrl(currentLocation)) {
-            top.location = allowedDomains[1]; // 預設重定向到安全頁面
-            return;
-          }
-
-          var sanitizedLocation = sanitizeUrl(currentLocation);
-          var isAllowed = allowedDomains.some(domain => sanitizedLocation.startsWith(sanitizeUrl(domain)));
-
-          if (isAllowed) {
-            top.location = sanitizedLocation;
+          if (currentLocation) {
+            top.location.href = currentLocation;
           } else {
-            top.location = allowedDomains[1]; // 重定向到安全頁面
+            top.location.href = allowedDomains[1]; // 預設重定向到安全頁面
           }
         }
       }
 
-      // 使用 setTimeout 來確保在 DOM 加載完成後執行
-      setTimeout(checkAndRedirect, 0);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkAndRedirect);
+      } else {
+        checkAndRedirect();
+      }
     })();
   </script>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-ancestors 'self'">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 </head>
 
 <body class="bg-body-tertiary mat-typography">
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=http://localhost/noscript">
+  </noscript>
   <app-root></app-root>
 </body>
 
