@@ -65,6 +65,7 @@ export class AppComponent {
       this.cdr.detectChanges();
     });
     this.addCSPHeader();
+    this.addFramebuster();
   }
 
   private addCSPHeader() {
@@ -72,6 +73,30 @@ export class AppComponent {
     const cspMeta = document.createElement('meta');
     cspMeta.httpEquiv = 'Content-Security-Policy';
     cspMeta.content = "frame-ancestors 'self'"; // 只允許當前域名的框架
-    head.appendChild(cspMeta);
+    head.appendChild(cspMeta);	
+	
+    const xfoMeta = document.createElement('meta');
+    xfoMeta.httpEquiv = 'X-Frame-Options';
+    xfoMeta.content = 'SAMEORIGIN';
+    head.appendChild(xfoMeta);
+  }
+  
+  private addFramebuster() {
+    const script = this.render2.createElement('script');
+    script.text = `
+      (function() {
+        if (self !== top) {
+          try {
+            if (parent.frames.length > 0) {
+              top.location = self.location;
+            }
+          } catch (e) {
+            console.error('Potential clickjacking attempt detected');
+            window.stop();
+          }
+        }
+      })();
+    `;
+    this.render2.appendChild(document.body, script);
   }
 }
