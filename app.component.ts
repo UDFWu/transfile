@@ -64,9 +64,9 @@ export class AppComponent {
       this.isLoading = isLoading;
       this.cdr.detectChanges();
     });
-	this.addCSPHeader();
+    this.addCSPHeader();
   }
-  
+
   private addCSPHeader() {
     const head = document.getElementsByTagName('head')[0];
     const cspMeta = document.createElement('meta');
