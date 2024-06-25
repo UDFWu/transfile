@@ -64,5 +64,14 @@ export class AppComponent {
       this.isLoading = isLoading;
       this.cdr.detectChanges();
     });
+	this.addCSPHeader();
+  }
+  
+  private addCSPHeader() {
+    const head = document.getElementsByTagName('head')[0];
+    const cspMeta = document.createElement('meta');
+    cspMeta.httpEquiv = 'Content-Security-Policy';
+    cspMeta.content = "frame-ancestors 'self'"; // 只允許當前域名的框架
+    head.appendChild(cspMeta);
   }
 }
