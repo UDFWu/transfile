@@ -11,22 +11,50 @@
     }
   </style>
   <script>
-    if (self === top) {
-      document.documentElement.style.display = 'block';
-    }
-    else {
-      // 使用白名單方法來限制重定向
-      var allowedDomains = ['http://10.10.32.10/', 'http://localhost/'];
-      var currentLocation = encodeURI(self.location.toString());
-      var isAllowed = allowedDomains.some(domain => currentLocation.startsWith(domain));
+    (function() {
+      // 立即執行函數以避免污染全局命名空間
 
-      if (isAllowed) {
-        top.location = currentLocation;
-      } else {
-        // 如果不在白名單中，可以選擇重定向到一個安全的頁面
-        top.location = 'http://localhost/';
+      function isValidUrl(url) {
+        try {
+          new URL(url);
+          return true;
+        } catch {
+          return false;
+        }
       }
-    }
+
+      function sanitizeUrl(url) {
+        // 移除所有可能導致 XSS 的字符
+        return url.replace(/[^\w-_.]/g, '');
+      }
+
+      var allowedDomains = ['http://10.10.32.10/', 'http://localhost/'];
+
+      function checkAndRedirect() {
+        if (self === top) {
+          document.documentElement.style.display = 'block';
+        } else {
+          var currentLocation = self.location.toString();
+          
+          if (!isValidUrl(currentLocation)) {
+            top.location = allowedDomains[1]; // 預設重定向到安全頁面
+            return;
+          }
+
+          var sanitizedLocation = sanitizeUrl(currentLocation);
+          var isAllowed = allowedDomains.some(domain => sanitizedLocation.startsWith(sanitizeUrl(domain)));
+
+          if (isAllowed) {
+            top.location = sanitizedLocation;
+          } else {
+            top.location = allowedDomains[1]; // 重定向到安全頁面
+          }
+        }
+      }
+
+      // 使用 setTimeout 來確保在 DOM 加載完成後執行
+      setTimeout(checkAndRedirect, 0);
+    })();
   </script>
 </head>
 
