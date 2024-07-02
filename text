@@ -1,10 +1,59 @@
-<script>
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-const lib = urlParams.get('lib');
-var script = document.createElement("script");
-const safeDomain = 'https://' + TRUST_DOMAIN_NAME + '/';
-script.src = safeDomain + lib;
-var element = document.getElementById(DIV_ID);
-element.appendChild(script);
-</script>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <mirrors>
+    <mirror>
+      <id>nexus</id>
+      <mirrorOf>*</mirrorOf>
+      <url>http://your-nexus-url/repository/maven-public/</url>
+    </mirror>
+  </mirrors>
+  
+  <servers>
+    <server>
+      <id>nexus</id>
+      <username>your-nexus-username</username>
+      <password>your-nexus-password</password>
+    </server>
+  </servers>
+
+  <profiles>
+    <profile>
+      <id>nexus</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>http://your-nexus-url/repository/maven-central/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>releases</id>
+          <url>http://your-nexus-url/repository/maven-releases/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>snapshots</id>
+          <url>http://your-nexus-url/repository/maven-snapshots/</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>nexus</activeProfile>
+  </activeProfiles>
+</settings>
