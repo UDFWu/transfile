@@ -1,59 +1,74 @@
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-  <mirrors>
-    <mirror>
-      <id>nexus</id>
-      <mirrorOf>*</mirrorOf>
-      <url>http://your-nexus-url/repository/maven-public/</url>
-    </mirror>
-  </mirrors>
-  
-  <servers>
-    <server>
-      <id>nexus</id>
-      <username>your-nexus-username</username>
-      <password>your-nexus-password</password>
-    </server>
-  </servers>
+pipeline {
+    agent any
 
-  <profiles>
-    <profile>
-      <id>nexus</id>
-      <repositories>
-        <repository>
-          <id>central</id>
-          <url>http://your-nexus-url/repository/maven-central/</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
-        <repository>
-          <id>releases</id>
-          <url>http://your-nexus-url/repository/maven-releases/</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </repository>
-        <repository>
-          <id>snapshots</id>
-          <url>http://your-nexus-url/repository/maven-snapshots/</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
-    </profile>
-  </profiles>
+    tools { 
+      maven 'Apache Maven 3.9.6' 
+      jdk 'jdk17' 
+    }
+    
+    environment { 
+        GITLAB_URL = 'git@10.10.32.10:chip/scsb_automated_test_server.git'
+        SONAR_SCANNER_NAME = 'sonar-scanner'
+        SONAR_SERVER_NAME = 'sonar-server'
+        SONAR_SCANNER_HOME = '/var/jenkins_home/sonar-scanner/bin/sonar-scanner'  // 指定 SonarScanner 的安裝路徑
+        SONARQUBE_TOKEN = credentials('sonar-server-token')
+        SONARQUBE_SERVER = 'http://10.10.32.10:9000'
+    }
 
-  <activeProfiles>
-    <activeProfile>nexus</activeProfile>
-  </activeProfiles>
-</settings>
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                    branches: [[name: "main"]],
+                    userRemoteConfigs: [[url: "${GITLAB_URL}", credentialsId: 'ssh-key']]
+                    ])
+                }
+            }
+        }
+        
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                        // 使用 SonarScanner 進行代碼掃描
+                    withCredentials([string(credentialsId: 'sonar-server-token', variable: 'SONARQUBE_TOKEN')]) {
+                        withSonarQubeEnv("${SONAR_SERVER_NAME}") {
+                            sh "${SONAR_SCANNER_NAME} -Dsonar.login=\$SONARQUBE_TOKEN -Dsonar.host.url=${SONARQUBE_SERVER}"
+                        }
+                    }
+                }
+                
+            }
+            
+        }
+        
+        stage('Build') {
+            steps {
+                script {
+                    sh 'mvn -U clean install -Dmaven.test.skip -Dmaven.repo.local=/opt/repository'
+                }
+            }
+        }
+        
+        stage('Deploy') {
+           steps {
+                script {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'gitlab-ssh-eform-server', keyFileVariable: 'SSH_PRIVATE_KEY')]){
+                        def localPath = '/var/lib/jenkins/workspace/SCSB_Automated_Test_Server/target'
+                        def remotePath = '/home/itdc/Desktop/atms_test'
+                        def fileName = 'atms.war'
+                        sh """
+                        cd ${localPath}
+                        sftp -i \${SSH_PRIVATE_KEY} -o StrictHostKeyChecking=no -P 2222 itdc@10.10.32.10 << EOF 
+                        cd ${remotePath}
+                        put ${fileName}
+                        EOF
+                        """  
+                    }
+                }
+            }
+        }
+    }
+}
+
+
