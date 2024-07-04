@@ -71,4 +71,15 @@ pipeline {
     }
 }
 
++ mvn clean package -s /var/lib/jenkins/.m2/settings.xml -Dmaven.test.skip -Dmaven.repo.local=/opt/repository
+[INFO] Scanning for projects...
+Downloading from nexus: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/3.3.1/spring-boot-starter-parent-3.3.1.pom
+[ERROR] [ERROR] Some problems were encountered while processing the POMs:
+[FATAL] Non-resolvable parent POM for com.scsb:atms:0.1.0-BETA: The following artifacts could not be resolved: org.springframework.boot:spring-boot-starter-parent:pom:3.3.1 (absent): Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:3.3.1 from/to nexus (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/): ddpsn01.cbsd.scsb.com.tw: Temporary failure in name resolution and 'parent.relativePath' points at no local POM @ line 5, column 13
+ @ 
+[ERROR] The build could not read 1 project -> [Help 1]
+[ERROR]   
+[ERROR]   The project com.scsb:atms:0.1.0-BETA (/var/lib/jenkins/workspace/SCSB_AUTO_TEST/SCSB_Automated_Test_Server/pom.xml) has 1 error
+[ERROR]     Non-resolvable parent POM for com.scsb:atms:0.1.0-BETA: The following artifacts could not be resolved: org.springframework.boot:spring-boot-starter-parent:pom:3.3.1 (absent): Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:3.3.1 from/to nexus (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/): ddpsn01.cbsd.scsb.com.tw: Temporary failure in name resolution and 'parent.relativePath' points at no local POM @ line 5, column 13: Unknown host ddpsn01.cbsd.scsb.com.tw: Temporary failure in name resolution -> [Help 2]
+
 
