@@ -1,18 +1,8 @@
-
-宗樺好：
-	行內採購之Zoom到期後未再續購，爾後將全面使用Webex。未來有會議需求也請一併副本黃詣淳，我們互為備援。
-	會議資訊如下，屆時請使用zoomforscsb@gmail.com登入Webex主持會議，密碼後寄，謝謝。
-		Sincerely, 御宸
-
-===請將以下資訊通知與會人員===
-OCP CICD 流程討論會議
-由 上海商業儲蓄銀行 主持
-
-https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialandsavingsbank.my/j.php?MTID=m55fc68d1a84667bce86d250671a3751c
-
-2024年7月5日星期五 下午 02:00 | 2 小時 | （UTC+08:00）台北
-會議號： 2558 825 8791
-密碼： Jb*M2974
+https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialandsavingsbank.my/j.php?MTID=m06ae08ab449cc56d4607b24c836ac45e
+2024年7月9日星期二 下午 03:00 | 1 小時 | （UTC+08:00）台北
+每 2 天進行進行一次，自 2024/7/9起生效直至 2024/7/11，從 下午 02:00 到 下午 03:00, （UTC+08:00）台北
+會議號： 2556 698 4636
+密碼： 7232R$vH
 
 pipeline {
     agent any
