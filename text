@@ -1,91 +1,24 @@
-https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialandsavingsbank.my/j.php?MTID=m06ae08ab449cc56d4607b24c836ac45e
-2024年7月9日星期二 下午 03:00 | 1 小時 | （UTC+08:00）台北
-每 2 天進行進行一次，自 2024/7/9起生效直至 2024/7/11，從 下午 02:00 到 下午 03:00, （UTC+08:00）台北
-會議號： 2556 698 4636
-密碼： 7232R$vH
+Open Source 開源軟體掃碼-RFP確認會議
+由 SCSB 主持
 
-pipeline {
-    agent any
+https://scsbtw.webex.com/scsbtw/j.php?MTID=m2d289f75610c75c667a2a26527769ce2
+2024年7月15日星期一 上午 10:00 | 1 小時 | （UTC+08:00）台北
+會議號： 2513 006 2137
+密碼： 6025m$Hv
 
-    tools { 
-      maven 'Apache Maven 3.9.6' 
-      jdk 'jdk17' 
-    }
-    
-    environment { 
-        GITLAB_URL = 'git@10.10.32.10:chip/scsb_automated_test_server.git'
-        SONAR_SCANNER_NAME = 'sonar-scanner'
-        SONAR_SERVER_NAME = 'sonar-server'
-        SONAR_SCANNER_HOME = '/var/jenkins_home/sonar-scanner/bin/sonar-scanner'  // 指定 SonarScanner 的安裝路徑
-        SONARQUBE_TOKEN = credentials('sonar-server-token')
-        SONARQUBE_SERVER = 'http://10.10.32.10:9000'
-    }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                script {
-                    checkout([$class: 'GitSCM',
-                    branches: [[name: "main"]],
-                    userRemoteConfigs: [[url: "${GITLAB_URL}", credentialsId: 'ssh-key']]
-                    ])
-                }
-            }
-        }
-        
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                        // 使用 SonarScanner 進行代碼掃描
-                    withCredentials([string(credentialsId: 'sonar-server-token', variable: 'SONARQUBE_TOKEN')]) {
-                        withSonarQubeEnv("${SONAR_SERVER_NAME}") {
-                            sh "${SONAR_SCANNER_NAME} -Dsonar.login=\$SONARQUBE_TOKEN -Dsonar.host.url=${SONARQUBE_SERVER}"
-                        }
-                    }
-                }
-                
-            }
-            
-        }
-        
-        stage('Build') {
-            steps {
-                script {
-                    sh 'mvn -U clean install -Dmaven.test.skip -Dmaven.repo.local=/opt/repository'
-                }
-            }
-        }
-        
-        stage('Deploy') {
-           steps {
-                script {
-                    withCredentials([sshUserPrivateKey(credentialsId: 'gitlab-ssh-eform-server', keyFileVariable: 'SSH_PRIVATE_KEY')]){
-                        def localPath = '/var/lib/jenkins/workspace/SCSB_Automated_Test_Server/target'
-                        def remotePath = '/home/itdc/Desktop/atms_test'
-                        def fileName = 'atms.war'
-                        sh """
-                        cd ${localPath}
-                        sftp -i \${SSH_PRIVATE_KEY} -o StrictHostKeyChecking=no -P 2222 itdc@10.10.32.10 << EOF 
-                        cd ${remotePath}
-                        put ${fileName}
-                        EOF
-                        """  
-                    }
-                }
-            }
-        }
-    }
-}
 
-+ mvn clean package -s /var/lib/jenkins/.m2/settings.xml -Dmaven.test.skip -Dmaven.repo.local=/opt/repository
-[INFO] Scanning for projects...
-Downloading from nexus: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/3.3.1/spring-boot-starter-parent-3.3.1.pom
-[ERROR] [ERROR] Some problems were encountered while processing the POMs:
-[FATAL] Non-resolvable parent POM for com.scsb:atms:0.1.0-BETA: The following artifacts could not be resolved: org.springframework.boot:spring-boot-starter-parent:pom:3.3.1 (absent): Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:3.3.1 from/to nexus (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/): ddpsn01.cbsd.scsb.com.tw: Temporary failure in name resolution and 'parent.relativePath' points at no local POM @ line 5, column 13
- @ 
-[ERROR] The build could not read 1 project -> [Help 1]
-[ERROR]   
-[ERROR]   The project com.scsb:atms:0.1.0-BETA (/var/lib/jenkins/workspace/SCSB_AUTO_TEST/SCSB_Automated_Test_Server/pom.xml) has 1 error
-[ERROR]     Non-resolvable parent POM for com.scsb:atms:0.1.0-BETA: The following artifacts could not be resolved: org.springframework.boot:spring-boot-starter-parent:pom:3.3.1 (absent): Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:3.3.1 from/to nexus (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/): ddpsn01.cbsd.scsb.com.tw: Temporary failure in name resolution and 'parent.relativePath' points at no local POM @ line 5, column 13: Unknown host ddpsn01.cbsd.scsb.com.tw: Temporary failure in name resolution -> [Help 2]
+----
+
+
+
+Open Source 開源軟體掃碼-廠商產品說明
+由 上海商業儲蓄銀行 主持
+
+https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialandsavingsbank.my/j.php?MTID=mc6abf636d5e18a6c7d233c40f98e72ff
+2024年7月22日星期四 上午 10:00 | 2 小時 | （UTC+08:00）台北
+會議號： 2554 931 7233
+密碼： j*Fn2389
+
 
 
