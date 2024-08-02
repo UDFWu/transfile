@@ -2,3 +2,29 @@ https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialan
 2024年8月2日星期五 上午 10:00 | 1 小時 | （UTC+08:00）台北
 會議號： 2550 440 9188
 密碼： Di%X2383
+
+
+public void createSecureDirectory(String basePath, String dirName) throws IOException {
+        Path dir = Paths.get(basePath, dirName);
+        
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+            createWindowsSecureDirectory(dir);
+        } else {
+            createLinuxSecureDirectory(dir);
+        }
+    }
+
+    private void createWindowsSecureDirectory(Path dir) throws IOException {
+        Files.createDirectories(dir);
+        File file = dir.toFile();
+        file.setReadable(true, true);  // 只有擁有者可讀
+        file.setWritable(true, true);  // 只有擁有者可寫
+        file.setExecutable(true, false);  // 所有人可執行（對目錄來說是必要的）
+    }
+
+    private void createLinuxSecureDirectory(Path dir) throws IOException {
+        Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr-x---");
+        FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
+        Files.createDirectories(dir, fileAttributes);
+    }
