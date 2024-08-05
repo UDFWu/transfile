@@ -4,27 +4,8 @@ https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialan
 密碼： Di%X2383
 
 
-public void createSecureDirectory(String basePath, String dirName) throws IOException {
-        Path dir = Paths.get(basePath, dirName);
-        
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) {
-            createWindowsSecureDirectory(dir);
-        } else {
-            createLinuxSecureDirectory(dir);
-        }
-    }
-
-    private void createWindowsSecureDirectory(Path dir) throws IOException {
-        Files.createDirectories(dir);
-        File file = dir.toFile();
-        file.setReadable(true, true);  // 只有擁有者可讀
-        file.setWritable(true, true);  // 只有擁有者可寫
-        file.setExecutable(true, false);  // 所有人可執行（對目錄來說是必要的）
-    }
-
-    private void createLinuxSecureDirectory(Path dir) throws IOException {
-        Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr-x---");
-        FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
-        Files.createDirectories(dir, fileAttributes);
-    }
+團隊工程師名單如下，請協助相關Gitlab帳號 and Jenkins的帳號， 還可攜式裝置(筆電)MAC。
+謝耀德：edwinhsieh@pershing.com.tw
+蔡瑞麒：richardtsai@pershing.com.tw
+曾雅惠：sandytseng@pershing.com.tw
+曹正明：jimmytsao@pershing.com.tw
