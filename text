@@ -20,3 +20,34 @@ https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialan
 
 會議號： 2552 504 6032
 密碼： nZp7KQt%
+
+----
+private static final String BASE_DIRECTORY = "/your/base/directory"; // 替換為實際的基礎目錄
+
+    // 避免路徑遍歷攻擊的方法
+    private Path getFilePath(String uuid) throws IOException {
+        if (!StringUtils.hasText(uuid) || uuid.contains("..") || uuid.contains("/") || uuid.contains("\\")) {
+            throw new IllegalArgumentException("Invalid file identifier");
+        }
+
+        Path filePath = Paths.get(BASE_DIRECTORY, uuid);
+        if (!filePath.normalize().startsWith(Paths.get(BASE_DIRECTORY).normalize())) {
+            throw new SecurityException("Path traversal attempt detected");
+        }
+        return filePath;
+    }
+
+    @Override
+    public ResponseEntity<byte[]> downloadFile(ActionInfo actionInfo, String uuid) throws IOException {
+        // 讀取檔案
+        Path filePath = getFilePath(uuid);
+        byte[] fileContent = Files.readAllBytes(filePath);
+
+        // 設定 HTTP headers 以供下載
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", uuid);
+
+        // 返回 byte array 作為 ResponseEntity
+        return ResponseEntity.ok().headers(headers).body(fileContent);
+    }
