@@ -51,3 +51,24 @@ private static final String BASE_DIRECTORY = "/your/base/directory"; // 替換�
         // 返回 byte array 作為 ResponseEntity
         return ResponseEntity.ok().headers(headers).body(fileContent);
     }
+*/
+		stage('maven install'){
+		    steps{
+		        echo 'maven install'
+		        echo '------------------------------'
+				dir("./SCSB_Automated_Test_Server"){
+					sh 'ls -al'
+					echo '------------------------------'
+					sh 'mvn -e -U install'
+					echo '------------------------------'
+				}
+            }
+            post{
+                failure {
+					echo 'maven install 失敗'
+				}
+				success {
+					echo 'maven install 成功'            	
+				} 
+            }
+		}
