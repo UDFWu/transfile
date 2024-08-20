@@ -1,4 +1,52 @@
-<settings>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              https://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <!-- 本地儲存庫路徑 -->
+  <localRepository>${user.home}/.m2/repository</localRepository>
+
+  <!-- 交互模式 -->
+  <interactiveMode>true</interactiveMode>
+
+  <!-- 離線模式 -->
+  <offline>false</offline>
+
+  <!-- 插件組 -->
+  <pluginGroups>
+    <pluginGroup>org.apache.maven.plugins</pluginGroup>
+    <pluginGroup>org.codehaus.mojo</pluginGroup>
+  </pluginGroups>
+
+  <!-- 代理設置 -->
+  <proxies>
+    <proxy>
+      <id>optional</id>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>proxy.company.com</host>
+      <port>8080</port>
+      <username>proxyuser</username>
+      <password>proxypass</password>
+      <nonProxyHosts>localhost|127.0.0.1</nonProxyHosts>
+    </proxy>
+  </proxies>
+
+  <!-- 伺服器認證 -->
+  <servers>
+    <server>
+      <id>nexus</id>
+      <username>${env.NEXUS_USERNAME}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
+    </server>
+    <server>
+      <id>deploymentRepo</id>
+      <username>deployuser</username>
+      <password>deploypass</password>
+    </server>
+  </servers>
+
+  <!-- 鏡像設置 -->
   <mirrors>
     <mirror>
       <id>nexus</id>
@@ -7,11 +55,43 @@
     </mirror>
   </mirrors>
 
-  <servers>
-    <server>
-      <id>nexus</id>
-      <username>your_username</username>
-      <password>your_password</password>
-    </server>
-  </servers>
+  <!-- 配置文件 -->
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>http://central</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>http://central</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+
+  <!-- 啟用的配置文件 -->
+  <activeProfiles>
+    <activeProfile>default</activeProfile>
+  </activeProfiles>
+
 </settings>
