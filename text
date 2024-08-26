@@ -1,108 +1,40 @@
+stage('SFTP RemoteHost'){
+			steps{
+				echo 'SFTP RemoteHost'
+				echo '------------------------------' 
+                script{
+    				echo 'Test Connection'     
+    				def host = '10.10.32.10'
+    				def port = '22'
+    				def timeout = '10'
+    				echo '------------------------------'
+        			withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-sftp-agent', keyFileVariable: 'SSH_KEY')]) {
+        				dir("./SCSB_Automated_Test_Server/target"){
+        					sh """
+        					timeout ${timeout} ssh -o ConnectTimeout=${timeout} -o StrictHostKeyChecking=no ${host} -p ${port} echo "Connection Successful"
+        					"""
+        				    sh "sftp -p 22 -i ${SSH_KEY} -oStrictHostKeyChecking=no itdc@10.10.32.10 <<< 'put ./target/atms.war /home/itdc/atms_test '"
+        		        }
+                    }
+    				
+				}
+				echo '------------------------------'
+			}
+			post{
+		       failure {
+					echo 'SSH RemoteHost 失敗'
+				}
+				success {
+					echo 'SSH RemoteHost 成功'            	
+				} 
+		    }
+		}
 
-CI/CD 流程討論
-由 上海商業儲蓄銀行 主持
-
-https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialandsavingsbank.my/j.php?MTID=mc1e6fd0f7558819f11a50c690bbc4c0d
-2024年8月23日星期五 下午 02:00 | 1 小時 | （UTC+08:00）台北
-會議號： 2552 255 7597
-密碼： Z%cS9253
 
 
 
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
-                              https://maven.apache.org/xsd/settings-1.0.0.xsd">
-
-  <!-- 本地儲存庫路徑 -->
-  <localRepository>${user.home}/.m2/repository</localRepository>
-
-  <!-- 交互模式 -->
-  <interactiveMode>true</interactiveMode>
-
-  <!-- 離線模式 -->
-  <offline>false</offline>
-
-  <!-- 插件組 -->
-  <pluginGroups>
-    <pluginGroup>org.apache.maven.plugins</pluginGroup>
-    <pluginGroup>org.codehaus.mojo</pluginGroup>
-  </pluginGroups>
-
-  <!-- 代理設置 -->
-  <proxies>
-    <proxy>
-      <id>optional</id>
-      <active>true</active>
-      <protocol>http</protocol>
-      <host>proxy.company.com</host>
-      <port>8080</port>
-      <username>proxyuser</username>
-      <password>proxypass</password>
-      <nonProxyHosts>localhost|127.0.0.1</nonProxyHosts>
-    </proxy>
-  </proxies>
-
-  <!-- 伺服器認證 -->
-  <servers>
-    <server>
-      <id>nexus</id>
-      <username>${env.NEXUS_USERNAME}</username>
-      <password>${env.NEXUS_PASSWORD}</password>
-    </server>
-    <server>
-      <id>deploymentRepo</id>
-      <username>deployuser</username>
-      <password>deploypass</password>
-    </server>
-  </servers>
-
-  <!-- 鏡像設置 -->
-  <mirrors>
-    <mirror>
-      <id>nexus</id>
-      <mirrorOf>*</mirrorOf>
-      <url>http://your.nexus.url/repository/maven-public/</url>
-    </mirror>
-  </mirrors>
-
-  <!-- 配置文件 -->
-  <profiles>
-    <profile>
-      <id>default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <repositories>
-        <repository>
-          <id>central</id>
-          <url>http://central</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>central</id>
-          <url>http://central</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-  </profiles>
-
-  <!-- 啟用的配置文件 -->
-  <activeProfiles>
-    <activeProfile>default</activeProfile>
-  </activeProfiles>
-
-</settings>
++ timeout 10 ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no 10.10.32.10 -p 22 echo 'Connection Successful'
+Warning: Permanently added '10.10.32.10' (ECDSA) to the list of known hosts.
+Permission denied, please try again.
+Permission denied, please try again.
+jenkins@10.10.32.10: Permission denied (publickey,password).
