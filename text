@@ -47,7 +47,7 @@ pipeline {
             steps {
                 dependencyCheck additionalArguments: '',
                                 odcInstallation: 'OWASP_Dependency_Check',
-                                scanPath: /var/lib/jenkins/workspace/e-form-backend-test,
+                                scanPath: '/var/lib/jenkins/workspace/e-form-backend-test',
                                 failOnCVSS: '7',
                                 failBuildOnCVSS: true
                 
@@ -61,10 +61,25 @@ pipeline {
 
 
 
+
+
+
 Started by user admin
 org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:
-WorkflowScript: 50: expecting '}', found 'lib' @ line 50, column 48.
-                  scanPath: /var/lib/jenkin
-                                 ^
+WorkflowScript: 50: Invalid parameter "scanPath", did you mean "stopBuild"? @ line 50, column 33.
+                                   scanPath: '/var/lib/jenkins/workspace/e-form-backend-test',
+                                   ^
 
-1 error
+WorkflowScript: 51: Invalid parameter "failOnCVSS", did you mean "stopBuild"? @ line 51, column 33.
+                                   failOnCVSS: '7',
+                                   ^
+
+WorkflowScript: 52: Invalid parameter "failBuildOnCVSS", did you mean "stopBuild"? @ line 52, column 33.
+                                   failBuildOnCVSS: true
+                                   ^
+
+WorkflowScript: 7: Invalid tool type "dependencyCheck". Valid tool types: [ant, hudson.tasks.Ant$AntInstallation, dependency-check, org.jenkinsci.plugins.DependencyCheck.tools.DependencyCheckInstallation, git, hudson.plugins.git.GitTool, gradle, hudson.plugins.gradle.GradleInstallation, jdk, hudson.model.JDK, jgit, org.jenkinsci.plugins.gitclient.JGitTool, jgitapache, org.jenkinsci.plugins.gitclient.JGitApacheTool, maven, hudson.tasks.Maven$MavenInstallation, hudson.plugins.sonar.SonarRunnerInstallation, hudson.plugins.sonar.MsBuildSQRunnerInstallation] @ line 7, column 7.
+         dependencyCheck 'OWASP_Dependency_Check'
+         ^
+
+4 errors
