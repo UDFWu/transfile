@@ -4,7 +4,7 @@ pipeline {
     tools { 
       maven 'Apache Maven 3.9.6' 
       jdk 'jdk17' 
-      dependencyCheck 'OWASP_Dependency_Check'
+      'dependency-check' 'OWASP_Dependency_Check'
     }
     
     environment { 
@@ -45,11 +45,12 @@ pipeline {
         
         stage('OWASP Analysis') {
             steps {
-                dependencyCheck additionalArguments: '',
-                                odcInstallation: 'OWASP_Dependency_Check',
-                                scanPath: '/var/lib/jenkins/workspace/e-form-backend-test',
-                                failOnCVSS: '7',
-                                failBuildOnCVSS: true
+                dependencyCheck arguments: '''
+                                -o './'
+                                -s '/var/lib/jenkins/workspace/e-form-backend-test'
+                                -f 'ALL'
+                                --prettyPrint''',
+                                odcInstallation: 'OWASP_Dependency_Check'
                 
             }
             
@@ -59,27 +60,37 @@ pipeline {
 }
 
 
-
-
-
-
-
 Started by user admin
 org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:
-WorkflowScript: 50: Invalid parameter "scanPath", did you mean "stopBuild"? @ line 50, column 33.
-                                   scanPath: '/var/lib/jenkins/workspace/e-form-backend-test',
-                                   ^
+WorkflowScript: 58: unexpected token: } @ line 58, column 13.
+               }
+               ^
 
-WorkflowScript: 51: Invalid parameter "failOnCVSS", did you mean "stopBuild"? @ line 51, column 33.
-                                   failOnCVSS: '7',
-                                   ^
+1 error
 
-WorkflowScript: 52: Invalid parameter "failBuildOnCVSS", did you mean "stopBuild"? @ line 52, column 33.
-                                   failBuildOnCVSS: true
-                                   ^
-
-WorkflowScript: 7: Invalid tool type "dependencyCheck". Valid tool types: [ant, hudson.tasks.Ant$AntInstallation, dependency-check, org.jenkinsci.plugins.DependencyCheck.tools.DependencyCheckInstallation, git, hudson.plugins.git.GitTool, gradle, hudson.plugins.gradle.GradleInstallation, jdk, hudson.model.JDK, jgit, org.jenkinsci.plugins.gitclient.JGitTool, jgitapache, org.jenkinsci.plugins.gitclient.JGitApacheTool, maven, hudson.tasks.Maven$MavenInstallation, hudson.plugins.sonar.SonarRunnerInstallation, hudson.plugins.sonar.MsBuildSQRunnerInstallation] @ line 7, column 7.
-         dependencyCheck 'OWASP_Dependency_Check'
-         ^
-
-4 errors
+	at org.codehaus.groovy.control.ErrorCollector.failIfErrors(ErrorCollector.java:309)
+	at org.codehaus.groovy.control.ErrorCollector.addFatalError(ErrorCollector.java:149)
+	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:119)
+	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:131)
+	at org.codehaus.groovy.control.SourceUnit.addError(SourceUnit.java:349)
+	at org.codehaus.groovy.antlr.AntlrParserPlugin.transformCSTIntoAST(AntlrParserPlugin.java:225)
+	at org.codehaus.groovy.antlr.AntlrParserPlugin.parseCST(AntlrParserPlugin.java:191)
+	at org.codehaus.groovy.control.SourceUnit.parse(SourceUnit.java:233)
+	at org.codehaus.groovy.control.CompilationUnit$1.call(CompilationUnit.java:189)
+	at org.codehaus.groovy.control.CompilationUnit.applyToSourceUnits(CompilationUnit.java:966)
+	at org.codehaus.groovy.control.CompilationUnit.doPhaseOperation(CompilationUnit.java:626)
+	at org.codehaus.groovy.control.CompilationUnit.processPhaseOperations(CompilationUnit.java:602)
+	at org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:579)
+	at groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:323)
+	at groovy.lang.GroovyClassLoader.parseClass(GroovyClassLoader.java:293)
+	at org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.GroovySandbox$Scope.parse(GroovySandbox.java:163)
+	at org.jenkinsci.plugins.workflow.cps.CpsGroovyShell.doParse(CpsGroovyShell.java:190)
+	at org.jenkinsci.plugins.workflow.cps.CpsGroovyShell.reparse(CpsGroovyShell.java:175)
+	at org.jenkinsci.plugins.workflow.cps.CpsFlowExecution.parseScript(CpsFlowExecution.java:636)
+	at org.jenkinsci.plugins.workflow.cps.CpsFlowExecution.start(CpsFlowExecution.java:582)
+	at org.jenkinsci.plugins.workflow.job.WorkflowRun.run(WorkflowRun.java:335)
+	at hudson.model.ResourceController.execute(ResourceController.java:101)
+	at hudson.model.Executor.run(Executor.java:442)
+[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: cicd-form/cicd-form-backend #13 did not yet start
+[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: cicd-form/cicd-form-backend #13 did not yet start
+Finished: FAILURE
