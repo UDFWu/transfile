@@ -1,8 +1,13 @@
 docker run --detach \
-  --publish 443:443 --publish 80:80 \
+  --publish 11443:443 --publish 11080:80 \
   --name gitlab-ce-15.2.1 \
   --restart always \
-  --volume /home/itdc/gitlab_ce_15_2_1/config:/etc/gitlab \
-  --volume /home/itdc/gitlab_ce_15_2_1/logs:/var/log/gitlab \
-  --volume /home/itdc/gitlab_ce_15_2_1/data:/var/opt/gitlab \
+  --volume /home/gitlab_15_2_1/config:/etc/gitlab \
+  --volume /home/gitlab_15_2_1/logs:/var/log/gitlab \
+  --volume /home/gitlab_15_2_1/data:/var/opt/gitlab \
   gitlab/gitlab-ce:15.2.1-ce.0
+
+TIBCO CI/CD討論
+由 上海商業儲蓄銀行 主持
+
+https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialandsavingsbank.my/j.php?MTID=mb0956546e99d1010e02848778773770a
