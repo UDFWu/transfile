@@ -1,13 +1,24 @@
+1. 新增使用者
+使用 useradd 指令來新增一個新使用者，例如新增使用者 newuser：
 
-使用 useradd 命令創建新用戶:
-Copysudo useradd jenkinsdev
-設置新用戶的密碼:
-Copysudo passwd jenkins0328dev
+sudo useradd newuser
+2. 設定使用者密碼
+使用 passwd 指令來設定該新使用者的密碼：
 
-將新用戶添加到 wheel 組,這是 Red Hat 系統上通常具有 sudo 權限的組:
-Copysudo usermod -aG wheel jenkinsdev
+sudo passwd newuser
+您會被提示輸入並確認新使用者的密碼。
 
-編輯 sudoers 文件以確保 wheel 組成員可以使用 sudo:
-Copysudo visudo
-在打開的文件中,確保有以下行(如果沒有,請添加):
-Copy%wheel  ALL=(ALL)       ALL
+3. 新增使用者至 wheel 群組
+在 Red Hat 系統中，wheel 群組的使用者通常擁有 sudo 權限。您可以使用 usermod 指令將新使用者加入 wheel 群組：
+
+sudo usermod -aG wheel newuser
+4. 驗證 sudo 權限
+切換到新使用者以確認其擁有 sudo 權限：
+
+su - newuser
+然後執行 sudo 指令來確認新使用者是否能以管理員身份執行命令：
+
+sudo whoami
+此命令應該回傳 root，代表新使用者已擁有 sudo 權限。
+
+完成
