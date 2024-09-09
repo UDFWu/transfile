@@ -1,7 +1,7 @@
 1. 新增使用者
-使用 useradd 指令來新增一個新使用者，例如新增使用者 newuser：
+使用 useradd 指令來新增一個新使用者：
 
-sudo useradd newuser
+sudo useradd jenkinsdev
 2. 設定使用者密碼
 使用 passwd 指令來設定該新使用者的密碼：
 
@@ -22,3 +22,15 @@ sudo whoami
 此命令應該回傳 root，代表新使用者已擁有 sudo 權限。
 
 完成
+
+
+
+===請將以下資訊通知與會人員===
+T24 CI/CD流程討論會議
+由 SCSB 主持
+
+https://scsbtw.webex.com/scsbtw/j.php?MTID=m0d0b840ce08dfdadab43615ea0dd2484
+2024年9月9日星期一 下午 02:00 | 3 小時 | （UTC+08:00）台北
+會議號： 2518 180 8148
+密碼： C#Ju7984
+
