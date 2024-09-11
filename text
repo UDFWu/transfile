@@ -1,23 +1,21 @@
 1. 新增使用者
 使用 useradd 指令來新增一個新使用者：
+sudo useradd itdc
 
-sudo useradd jenkinsdev
 2. 設定使用者密碼
 使用 passwd 指令來設定該新使用者的密碼：
-
-sudo passwd newuser
-您會被提示輸入並確認新使用者的密碼。
+sudo passwd jenkins0328dev
+(您會被提示輸入並確認新使用者的密碼。)
 
 3. 新增使用者至 wheel 群組
 在 Red Hat 系統中，wheel 群組的使用者通常擁有 sudo 權限。您可以使用 usermod 指令將新使用者加入 wheel 群組：
-
 sudo usermod -aG wheel newuser
+
 4. 驗證 sudo 權限
 切換到新使用者以確認其擁有 sudo 權限：
-
 su - newuser
-然後執行 sudo 指令來確認新使用者是否能以管理員身份執行命令：
 
+然後執行 sudo 指令來確認新使用者是否能以管理員身份執行命令：
 sudo whoami
 此命令應該回傳 root，代表新使用者已擁有 sudo 權限。
 
@@ -25,14 +23,10 @@ sudo whoami
 
 
 
-===請將以下資訊通知與會人員===
-T24 CI/CD流程討論會議
+Open Source 開源軟體掃碼-選商會議
 由 SCSB 主持
 
-https://scsbtw.webex.com/scsbtw/j.php?MTID=m0d0b840ce08dfdadab43615ea0dd2484
-2024年9月9日星期一 下午 02:00 | 3 小時 | （UTC+08:00）台北
-會議號： 2518 180 8148
-密碼： C#Ju7984
-
-
-zoomforscsb.conf@gmail.com
+https://scsbtw.webex.com/scsbtw/j.php?MTID=m7ac12b5521b307aa233e29bf9a0420c4
+2024年9月11日星期三 上午 10:00 | 1 小時 30 分鐘 | （UTC+08:00）台北
+會議號： 2514 665 4150
+密碼： nH*y2743
