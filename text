@@ -1,32 +1,61 @@
-1. 新增使用者
-使用 useradd 指令來新增一個新使用者：
-sudo useradd itdc
+pipeline {
+    agent any
 
-2. 設定使用者密碼
-使用 passwd 指令來設定該新使用者的密碼：
-sudo passwd jenkins0328dev
-(您會被提示輸入並確認新使用者的密碼。)
+    tools { 
+      maven 'Apache Maven 3.9.6' 
+      jdk 'jdk17' 
+    }
+    
+    environment { 
+        GIT_URL = 'https://10.10.32.10/auto_test/scsb_automated_test_server.git'
+    }
 
-3. 新增使用者至 wheel 群組
-在 Red Hat 系統中，wheel 群組的使用者通常擁有 sudo 權限。您可以使用 usermod 指令將新使用者加入 wheel 群組：
-sudo usermod -aG wheel newuser
+    stages {
+		
+		stage('WORKSPACE init') {
+			steps {
+				echo 'WORKSPACE init'
+				echo '------------------------------'
+				sh 'rm -rf *'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'WORKSPACE init 失敗'
+				}
+				success {
+					echo 'WORKSPACE init 成功'
+				}
+			}
+		}
+		
+		stage('git clone'){
+		    steps{
+				echo 'git clone'
+				echo '------------------------------'
+				withCredentials([gitUsernamePassword(credentialsId: 'gitlab-root-personal-access-token', gitToolName: 'Default')]) {
+					// git config --global http.sslVerify false 已經關掉
+					sh '''
+						git clone --branch main ${GIT_URL}
+						ls -al
+						pwd
+					'''
+				}
+		    }
+		    post{
+				failure {
+					echo 'git clone 失敗'
+				}
+				success {
+					echo 'git clone 成功'            	
+				} 
+		    }
+		}
+        
+        
+    }
+}
 
-4. 驗證 sudo 權限
-切換到新使用者以確認其擁有 sudo 權限：
-su - newuser
 
-然後執行 sudo 指令來確認新使用者是否能以管理員身份執行命令：
-sudo whoami
-此命令應該回傳 root，代表新使用者已擁有 sudo 權限。
-
-完成
-
-
-
-Open Source 開源軟體掃碼-選商會議
-由 SCSB 主持
-
-https://scsbtw.webex.com/scsbtw/j.php?MTID=m7ac12b5521b307aa233e29bf9a0420c4
-2024年9月11日星期三 上午 10:00 | 1 小時 30 分鐘 | （UTC+08:00）台北
-會議號： 2514 665 4150
-密碼： nH*y2743
