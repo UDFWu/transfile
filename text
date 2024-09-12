@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     tools { 
       maven 'Apache Maven 3.9.6' 
       jdk 'jdk17' 
@@ -8,54 +7,72 @@ pipeline {
     
     environment { 
         GIT_URL = 'https://10.10.32.10/auto_test/scsb_automated_test_server.git'
+        CHECKMARX_PROJECT_NAME = 'Your_Project_Name'
+        CHECKMARX_TEAM = 'Your_Team_Name'
     }
-
+    
     stages {
-		
-		stage('WORKSPACE init') {
-			steps {
-				echo 'WORKSPACE init'
-				echo '------------------------------'
-				sh 'rm -rf *'
-				echo '------------------------------'
-				sh 'ls -al'
-				echo '------------------------------'
-			}
-			post {
-				failure {
-					echo 'WORKSPACE init 失敗'
-				}
-				success {
-					echo 'WORKSPACE init 成功'
-				}
-			}
-		}
-		
-		stage('git clone'){
-		    steps{
-				echo 'git clone'
-				echo '------------------------------'
-				withCredentials([gitUsernamePassword(credentialsId: 'gitlab-root-personal-access-token', gitToolName: 'Default')]) {
-					// git config --global http.sslVerify false 已經關掉
-					sh '''
-						git clone --branch main ${GIT_URL}
-						ls -al
-						pwd
-					'''
-				}
-		    }
-		    post{
-				failure {
-					echo 'git clone 失敗'
-				}
-				success {
-					echo 'git clone 成功'            	
-				} 
-		    }
-		}
+        stage('git clone') {
+            steps {
+                echo 'git clone'
+                echo '------------------------------'
+                withCredentials([gitUsernamePassword(credentialsId: 'gitlab-root-personal-access-token', gitToolName: 'Default')]) {
+                    // git config --global http.sslVerify false 已經關掉
+                    sh '''
+                        git clone --branch main ${GIT_URL}
+                        ls -al
+                        pwd
+                    '''
+                }
+            }
+            post {
+                failure {
+                    echo 'git clone 失敗'
+                }
+                success {
+                    echo 'git clone 成功'            	
+                } 
+            }
+        }
         
-        
+        stage('Checkmarx Scan') {
+            steps {
+                echo 'Starting Checkmarx Scan'
+                step([$class: 'CxScanBuilder',
+                    comment: 'This is a demo scan',
+                    credentialsId: 'checkmarx-credentials',
+                    projectName: '${CHECKMARX_PROJECT_NAME}',
+                    groupId: '${CHECKMARX_TEAM}',
+                    excludeFolders: '',
+                    excludeFiles: '',
+                    preset: '36',
+                    incremental: true,
+                    fullScansScheduled: false,
+                    fullScanCycle: 10,
+                    isThisBuildIncremental: true,
+                    sourceEncoding: '1',
+                    waitForResultsEnabled: true,
+                    vulnerabilityThresholdEnabled: true,
+                    highThreshold: 1,
+                    mediumThreshold: 5,
+                    lowThreshold: 10,
+                    generatePdfReport: true
+                ])
+            }
+            post {
+                success {
+                    echo 'Checkmarx scan completed successfully'
+                }
+                failure {
+                    echo 'Checkmarx scan failed'
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo 'Pipeline execution completed'
+        }
     }
 }
-
-
