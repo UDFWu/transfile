@@ -1,78 +1,31 @@
-pipeline {
-    agent any
-    tools { 
-      maven 'Apache Maven 3.9.6' 
-      jdk 'jdk17' 
-    }
-    
-    environment { 
-        GIT_URL = 'https://10.10.32.10/auto_test/scsb_automated_test_server.git'
-        CHECKMARX_PROJECT_NAME = 'Your_Project_Name'
-        CHECKMARX_TEAM = 'Your_Team_Name'
-    }
-    
-    stages {
-        stage('git clone') {
-            steps {
-                echo 'git clone'
-                echo '------------------------------'
-                withCredentials([gitUsernamePassword(credentialsId: 'gitlab-root-personal-access-token', gitToolName: 'Default')]) {
-                    // git config --global http.sslVerify false 已經關掉
-                    sh '''
-                        git clone --branch main ${GIT_URL}
-                        ls -al
-                        pwd
-                    '''
-                }
-            }
-            post {
-                failure {
-                    echo 'git clone 失敗'
-                }
-                success {
-                    echo 'git clone 成功'            	
-                } 
-            }
-        }
-        
-        stage('Checkmarx Scan') {
-            steps {
-                echo 'Starting Checkmarx Scan'
-                step([$class: 'CxScanBuilder',
-                    comment: 'This is a demo scan',
-                    credentialsId: 'checkmarx-credentials',
-                    projectName: '${CHECKMARX_PROJECT_NAME}',
-                    groupId: '${CHECKMARX_TEAM}',
-                    excludeFolders: '',
-                    excludeFiles: '',
-                    preset: '36',
-                    incremental: true,
-                    fullScansScheduled: false,
-                    fullScanCycle: 10,
-                    isThisBuildIncremental: true,
-                    sourceEncoding: '1',
-                    waitForResultsEnabled: true,
-                    vulnerabilityThresholdEnabled: true,
-                    highThreshold: 1,
-                    mediumThreshold: 5,
-                    lowThreshold: 10,
-                    generatePdfReport: true
-                ])
-            }
-            post {
-                success {
-                    echo 'Checkmarx scan completed successfully'
-                }
-                failure {
-                    echo 'Checkmarx scan failed'
-                }
-            }
-        }
-    }
-    
-    post {
-        always {
-            echo 'Pipeline execution completed'
-        }
-    }
-}
+Starting Checkmarx Scan
+[Pipeline] step
+WARNING: Unknown parameter(s) found for class type 'com.checkmarx.jenkins.CxScanBuilder': excludeFiles,isThisBuildIncremental
+Post stage
+[Pipeline] echo
+Checkmarx scan failed
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 9cb3d064-02f5-4054-9548-8ed6176c6368
+java.lang.NullPointerException: Cannot invoke "String.trim()" because the return value of "com.checkmarx.jenkins.CxCredentials.getServerUrl()" is null
+	at com.checkmarx.jenkins.CxScanBuilder.resolveConfiguration(CxScanBuilder.java:763)
+	at com.checkmarx.jenkins.CxScanBuilder.perform(CxScanBuilder.java:696)
+	at jenkins.tasks.SimpleBuildStep.perform(SimpleBuildStep.java:123)
+	at org.jenkinsci.plugins.workflow.steps.CoreStep$Execution.run(CoreStep.java:101)
+	at org.jenkinsci.plugins.workflow.steps.CoreStep$Execution.run(CoreStep.java:71)
+	at org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution.lambda$start$0(SynchronousNonBlockingStepExecution.java:47)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Finished: FAILURE
