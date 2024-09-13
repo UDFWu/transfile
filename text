@@ -1,34 +1,117 @@
-Started by user admin
-org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:
-WorkflowScript: 7: expecting '}', found 'owasp_check' @ line 7, column 24.
-         dependency-check 'owasp_check'
-                          ^
+pipeline {
+    agent any
 
-1 error
+    tools { 
+        maven 'Apache Maven 3.9.6' 
+        jdk 'jdk17' 
+        //dependency-check 'owasp_check'
+        'org.jenkinsci.plugins.DependencyCheck.tools.DependencyCheckInstallation' 'owasp_check'
+    }
+    
+    environment { 
+        GIT_URL = 'https://10.10.32.10/auto_test/scsb_automated_test_server.git'
+    }
 
-	at org.codehaus.groovy.control.ErrorCollector.failIfErrors(ErrorCollector.java:309)
-	at org.codehaus.groovy.control.ErrorCollector.addFatalError(ErrorCollector.java:149)
-	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:119)
-	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:131)
-	at org.codehaus.groovy.control.SourceUnit.addError(SourceUnit.java:349)
-	at org.codehaus.groovy.antlr.AntlrParserPlugin.transformCSTIntoAST(AntlrParserPlugin.java:225)
-	at org.codehaus.groovy.antlr.AntlrParserPlugin.parseCST(AntlrParserPlugin.java:191)
-	at org.codehaus.groovy.control.SourceUnit.parse(SourceUnit.java:233)
-	at org.codehaus.groovy.control.CompilationUnit$1.call(CompilationUnit.java:189)
-	at org.codehaus.groovy.control.CompilationUnit.applyToSourceUnits(CompilationUnit.java:966)
-	at org.codehaus.groovy.control.CompilationUnit.doPhaseOperation(CompilationUnit.java:626)
-	at org.codehaus.groovy.control.CompilationUnit.processPhaseOperations(CompilationUnit.java:602)
-	at org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:579)
-	at groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:323)
-	at groovy.lang.GroovyClassLoader.parseClass(GroovyClassLoader.java:293)
-	at org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.GroovySandbox$Scope.parse(GroovySandbox.java:163)
-	at org.jenkinsci.plugins.workflow.cps.CpsGroovyShell.doParse(CpsGroovyShell.java:190)
-	at org.jenkinsci.plugins.workflow.cps.CpsGroovyShell.reparse(CpsGroovyShell.java:175)
-	at org.jenkinsci.plugins.workflow.cps.CpsFlowExecution.parseScript(CpsFlowExecution.java:636)
-	at org.jenkinsci.plugins.workflow.cps.CpsFlowExecution.start(CpsFlowExecution.java:582)
-	at org.jenkinsci.plugins.workflow.job.WorkflowRun.run(WorkflowRun.java:335)
-	at hudson.model.ResourceController.execute(ResourceController.java:101)
-	at hudson.model.Executor.run(Executor.java:442)
-[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: Test Folder/test #16 did not yet start
-[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: Test Folder/test #16 did not yet start
-Finished: FAILURE
+    stages {
+        stage('check env') {
+			steps {
+				echo 'check env'
+				echo '------------------------------'
+				sh 'pwd'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+				echo sh(script: 'env|sort', returnStdout: true)
+				echo '------------------------------'
+				sh 'java -version'
+				echo '------------------------------'
+				sh 'mvn -version'
+				echo '------------------------------'
+				sh 'git --version'
+				echo '------------------------------'
+				sh 'df -h' //Show Disk space
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'check env 失敗'
+				}
+				success {
+					echo 'check env 成功'
+				}
+			}
+		}
+		
+		stage('WORKSPACE init') {
+			steps {
+				echo 'WORKSPACE init'
+				echo '------------------------------'
+				sh 'rm -rf *'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'WORKSPACE init 失敗'
+				}
+				success {
+					echo 'WORKSPACE init 成功'
+				}
+			}
+		}
+		
+		stage('git clone'){
+		    steps{
+				echo 'git clone'
+				echo '------------------------------'
+				withCredentials([string(credentialsId: 'gitlab-root-personal-access-token', variable: 'GITlAB_TOKEN')]) {
+					// git config --global http.sslVerify false 已經關掉
+					sh '''
+						git clone --branch main ${GIT_URL}
+						ls -al
+						pwd
+					'''
+				}
+		    }
+		    post{
+				failure {
+					echo 'git clone 失敗'
+				}
+				success {
+					echo 'git clone 成功'            	
+				} 
+		    }
+		}
+		
+		stage('OWASP check') {
+            steps {
+                dependencyCheck additionalArguments: '''
+                    --scan ./
+                    --format "ALL"
+                    --project "test"
+                    --failOnCVSS 7
+                ''', odcInstallation: 'owasp_check'
+                
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+            post {
+                always {
+                    cleanWs()
+                }
+                success {
+                    echo 'Checkmarx scan completed successfully'
+                }
+                failure {
+                    echo 'Checkmarx scan failed'
+                }
+            }
+        }
+        
+        
+    }
+}
+
++ git clone --branch main https://10.10.32.10/auto_test/scsb_automated_test_server.git
+Cloning into 'scsb_automated_test_server'...
+fatal: could not read Username for 'https://10.10.32.10': No such device or address
