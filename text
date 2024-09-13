@@ -68,7 +68,7 @@ pipeline {
 				withCredentials([string(credentialsId: 'gitlab-root-personal-access-token', variable: 'GITlAB_TOKEN')]) {
 					// git config --global http.sslVerify false 已經關掉
 					sh '''
-						git clone --branch main ${GIT_URL}
+						git clone --branch main https://${GITLAB_TOKEN}@10.10.32.10/auto_test/scsb_automated_test_server.git
 						ls -al
 						pwd
 					'''
@@ -111,6 +111,9 @@ pipeline {
         
     }
 }
+
+
+
 
 + git clone --branch main https://10.10.32.10/auto_test/scsb_automated_test_server.git
 Cloning into 'scsb_automated_test_server'...
