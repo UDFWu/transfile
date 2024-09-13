@@ -1,14 +1,22 @@
 Started by user admin
 org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:
-WorkflowScript: 7: Invalid tool type "dependencyCheck". Valid tool types: [ant, hudson.tasks.Ant$AntInstallation, dependency-check, org.jenkinsci.plugins.DependencyCheck.tools.DependencyCheckInstallation, git, hudson.plugins.git.GitTool, gradle, hudson.plugins.gradle.GradleInstallation, jdk, hudson.model.JDK, jgit, org.jenkinsci.plugins.gitclient.JGitTool, jgitapache, org.jenkinsci.plugins.gitclient.JGitApacheTool, maven, hudson.tasks.Maven$MavenInstallation, hudson.plugins.sonar.SonarRunnerInstallation, hudson.plugins.sonar.MsBuildSQRunnerInstallation] @ line 7, column 7.
-         dependencyCheck 'OWASP_Dependency_Check'
-         ^
+WorkflowScript: 7: expecting '}', found 'owasp_check' @ line 7, column 24.
+         dependency-check 'owasp_check'
+                          ^
 
 1 error
 
 	at org.codehaus.groovy.control.ErrorCollector.failIfErrors(ErrorCollector.java:309)
-	at org.codehaus.groovy.control.CompilationUnit.applyToPrimaryClassNodes(CompilationUnit.java:1107)
-	at org.codehaus.groovy.control.CompilationUnit.doPhaseOperation(CompilationUnit.java:624)
+	at org.codehaus.groovy.control.ErrorCollector.addFatalError(ErrorCollector.java:149)
+	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:119)
+	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:131)
+	at org.codehaus.groovy.control.SourceUnit.addError(SourceUnit.java:349)
+	at org.codehaus.groovy.antlr.AntlrParserPlugin.transformCSTIntoAST(AntlrParserPlugin.java:225)
+	at org.codehaus.groovy.antlr.AntlrParserPlugin.parseCST(AntlrParserPlugin.java:191)
+	at org.codehaus.groovy.control.SourceUnit.parse(SourceUnit.java:233)
+	at org.codehaus.groovy.control.CompilationUnit$1.call(CompilationUnit.java:189)
+	at org.codehaus.groovy.control.CompilationUnit.applyToSourceUnits(CompilationUnit.java:966)
+	at org.codehaus.groovy.control.CompilationUnit.doPhaseOperation(CompilationUnit.java:626)
 	at org.codehaus.groovy.control.CompilationUnit.processPhaseOperations(CompilationUnit.java:602)
 	at org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:579)
 	at groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:323)
@@ -21,6 +29,6 @@ WorkflowScript: 7: Invalid tool type "dependencyCheck". Valid tool types: [ant, 
 	at org.jenkinsci.plugins.workflow.job.WorkflowRun.run(WorkflowRun.java:335)
 	at hudson.model.ResourceController.execute(ResourceController.java:101)
 	at hudson.model.Executor.run(Executor.java:442)
-[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: Test Folder/test #13 did not yet start
-[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: Test Folder/test #13 did not yet start
+[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: Test Folder/test #16 did not yet start
+[withMaven] downstreamPipelineTriggerRunListener - Failure to introspect build steps: java.io.IOException: Test Folder/test #16 did not yet start
 Finished: FAILURE
