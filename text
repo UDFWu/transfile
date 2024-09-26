@@ -1,11 +1,9 @@
-SAST scan finished successfully.
-[Cx-Info]: Retrieving SAST scan results
-[Cx-Info]: Waiting for server to generate xml report. 495 seconds left to timeout
-[Cx-Error]: Failed to get SAST scan results: Failed to parse xml report: Implementation of JAXB-API has not been found on module path or classpath.
-[Cx-Error]: ********************************************
-[Cx-Error]:  The Build Failed for the Following Reasons:
-[Cx-Error]: ********************************************
-[Cx-Error]: Failed to get SAST scan results: com.cx.restclient.exception.CxClientException: Failed to parse xml report: Implementation of JAXB-API has not been found on module path or classpath.
-[Cx-Info]: Copying file [Report_CxSAST.html] to workspace [/var/lib/jenkins/workspace/Test Folder/test222/Checkmarx/Reports/Report_CxSAST.html]
-Build step 'Execute Checkmarx Scan' changed build result to FAILURE
-Finished: FAILURE
+OPEN SOURCE 開源軟體掃碼_叡揚POC
+由 SCSB 主持
+
+https://scsbtw.webex.com/scsbtw/j.php?MTID=m23724f738b0ddb71cfca142eb6dac871
+
+2024年9月26日星期四 上午 09:00 | 2 小時 30 分鐘 | （UTC+08:00）台北
+
+會議號： 2513 111 5418
+密碼： eG7PbJ#H
