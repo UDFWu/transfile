@@ -1,5 +1,5 @@
-[INFO] Checking for updates
-[WARN] An NVD API Key was not provided - it is highly recommended to use an NVD API key as the update can take a VERY long time without an API Key
-[WARN] Retrying request /rest/json/cves/2.0?resultsPerPage=2000&startIndex=0 : 2 time
-[WARN] Retrying request /rest/json/cves/2.0?resultsPerPage=2000&startIndex=0 : 3 time
-[WARN] Retrying request /rest/json/cves/2.0?resultsPerPage=2000&startIndex=0 : 4 time
+Thank you for confirming your request for an NVD API key. Please securely save this key. Once you close or leave this page, the key will no longer be accessible from this link. If you lose or forget your API key you must request a new one. There is no process for recovering an API Key.
+
+API Key: 6b1c005a-ecd0-4c55-8896-44f00129cc9a  
+
+To request a new API key, please resubmit an API Key Request. Please note that activating a new key will deactivate the key shown above.
