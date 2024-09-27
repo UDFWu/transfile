@@ -1,9 +1,8 @@
-OPEN SOURCE 開源軟體掃碼_叡揚POC
-由 SCSB 主持
-
-https://scsbtw.webex.com/scsbtw/j.php?MTID=m23724f738b0ddb71cfca142eb6dac871
-
-2024年9月26日星期四 上午 09:00 | 2 小時 30 分鐘 | （UTC+08:00）台北
-
-會議號： 2513 111 5418
-密碼： eG7PbJ#H
+[Cx-Info]: Copying file [Report_CxSAST.html] to workspace [/var/lib/jenkins/workspace/Test Folder/test222/Checkmarx/Reports/Report_CxSAST.html]
+FATAL: Cannot run program "/opt/dependency-check/bin/dependency-check.sh" (in directory "/var/lib/jenkins/workspace/Test Folder/test222"): error=13, Permission denied
+java.io.IOException: error=13, Permission denied
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+Caused: java.io.IOException: Cannot run program "/opt/dependency-check/bin/dependency-check.sh" (in directory "/var/lib/jenkins/workspace/Test Folder/test222"): error=13, Permission denied
