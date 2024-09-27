@@ -1,8 +1,5 @@
-[Cx-Info]: Copying file [Report_CxSAST.html] to workspace [/var/lib/jenkins/workspace/Test Folder/test222/Checkmarx/Reports/Report_CxSAST.html]
-FATAL: Cannot run program "/opt/dependency-check/bin/dependency-check.sh" (in directory "/var/lib/jenkins/workspace/Test Folder/test222"): error=13, Permission denied
-java.io.IOException: error=13, Permission denied
-	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
-	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
-	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
-	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
-Caused: java.io.IOException: Cannot run program "/opt/dependency-check/bin/dependency-check.sh" (in directory "/var/lib/jenkins/workspace/Test Folder/test222"): error=13, Permission denied
+[INFO] Checking for updates
+[WARN] An NVD API Key was not provided - it is highly recommended to use an NVD API key as the update can take a VERY long time without an API Key
+[WARN] Retrying request /rest/json/cves/2.0?resultsPerPage=2000&startIndex=0 : 2 time
+[WARN] Retrying request /rest/json/cves/2.0?resultsPerPage=2000&startIndex=0 : 3 time
+[WARN] Retrying request /rest/json/cves/2.0?resultsPerPage=2000&startIndex=0 : 4 time
