@@ -3,3 +3,63 @@ Thank you for confirming your request for an NVD API key. Please securely save t
 API Key: 6b1c005a-ecd0-4c55-8896-44f00129cc9a  
 
 To request a new API key, please resubmit an API Key Request. Please note that activating a new key will deactivate the key shown above.
+
+
+[Cx-Info]: PDF report location: /var/lib/jenkins/workspace/Test Folder/test222/Checkmarx/Reports/CxSASTReport_27_09_2024-15_36_55.pdf
+[Cx-Info]: Copying file [Report_CxSAST.html] to workspace [/var/lib/jenkins/workspace/Test Folder/test222/Checkmarx/Reports/Report_CxSAST.html]
+Unrecognized option: --disableNvd
+usage: Dependency-Check Core [--advancedHelp] [--enableExperimental]
+       [--exclude <pattern>] [-f <format>] [--failOnCVSS <score>] [-h]
+       [--junitFailOnCVSS <score>] [-l <file>] [-n] [--nvdApiKey <apiKey>]
+       [-o <path>] [--prettyPrint] [--project <name>] [-s <path>]
+       [--suppression <file>] [-v]
+
+Dependency-Check Core can be used to identify if there are any known CVE
+vulnerabilities in libraries utilized by an application. Dependency-Check
+Core will automatically update required data from the Internet, such as
+the CVE and CPE data files from nvd.nist.gov.
+
+    --advancedHelp              Print the advanced help message.
+    --enableExperimental        Enables the experimental analyzers.
+    --exclude <pattern>         Specify an exclusion pattern. This option
+                                can be specified multiple times and it
+                                accepts Ant style exclusions.
+ -f,--format <format>           The report format (HTML, XML, CSV, JSON,
+                                JUNIT, SARIF, JENKINS, GITLAB or ALL). The
+                                default is HTML. Multiple format
+                                parameters can be specified.
+    --failOnCVSS <score>        Specifies if the build should be failed if
+                                a CVSS score above a specified level is
+                                identified. The default is 11; since the
+                                CVSS scores are 0-10, by default the build
+                                will never fail.
+ -h,--help                      Print this message.
+    --junitFailOnCVSS <score>   Specifies the CVSS score that is
+                                considered a failure when generating the
+                                junit report. The default is 0.
+ -l,--log <file>                The file path to write verbose logging
+                                information.
+ -n,--noupdate                  Disables the automatic updating of the
+                                NVD-CVE, hosted-suppressions and RetireJS
+                                data.
+    --nvdApiKey <apiKey>        The API Key to access the NVD API.
+ -o,--out <path>                The folder to write reports to. This
+                                defaults to the current directory. It is
+                                possible to set this to a specific file
+                                name if the format argument is not set to
+                                ALL.
+    --prettyPrint               When specified the JSON and XML report
+                                formats will be pretty printed.
+    --project <name>            The name of the project being scanned.
+ -s,--scan <path>               The path to scan - this option can be
+                                specified multiple times. Ant style paths
+                                are supported (e.g. 'path/**/*.jar'); if
+                                using Ant style paths it is highly
+                                recommended to quote the argument value.
+    --suppression <file>        The file path to the suppression XML file.
+                                This can be specified more then once to
+                                utilize multiple suppression files
+ -v,--version                   Print the version information.
+ERROR: Mark build as failed because of exit code 2
+Build step 'Invoke Dependency-Check' changed build result to FAILURE
+Finished: FAILURE
