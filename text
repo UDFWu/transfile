@@ -1,81 +1,31 @@
-[Cx-Info]: ---------------------------------------Configurations:------------------------------------
-[Cx-Info]: plugin version: 8.90.4
-[Cx-Info]: server url: http://10.10.2.164/
-[Cx-Info]: username: plan01@cx
-[Cx-Info]: project name: atms
-[Cx-Info]: team path: null
-[Cx-Info]: team id: 1
-[Cx-Info]: is synchronous mode: true
-[Cx-Info]: deny project creation: false
-[Cx-Info]: SAST scan enabled: true
-[Cx-Info]: avoid duplicated projects scans: false
-[Cx-Info]: enable Project Policy Enforcement: false
-[Cx-Info]: preset id: 36
-[Cx-Info]: SAST folder exclusions: 
-[Cx-Info]: SAST filter pattern: !**/_cvs/**/*, !**/.svn/**/*,   !**/.hg/**/*,   !**/.git/**/*,  !**/.bzr/**/*, !**/bin/**/*,
-!**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr,     !**/*.iws,
-!**/*.bak,     !**/*.tmp,       !**/*.aac,      !**/*.aif,      !**/*.iff,     !**/*.m3u, !**/*.mid, !**/*.mp3,
-!**/*.mpa,     !**/*.ra,        !**/*.wav,      !**/*.wma,      !**/*.3g2,     !**/*.3gp, !**/*.asf, !**/*.asx,
-!**/*.avi,     !**/*.flv,       !**/*.mov,      !**/*.mp4,      !**/*.mpg,     !**/*.rm,  !**/*.swf, !**/*.vob,
-!**/*.wmv,     !**/*.bmp,       !**/*.gif,      !**/*.jpg,      !**/*.png,     !**/*.psd, !**/*.tif, !**/*.swf,
-!**/*.jar,     !**/*.zip,       !**/*.rar,      !**/*.exe,      !**/*.dll,     !**/*.pdb, !**/*.7z,  !**/*.gz,
-!**/*.tar.gz,  !**/*.tar,       !**/*.gz,       !**/*.ahtm,     !**/*.ahtml,   !**/*.fhtml, !**/*.hdm,
-!**/*.hdml,    !**/*.hsql,      !**/*.ht,       !**/*.hta,      !**/*.htc,     !**/*.htd, !**/*.war, !**/*.ear,
-!**/*.htmls,   !**/*.ihtml,     !**/*.mht,      !**/*.mhtm,     !**/*.mhtml,   !**/*.ssi, !**/*.stm,
-!**/*.stml,    !**/*.ttml,      !**/*.txn,      !**/*.xhtm,     !**/*.xhtml,   !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*
-[Cx-Info]: SAST timeout: -1
-[Cx-Info]: SAST scan comment: Jenkins Scan
-[Cx-Info]: is incremental scan: true
-[Cx-Info]: is generate full XML report: true
-[Cx-Info]: is generate pfd report: true
-[Cx-Info]: source code encoding id: 1
-[Cx-Info]: SAST thresholds enabled: false
-[Cx-Info]: OSA scan enabled: false
-[Cx-Info]: ------------------------------------------------------------------------------------------
-[Cx-Info]: Initializing Cx client
-[Cx-Info]: Logging into the Checkmarx service.
-[Cx-Info]: preset name: Checkmarx Default
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Dependency Check)
-Stage "Dependency Check" skipped due to earlier failure(s)
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Declarative: Post Actions)
-[Pipeline] archiveArtifacts
-Archiving artifacts
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] End of Pipeline
-com.cx.restclient.exception.CxHTTPClientException: Failed to create new project: atms: 
- "messageCode": 47823,
- "messageDetails": "無法儲存專案"
- 
-	at com.cx.restclient.httpClient.utils.HttpClientHelper.validateResponse(HttpClientHelper.java:79)
-	at com.cx.restclient.httpClient.CxHttpClient.request(CxHttpClient.java:143)
-	at com.cx.restclient.httpClient.CxHttpClient.postRequest(CxHttpClient.java:113)
-	at com.cx.restclient.CxShragaClient.createNewProject(CxShragaClient.java:296)
-	at com.cx.restclient.CxShragaClient.resolveProject(CxShragaClient.java:272)
-	at com.cx.restclient.CxShragaClient.init(CxShragaClient.java:78)
-	at com.checkmarx.jenkins.CxScanCallable.invoke(CxScanCallable.java:48)
-Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: b97a27cb-eb87-489c-bd7c-8f15ddbb858f
-Caused: java.io.IOException
-	at com.checkmarx.jenkins.CxScanCallable.invoke(CxScanCallable.java:64)
-	at com.checkmarx.jenkins.CxScanCallable.invoke(CxScanCallable.java:21)
-	at hudson.FilePath.act(FilePath.java:1236)
-	at hudson.FilePath.act(FilePath.java:1219)
-	at com.checkmarx.jenkins.CxScanBuilder.perform(CxScanBuilder.java:710)
-	at jenkins.tasks.SimpleBuildStep.perform(SimpleBuildStep.java:123)
-	at org.jenkinsci.plugins.workflow.steps.CoreStep$Execution.run(CoreStep.java:101)
-	at org.jenkinsci.plugins.workflow.steps.CoreStep$Execution.run(CoreStep.java:71)
-	at org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution.lambda$start$0(SynchronousNonBlockingStepExecution.java:47)
-	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Finished: FAILURE
+stage('Checkmarx Scan') {
+            steps {
+                script {
+                    def checkmarxScanConfig = [
+                        projectName: 'atms',
+                        teamId: '1',
+                        groupId: '1',
+                        preset: '36',
+                        incremental: true,
+                        generatePdfReport: true,
+                        sastEnabled: true,
+                        osaEnabled: false,
+                        vulnerabilityThresholdEnabled: false,
+                        dependencyScanConfig: [
+                            scaEnabled: false,
+                            osaEnabled: false
+                        ]
+                    ]
+                    
+                    step([$class: 'CxScanBuilder', 
+                        comment: 'Jenkins Scan',
+                        failBuildOnNewResults: false,
+                        failBuildOnNewSeverity: 'HIGH',
+                        vulnerabilityThresholdResult: 'FAILURE',
+                        waitForResultsEnabled: true,
+                        avoidDuplicateProjectScans: true,
+                        *:checkmarxScanConfig
+                    ])
+                }
+            }
+        }
