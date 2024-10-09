@@ -1,5 +1,23 @@
-Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
-		 Affected argument(s) used the following variable(s): [CX_PASSWORD]
-		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
-+ CxConsolePlugin.exe Scan -ProjectName atms -LocationType Folder -LocationPath /var/lib/jenkins/workspace/Test Folder/project_scan_pipeline -CxServer http://10.10.2.164 -CxUser plan01@cx -CxPass **** -ReportType PDF -ReportFile /var/lib/jenkins/workspace/Test Folder/project_scan_pipeline/checkmarx_report.pdf
-/var/lib/jenkins/workspace/Test Folder/project_scan_pipeline@tmp/durable-308c8020/script.sh: 2: CxConsolePlugin.exe: not found
+stage('Checkmarx Scan') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: "${CX_CREDENTIALS_ID}", usernameVariable: 'CX_USER', passwordVariable: 'CX_PASSWORD')]) {
+                        // 使用 Checkmarx 插件的 CxScanBuilder 來執行掃描
+                        step([
+                            $class: 'CxScanBuilder',
+                            serverUrl: "${CX_URL}",
+                            projectName: "${PROJECT_NAME}",
+                            fullScanCycle: true,
+                            incremental: false,
+                            credentialsId: "${CX_CREDENTIALS_ID}",
+                            avoidDuplicateProjectScans: true,
+                            generatePdfReport: true,
+                            enablePDFReport: true,
+                            waitForResultsEnabled: true,
+                            vulnerabilityThresholdEnabled: false,  // 根據需求設置
+                            scanPreset: 'Checkmarx Default'  // 使用預設掃描配置
+                        ])
+                    }
+                }
+            }
+        }
