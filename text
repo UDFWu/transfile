@@ -1,5 +1,76 @@
-java.lang.ClassCastException: com.checkmarx.jenkins.CxScanBuilder.fullScanCycle expects int but received class java.lang.Boolean
-	at org.jenkinsci.plugins.structs.describable.DescribableModel.coerce(DescribableModel.java:492)
-	at org.jenkinsci.plugins.structs.describable.DescribableModel.buildArguments(DescribableModel.java:409)
-	at org.jenkinsci.plugins.structs.describable.DescribableModel.instantiate(DescribableModel.java:329)
-Caused: java.lang.IllegalArgumentException: Could not instantiate {fullScanCycle=true, avoidDuplicateProjectScans=true, generatePdfReport=true, vulnerabilityThresholdEnabled=false, incremental=false, credentialsId=checkmarx-server, enablePDFReport=true, scanPreset=Checkmarx Default, waitForResultsEnabled=true, serverUrl=http://10.10.2.164, projectName=atms, generateXmlReport=false} for com.checkmarx.jenkins.CxScanBuilder
+Masking supported pattern matches of $CX_PASSWORD
+[Pipeline] {
+[Pipeline] step
+WARNING: Unknown parameter(s) found for class type 'com.checkmarx.jenkins.CxScanBuilder': enablePDFReport,scanPreset,teamName
+[Cx-Warning]: Invalid presetId: [null]. Using default preset.
+[Cx-Warning]: Invalid source encoding (configuration) value: [null]. Using default configuration.
+[Cx-Info]: ---------------------------------------Configurations:------------------------------------
+[Cx-Info]: plugin version: 8.90.4
+[Cx-Info]: server url: http://10.10.2.164/
+[Cx-Info]: username: plan01@cx
+[Cx-Info]: project name: atms
+[Cx-Info]: team path: null
+[Cx-Info]: team id: null
+[Cx-Info]: is synchronous mode: true
+[Cx-Info]: deny project creation: false
+[Cx-Info]: SAST scan enabled: true
+[Cx-Info]: avoid duplicated projects scans: true
+[Cx-Info]: enable Project Policy Enforcement: false
+[Cx-Info]: preset id: 7
+[Cx-Info]: SAST folder exclusions: null
+[Cx-Info]: SAST filter pattern: null
+[Cx-Info]: SAST timeout: -1
+[Cx-Info]: SAST scan comment: null
+[Cx-Info]: is incremental scan: false
+[Cx-Info]: is generate full XML report: false
+[Cx-Info]: is generate pfd report: true
+[Cx-Info]: source code encoding id: 1
+[Cx-Info]: SAST thresholds enabled: false
+[Cx-Info]: OSA scan enabled: false
+[Cx-Info]: ------------------------------------------------------------------------------------------
+[Cx-Info]: Initializing Cx client
+[Cx-Info]: Logging into the Checkmarx service.
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Dependency Check)
+Stage "Dependency Check" skipped due to earlier failure(s)
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] archiveArtifacts
+Archiving artifacts
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+java.lang.NullPointerException: Cannot invoke "String.replace(java.lang.CharSequence, java.lang.CharSequence)" because "teamName" is null
+	at com.cx.restclient.CxShragaClient.getTeamIdByName(CxShragaClient.java:168)
+	at com.cx.restclient.CxShragaClient.resolveTeam(CxShragaClient.java:222)
+	at com.cx.restclient.CxShragaClient.init(CxShragaClient.java:71)
+	at com.checkmarx.jenkins.CxScanCallable.invoke(CxScanCallable.java:48)
+Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 1c18db15-6f23-4495-a2fb-0be956bf1c1e
+Caused: java.io.IOException
+	at com.checkmarx.jenkins.CxScanCallable.invoke(CxScanCallable.java:64)
+	at com.checkmarx.jenkins.CxScanCallable.invoke(CxScanCallable.java:21)
+	at hudson.FilePath.act(FilePath.java:1236)
+	at hudson.FilePath.act(FilePath.java:1219)
+	at com.checkmarx.jenkins.CxScanBuilder.perform(CxScanBuilder.java:710)
+	at jenkins.tasks.SimpleBuildStep.perform(SimpleBuildStep.java:123)
+	at org.jenkinsci.plugins.workflow.steps.CoreStep$Execution.run(CoreStep.java:101)
+	at org.jenkinsci.plugins.workflow.steps.CoreStep$Execution.run(CoreStep.java:71)
+	at org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution.lambda$start$0(SynchronousNonBlockingStepExecution.java:47)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Finished: FAILURE
