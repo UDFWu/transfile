@@ -1,23 +1,5 @@
-stage('Checkmarx Scan') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: "${CX_CREDENTIALS_ID}", usernameVariable: 'CX_USER', passwordVariable: 'CX_PASSWORD')]) {
-                        // 使用 Checkmarx 插件的 CxScanBuilder 來執行掃描
-                        step([
-                            $class: 'CxScanBuilder',
-                            serverUrl: "${CX_URL}",
-                            projectName: "${PROJECT_NAME}",
-                            fullScanCycle: true,
-                            incremental: false,
-                            credentialsId: "${CX_CREDENTIALS_ID}",
-                            avoidDuplicateProjectScans: true,
-                            generatePdfReport: true,
-                            enablePDFReport: true,
-                            waitForResultsEnabled: true,
-                            vulnerabilityThresholdEnabled: false,  // 根據需求設置
-                            scanPreset: 'Checkmarx Default'  // 使用預設掃描配置
-                        ])
-                    }
-                }
-            }
-        }
+java.lang.ClassCastException: com.checkmarx.jenkins.CxScanBuilder.fullScanCycle expects int but received class java.lang.Boolean
+	at org.jenkinsci.plugins.structs.describable.DescribableModel.coerce(DescribableModel.java:492)
+	at org.jenkinsci.plugins.structs.describable.DescribableModel.buildArguments(DescribableModel.java:409)
+	at org.jenkinsci.plugins.structs.describable.DescribableModel.instantiate(DescribableModel.java:329)
+Caused: java.lang.IllegalArgumentException: Could not instantiate {fullScanCycle=true, avoidDuplicateProjectScans=true, generatePdfReport=true, vulnerabilityThresholdEnabled=false, incremental=false, credentialsId=checkmarx-server, enablePDFReport=true, scanPreset=Checkmarx Default, waitForResultsEnabled=true, serverUrl=http://10.10.2.164, projectName=atms, generateXmlReport=false} for com.checkmarx.jenkins.CxScanBuilder
