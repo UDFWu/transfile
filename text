@@ -1,5 +1,52 @@
-OPEN SOURCE專案_選商會議
-10月 8日 (星期二) · 上午10:00 - 11:00
-時區：Asia/Taipei
-Google Meet 會議參加資訊
-視訊通話連結：https://meet.google.com/nnq-xipg-sxv 
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // 從 GitLab 檢出專案
+                checkout([$class: 'GitSCM', 
+                    branches: [[name: '*/master']], 
+                    userRemoteConfigs: [[url: 'https://your-gitlab-repo-url.git']]])
+            }
+        }
+        
+        stage('Checkmarx Scan') {
+            steps {
+                // 執行 Checkmarx 掃描，生成 PDF 報告
+                script {
+                    def checkmarxHome = tool 'Checkmarx'
+                    withEnv(["CHECKMARX_HOME=${checkmarxHome}"]) {
+                        sh """
+                            \${CHECKMARX_HOME}/bin/runCxConsole.sh Scan -v \
+                                -CxServer http://your-checkmarx-server \
+                                -ProjectName YourProjectName \
+                                -ReportPDF ${WORKSPACE}/checkmarx-report.pdf
+                        """
+                    }
+                }
+            }
+        }
+        
+        stage('Dependency Check') {
+            steps {
+                // 執行 Dependency Check
+                dependencyCheck additionalArguments: '''
+                    --data /opt/dependency-check/data 
+                    -f "HTML" "JSON" 
+                    --noupdate 
+                    --disableNodeAudit 
+                    --disableCentral 
+                    --disableOssIndex
+                    ''', odcInstallation: 'Default'
+            }
+        }
+    }
+
+    post {
+        always {
+            // 歸檔報告
+            archiveArtifacts artifacts: '**/dependency-check-report.html, **/checkmarx-report.pdf', allowEmptyArchive: true
+        }
+    }
+}
