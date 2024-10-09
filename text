@@ -1,52 +1,39 @@
-pipeline {
-    agent any
-
-    stages {
-        stage('Checkout') {
-            steps {
-                // 從 GitLab 檢出專案
-                checkout([$class: 'GitSCM', 
-                    branches: [[name: '*/master']], 
-                    userRemoteConfigs: [[url: 'https://your-gitlab-repo-url.git']]])
-            }
-        }
-        
-        stage('Checkmarx Scan') {
+stage('Checkmarx Scan') {
             steps {
                 // 執行 Checkmarx 掃描，生成 PDF 報告
-                script {
-                    def checkmarxHome = tool 'Checkmarx'
-                    withEnv(["CHECKMARX_HOME=${checkmarxHome}"]) {
-                        sh """
-                            \${CHECKMARX_HOME}/bin/runCxConsole.sh Scan -v \
-                                -CxServer http://your-checkmarx-server \
-                                -ProjectName YourProjectName \
-                                -ReportPDF ${WORKSPACE}/checkmarx-report.pdf
-                        """
-                    }
-                }
+                step([$class: 'CxScanBuilder',
+                    comment: 'Jenkins Scan',
+                    credentialsId: '',
+                    excludeFolders: '',
+                    excludeOpenSourceFolders: '',
+                    exclusionsSetting: 'global',
+                    failBuildOnNewResults: false,
+                    failBuildOnNewSeverity: 'HIGH',
+                    filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*,   !**/.hg/**/*,   !**/.git/**/*,  !**/.bzr/**/*, !**/bin/**/*,
+                        !**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr,     !**/*.iws,
+                        !**/*.bak,     !**/*.tmp,       !**/*.aac,      !**/*.aif,      !**/*.iff,     !**/*.m3u, !**/*.mid, !**/*.mp3,
+                        !**/*.mpa,     !**/*.ra,        !**/*.wav,      !**/*.wma,      !**/*.3g2,     !**/*.3gp, !**/*.asf, !**/*.asx,
+                        !**/*.avi,     !**/*.flv,       !**/*.mov,      !**/*.mp4,      !**/*.mpg,     !**/*.rm,  !**/*.swf, !**/*.vob,
+                        !**/*.wmv,     !**/*.bmp,       !**/*.gif,      !**/*.jpg,      !**/*.png,     !**/*.psd, !**/*.tif, !**/*.swf,
+                        !**/*.jar,     !**/*.zip,       !**/*.rar,      !**/*.exe,      !**/*.dll,     !**/*.pdb, !**/*.7z,  !**/*.gz,
+                        !**/*.tar.gz,  !**/*.tar,       !**/*.gz,       !**/*.ahtm,     !**/*.ahtml,   !**/*.fhtml, !**/*.hdm,
+                        !**/*.hdml,    !**/*.hsql,      !**/*.ht,       !**/*.hta,      !**/*.htc,     !**/*.htd, !**/*.war, !**/*.ear,
+                        !**/*.htmls,   !**/*.ihtml,     !**/*.mht,      !**/*.mhtm,     !**/*.mhtml,   !**/*.ssi, !**/*.stm,
+                        !**/*.stml,    !**/*.ttml,      !**/*.txn,      !**/*.xhtm,     !**/*.xhtml,   !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*''',
+                    fullScanCycle: 10,
+                    generatePdfReport: true,
+                    groupId: '1',
+                    incremental: true,
+                    osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz',
+                    osaInstallBeforeScan: false,
+                    password: '',
+                    preset: '36',
+                    projectName: 'YourProjectName',
+                    sastEnabled: true,
+                    sourceEncoding: '1',
+                    username: '',
+                    vulnerabilityThresholdResult: 'FAILURE',
+                    waitForResultsEnabled: true
+                ])
             }
         }
-        
-        stage('Dependency Check') {
-            steps {
-                // 執行 Dependency Check
-                dependencyCheck additionalArguments: '''
-                    --data /opt/dependency-check/data 
-                    -f "HTML" "JSON" 
-                    --noupdate 
-                    --disableNodeAudit 
-                    --disableCentral 
-                    --disableOssIndex
-                    ''', odcInstallation: 'Default'
-            }
-        }
-    }
-
-    post {
-        always {
-            // 歸檔報告
-            archiveArtifacts artifacts: '**/dependency-check-report.html, **/checkmarx-report.pdf', allowEmptyArchive: true
-        }
-    }
-}
