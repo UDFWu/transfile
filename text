@@ -1,18 +1,5 @@
-stage('Checkmarx Scan') {
-            environment {
-                CX_URL = 'http://10.10.2.164'  // Checkmarx URL
-                CX_CREDENTIALS_ID = 'checkmarx-credential-id'  // 你在 Jenkins 中設置的憑證 ID
-            }
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: "${CX_CREDENTIALS_ID}", usernameVariable: 'CX_USER', passwordVariable: 'CX_PASSWORD')]) {
-                        sh """
-                        CxConsolePlugin.exe Scan -ProjectName "YourProject" \
-                        -LocationType "Folder" -LocationPath "/path/to/your/source/code" \
-                        -CxServer ${CX_URL} -CxUser ${CX_USER} -CxPass ${CX_PASSWORD} \
-                        -ReportType "PDF" -ReportFile "/path/to/output/report.pdf"
-                        """
-                    }
-                }
-            }
-        }
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [CX_PASSWORD]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ CxConsolePlugin.exe Scan -ProjectName atms -LocationType Folder -LocationPath /var/lib/jenkins/workspace/Test Folder/project_scan_pipeline -CxServer http://10.10.2.164 -CxUser plan01@cx -CxPass **** -ReportType PDF -ReportFile /var/lib/jenkins/workspace/Test Folder/project_scan_pipeline/checkmarx_report.pdf
+/var/lib/jenkins/workspace/Test Folder/project_scan_pipeline@tmp/durable-308c8020/script.sh: 2: CxConsolePlugin.exe: not found
