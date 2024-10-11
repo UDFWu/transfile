@@ -1,11 +1,14 @@
-stage('Download PDF Report') {
-            steps {
-                script {
-                    // 假设报告在 Checkmarx 服务器路径: /checkmarx/reports/
-                    sh '''
-                        curl -u $CX_USER:$CX_PASSWORD -o $WORKSPACE/checkmarx_report.pdf \
-                        "$CX_URL/checkmarx/reports/$CX_PROJECT/report.pdf"
-                    '''
-                }
-            }
-        }
+Hi Hill,
+
+因 CI/CD API service 需要更新 Image 
+而 UAT上傳檔案需要填寫 Notes 申請單給服務處家毓,
+想請您幫忙填單申請
+
+申請標題
+CI/CD API service 更新 Image 上傳
+申請檔案上傳資訊
+ddpsj01.cbsd.scsb.com.tw(10.21.109.120) 的 /home/ansible/cicd-apiservice.v1.4.tar.xz
+需要放到 sdpsa01.cbss.scsb.com.tw(10.22.119.121)
+請協助把以上檔案傳送至對應主機，放置於 /home/ansible 目錄就可以了，謝謝。
+
+若有任何疑問，請與我們聯繫，謝謝！
