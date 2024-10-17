@@ -1,14 +1,24 @@
-Hi Hill,
+Some plugins could not be loaded due to unsatisfied dependencies. Fix these issues and restart Jenkins to re-enable these plugins.
 
-因 CI/CD API service 需要更新 Image 
-而 UAT上傳檔案需要填寫 Notes 申請單給服務處家毓,
-想請您幫忙填單申請
+Dependency errors:
 
-申請標題
-CI/CD API service 更新 Image 上傳
-申請檔案上傳資訊
-ddpsj01.cbsd.scsb.com.tw(10.21.109.120) 的 /home/ansible/cicd-apiservice.v1.4.tar.xz
-需要放到 sdpsa01.cbss.scsb.com.tw(10.22.119.121)
-請協助把以上檔案傳送至對應主機，放置於 /home/ansible 目錄就可以了，謝謝。
-
-若有任何疑問，請與我們聯繫，謝謝！
+Git plugin (5.3.0)
+Update required: Credentials Plugin (credentials 1361.v56f5ca_35d21c) to be updated to 1371.vfee6b_095f0a_3 or higher
+Update required: SCM API Plugin (scm-api 683.vb_16722fb_b_80b_) to be updated to 696.v778d637b_a_762 or higher
+Update required: Pipeline: Step API (workflow-step-api 657.v03b_e8115821b_) to be updated to 678.v3ee58b_469476 or higher
+Update required: Credentials Binding Plugin (credentials-binding 657.v2b_19db_7d6e6d) to be updated to 681.vf91669a_32e45 or higher
+Update required: Structs Plugin (structs 337.v1b_04ea_4df7c8) to be updated to 338.v848422169819 or higher
+Update required: Jenkins Git client plugin (git-client 4.6.0) to be updated to 5.0.0 or higher
+Update required: Pipeline: SCM Step (workflow-scm-step 415.v434365564324) to be updated to 427.v4ca_6512e7df1 or higher
+Update required: SSH Credentials Plugin (ssh-credentials 308.ve4497b_ccd8f4) to be updated to 343.v884f71d78167 or higher
+OpenText Application Automation Tools (24.3)
+Update required: Pipeline: Step API (workflow-step-api 657.v03b_e8115821b_) to be updated to 678.v3ee58b_469476 or higher
+Update required: Structs Plugin (structs 337.v1b_04ea_4df7c8) to be updated to 338.v848422169819 or higher
+Update required: Pipeline: Supporting APIs (workflow-support 865.v43e78cc44e0d) to be updated to 920.v59f71ce16f04 or higher
+Update required: Pipeline: Groovy (workflow-cps 3853.vb_a_490d892963) to be updated to 3908.vd6b_b_5a_a_54010 or higher
+Update required: SCM API Plugin (scm-api 683.vb_16722fb_b_80b_) to be updated to 690.vfc8b_54395023 or higher
+Update required: Pipeline: SCM Step (workflow-scm-step 415.v434365564324) to be updated to 427.v4ca_6512e7df1 or higher
+Pipeline: Declarative (2.2205.vc9522a_9d5711)
+Update required: Pipeline: Stage Tags Metadata (pipeline-stage-tags-metadata 2.2175.v76a_fff0a_2618) to be updated to 2.2205.vc9522a_9d5711 or higher
+Update required: Pipeline: Declarative Extension Points API (pipeline-model-extensions 2.2175.v76a_fff0a_2618) to be updated to 2.2205.vc9522a_9d5711 or higher
+Some of the above failures also result in additional indirectly dependent plugins not being able to load.
