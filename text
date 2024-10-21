@@ -1,24 +1,147 @@
-Some plugins could not be loaded due to unsatisfied dependencies. Fix these issues and restart Jenkins to re-enable these plugins.
+[INFO] ---------------------< com.pershing:scsb-ach-log >----------------------
+[INFO] Building scsb-ach-log 0.0.1
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ scsb-ach-log ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 2 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ scsb-ach-log ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 14 source files to /datam/jenkins/workspace/ncbs_ach/CICD_scsb-ach-log/scsb-ach-log/target/classes
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 0.867 s
+[INFO] Finished at: 2024-10-21T10:05:39+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.1:compile (default-compile) on project scsb-ach-log: Fatal error compiling: error: invalid target release: 17 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+Post stage
+[Pipeline] echo
+maven package 失敗
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
 
-Dependency errors:
 
-Git plugin (5.3.0)
-Update required: Credentials Plugin (credentials 1361.v56f5ca_35d21c) to be updated to 1371.vfee6b_095f0a_3 or higher
-Update required: SCM API Plugin (scm-api 683.vb_16722fb_b_80b_) to be updated to 696.v778d637b_a_762 or higher
-Update required: Pipeline: Step API (workflow-step-api 657.v03b_e8115821b_) to be updated to 678.v3ee58b_469476 or higher
-Update required: Credentials Binding Plugin (credentials-binding 657.v2b_19db_7d6e6d) to be updated to 681.vf91669a_32e45 or higher
-Update required: Structs Plugin (structs 337.v1b_04ea_4df7c8) to be updated to 338.v848422169819 or higher
-Update required: Jenkins Git client plugin (git-client 4.6.0) to be updated to 5.0.0 or higher
-Update required: Pipeline: SCM Step (workflow-scm-step 415.v434365564324) to be updated to 427.v4ca_6512e7df1 or higher
-Update required: SSH Credentials Plugin (ssh-credentials 308.ve4497b_ccd8f4) to be updated to 343.v884f71d78167 or higher
-OpenText Application Automation Tools (24.3)
-Update required: Pipeline: Step API (workflow-step-api 657.v03b_e8115821b_) to be updated to 678.v3ee58b_469476 or higher
-Update required: Structs Plugin (structs 337.v1b_04ea_4df7c8) to be updated to 338.v848422169819 or higher
-Update required: Pipeline: Supporting APIs (workflow-support 865.v43e78cc44e0d) to be updated to 920.v59f71ce16f04 or higher
-Update required: Pipeline: Groovy (workflow-cps 3853.vb_a_490d892963) to be updated to 3908.vd6b_b_5a_a_54010 or higher
-Update required: SCM API Plugin (scm-api 683.vb_16722fb_b_80b_) to be updated to 690.vfc8b_54395023 or higher
-Update required: Pipeline: SCM Step (workflow-scm-step 415.v434365564324) to be updated to 427.v4ca_6512e7df1 or higher
-Pipeline: Declarative (2.2205.vc9522a_9d5711)
-Update required: Pipeline: Stage Tags Metadata (pipeline-stage-tags-metadata 2.2175.v76a_fff0a_2618) to be updated to 2.2205.vc9522a_9d5711 or higher
-Update required: Pipeline: Declarative Extension Points API (pipeline-model-extensions 2.2175.v76a_fff0a_2618) to be updated to 2.2205.vc9522a_9d5711 or higher
-Some of the above failures also result in additional indirectly dependent plugins not being able to load.
+pipeline {
+    agent any
+
+    environment {
+		GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_ach/scsb-ach-log.git'
+        GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:ncbs_ach/scsb-ach-log.git'
+        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
+		SONAR_PROJECT_KEY = 'ncbs-ach'
+		PROJECT_NAME='scsb-ach-log'
+        RELEASE_TAG = ''
+        RELEASE_TIMESTAMP = ''
+        RELEASE_VERSION = ''
+        APP_VERSION = '1.0.0'
+        BATCH_SERVER = '10.21.109.220'
+        CICDAPISERVICE_URL = 'http://ddpsg01.cbsd.scsb.com.tw:5001'
+    }
+    stages {
+		stage('check env') {
+			steps {
+				echo 'check env'
+				echo '------------------------------'
+				sh 'pwd'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+				echo sh(script: 'env|sort', returnStdout: true)
+				echo '------------------------------'
+				sh 'java -version'
+				echo '------------------------------'
+				sh 'mvn -version'
+				echo '------------------------------'
+				sh 'git --version'
+				echo '------------------------------'
+				sh 'df -h' //Show Disk space
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'check env 失敗'
+				}
+				success {
+					echo 'check env 成功'            	
+				}
+			}
+		}
+		stage('WORKSPACE init') {
+			steps {
+				echo 'WORKSPACE init'
+				echo '------------------------------'
+				sh 'rm -rf *'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'WORKSPACE init 失敗'
+				}
+				success {
+					echo 'WORKSPACE init 成功'            	
+				}
+			}
+		}
+		
+		stage('git clone'){
+		    steps{
+				echo 'git clone'
+				echo '------------------------------'
+				withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
+					sh '''
+						git clone --branch main ${GIT_REPO_SSH_URL}
+						ls -al
+						pwd
+					'''
+				}
+		    }
+		    post{
+				failure {
+					echo 'git clone 失敗'
+				}
+				success {
+					echo 'git clone 成功'            	
+				} 
+		    }
+		}
+		
+		stage('maven package'){
+		    steps{
+		        echo 'maven package'
+		        echo '------------------------------'
+		        
+		        sh '''
+		            cd scsb-ach-log
+		            pwd
+		            mvn clean
+		            mvn package
+				'''
+				echo '------------------------------'
+		    }
+		    post{
+		       failure {
+					echo 'maven package 失敗'
+				}
+				success {
+					echo 'maven package 成功'
+				} 
+		    }
+		}
+    }
+}
