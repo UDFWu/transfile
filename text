@@ -1,147 +1,37 @@
-[INFO] ---------------------< com.pershing:scsb-ach-log >----------------------
-[INFO] Building scsb-ach-log 0.0.1
-[INFO] --------------------------------[ war ]---------------------------------
-[INFO] 
-[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ scsb-ach-log ---
-[INFO] Using 'UTF-8' encoding to copy filtered resources.
-[INFO] Copying 2 resources
-[INFO] 
-[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ scsb-ach-log ---
-[INFO] Changes detected - recompiling the module!
-[INFO] Compiling 14 source files to /datam/jenkins/workspace/ncbs_ach/CICD_scsb-ach-log/scsb-ach-log/target/classes
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD FAILURE
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 0.867 s
-[INFO] Finished at: 2024-10-21T10:05:39+08:00
-[INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.1:compile (default-compile) on project scsb-ach-log: Fatal error compiling: error: invalid target release: 17 -> [Help 1]
-[ERROR] 
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR] 
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
-Post stage
-[Pipeline] echo
-maven package 失敗
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 1
-
-
 pipeline {
     agent any
 
     environment {
-		GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_ach/scsb-ach-log.git'
-        GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:ncbs_ach/scsb-ach-log.git'
-        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
-		SONAR_PROJECT_KEY = 'ncbs-ach'
-		PROJECT_NAME='scsb-ach-log'
-        RELEASE_TAG = ''
-        RELEASE_TIMESTAMP = ''
-        RELEASE_VERSION = ''
-        APP_VERSION = '1.0.0'
-        BATCH_SERVER = '10.21.109.220'
-        CICDAPISERVICE_URL = 'http://ddpsg01.cbsd.scsb.com.tw:5001'
+        API_URL = "http://localhost:8091/atgt/api/execJsonAndFile"  // 你的 API endpoint
+        CSRF_URL = "http://localhost:8091/atgt/api/csrf"  // 你的 CSRF URL
+        API_KEY = "abcde"
+        USER_ID = "12345"
+        TOKEN = "xyz"
     }
+
     stages {
-		stage('check env') {
-			steps {
-				echo 'check env'
-				echo '------------------------------'
-				sh 'pwd'
-				echo '------------------------------'
-				sh 'ls -al'
-				echo '------------------------------'
-				echo sh(script: 'env|sort', returnStdout: true)
-				echo '------------------------------'
-				sh 'java -version'
-				echo '------------------------------'
-				sh 'mvn -version'
-				echo '------------------------------'
-				sh 'git --version'
-				echo '------------------------------'
-				sh 'df -h' //Show Disk space
-				echo '------------------------------'
-			}
-			post {
-				failure {
-					echo 'check env 失敗'
-				}
-				success {
-					echo 'check env 成功'            	
-				}
-			}
-		}
-		stage('WORKSPACE init') {
-			steps {
-				echo 'WORKSPACE init'
-				echo '------------------------------'
-				sh 'rm -rf *'
-				echo '------------------------------'
-				sh 'ls -al'
-				echo '------------------------------'
-			}
-			post {
-				failure {
-					echo 'WORKSPACE init 失敗'
-				}
-				success {
-					echo 'WORKSPACE init 成功'            	
-				}
-			}
-		}
-		
-		stage('git clone'){
-		    steps{
-				echo 'git clone'
-				echo '------------------------------'
-				withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
-					sh '''
-						git clone --branch main ${GIT_REPO_SSH_URL}
-						ls -al
-						pwd
-					'''
-				}
-		    }
-		    post{
-				failure {
-					echo 'git clone 失敗'
-				}
-				success {
-					echo 'git clone 成功'            	
-				} 
-		    }
-		}
-		
-		stage('maven package'){
-		    steps{
-		        echo 'maven package'
-		        echo '------------------------------'
-		        
-		        sh '''
-		            cd scsb-ach-log
-		            pwd
-		            mvn clean
-		            mvn package
-				'''
-				echo '------------------------------'
-		    }
-		    post{
-		       failure {
-					echo 'maven package 失敗'
-				}
-				success {
-					echo 'maven package 成功'
-				} 
-		    }
-		}
+        stage('Call Agent API') {
+            steps {
+                script {
+                    // 獲取 CSRF Token
+                    def csrfToken = sh(script: "curl -X GET ${CSRF_URL}", returnStdout: true).trim()
+                    echo "CSRF Token: ${csrfToken}"
+
+                    // 使用 curl 呼叫 API
+                    def response = sh(script: """
+                        curl -X POST ${API_URL} \
+                        -H 'Content-Type: application/json' \
+                        -H 'X-CSRF-Token: ${csrfToken}' \
+                        -d '{
+                            "apiKey": "${API_KEY}",
+                            "userId": "${USER_ID}",
+                            "token": "${TOKEN}"
+                        }'
+                    """, returnStdout: true).trim()
+
+                    echo "API Response: ${response}"
+                }
+            }
+        }
     }
 }
