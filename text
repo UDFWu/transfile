@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         API_URL = "http://localhost:8091/atgt/api/execJsonAndFile"
+        CSRF_URL = "http://localhost:8091/atgt/api/csrf"
     }
     parameters {
         string(name: 'username', defaultValue: 'ABCDE', description: '使用者名稱')
@@ -12,7 +13,18 @@ pipeline {
         stage('Call Agent API') {
             steps {
                 script {
-                    // 準備 JSON 數據，使用參數
+                    // 1. 取得 CSRF Token 和 Session ID
+                    def tokenResponse = sh(script: """
+                        curl -i -X GET "${CSRF_URL}"
+                    """, returnStdout: true).trim()
+                    
+                    def csrfToken = sh(script: """echo '${tokenResponse}' | grep 'X-CSRF-TOKEN' | cut -d' ' -f2""", returnStdout: true).trim()
+                    def jsessionId = sh(script: """echo '${tokenResponse}' | grep 'JSESSIONID' | cut -d';' -f1""", returnStdout: true).trim()
+                    
+                    echo "CSRF Token: ${csrfToken}"
+                    echo "Session ID: ${jsessionId}"
+                    
+                    // 2. 準備 JSON 數據
                     def jsonData = """
                         {
                             "username": "${params.username}",
@@ -21,15 +33,28 @@ pipeline {
                         }
                     """
                     
-                    // 使用 curl 呼叫 API，加入 jsonString 參數
+                    // 3. 使用完全符合Java程式碼的方式呼叫 API
                     def response = sh(script: """
                         curl -X POST \
                         "${API_URL}" \
                         -H 'Content-Type: application/x-www-form-urlencoded' \
-                        --data-urlencode 'jsonString=${jsonData}'
+                        -H 'X-CSRF-TOKEN: ${csrfToken}' \
+                        -H 'Cookie: ${jsessionId}' \
+                        -H 'Accept: */*' \
+                        --data "jsonString=${jsonData}"
                     """, returnStdout: true).trim()
                     
                     echo "API Response: ${response}"
+                    
+                    // 為了debug，顯示完整的請求內容
+                    echo "Debug - Full request:"
+                    echo "URL: ${API_URL}"
+                    echo "Headers:"
+                    echo "- Content-Type: application/x-www-form-urlencoded"
+                    echo "- X-CSRF-TOKEN: ${csrfToken}"
+                    echo "- Cookie: ${jsessionId}"
+                    echo "Request Body:"
+                    echo "jsonString=${jsonData}"
                 }
             }
         }
