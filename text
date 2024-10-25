@@ -10,53 +10,129 @@ pipeline {
         string(name: 'function', defaultValue: 'xyz', description: '功能代碼')
     }
     stages {
+        stage('Initial Debug Info') {
+            steps {
+                script {
+                    echo "=== 初始環境資訊 ==="
+                    echo "API URL: ${API_URL}"
+                    echo "CSRF URL: ${CSRF_URL}"
+                    echo "Username: ${params.username}"
+                    echo "Function: ${params.function}"
+                }
+            }
+        }
+
+        stage('Get CSRF Token') {
+            steps {
+                script {
+                    echo "=== 開始獲取 CSRF Token ==="
+                    echo "正在呼叫 CSRF endpoint: ${CSRF_URL}"
+                    
+                    // 先測試CSRF endpoint是否可連接
+                    def testConnection = sh(script: """
+                        curl -I "${CSRF_URL}"
+                    """, returnStatus: true)
+                    
+                    echo "CSRF endpoint 連線測試結果: ${testConnection == 0 ? '成功' : '失敗'}"
+                    
+                    // 獲取完整response，包含headers
+                    def tokenResponse = sh(script: """
+                        curl -i -X GET "${CSRF_URL}" \
+                        -D - \
+                        -o /dev/null \
+                        -v 2>&1
+                    """, returnStdout: true).trim()
+                    
+                    echo "=== CSRF 請求的完整回應 ==="
+                    echo tokenResponse
+                    
+                    // 解析 CSRF Token
+                    def csrfToken = sh(script: """
+                        echo '${tokenResponse}' | grep -i 'X-CSRF-TOKEN:' | cut -d' ' -f2 | tr -d '\\r'
+                    """, returnStdout: true).trim()
+                    
+                    echo "解析出的 CSRF Token: [${csrfToken}]"
+                    
+                    // 解析 JSESSIONID
+                    def jsessionId = sh(script: """
+                        echo '${tokenResponse}' | grep -i 'Set-Cookie:' | grep 'JSESSIONID' | cut -d';' -f1 | cut -d' ' -f2
+                    """, returnStdout: true).trim()
+                    
+                    echo "解析出的 JSESSIONID: [${jsessionId}]"
+                    
+                    // 儲存變數
+                    env.CSRF_TOKEN = csrfToken
+                    env.JSESSIONID = jsessionId
+                    
+                    echo "=== Token 獲取階段完成 ==="
+                    echo "儲存的 CSRF Token: ${env.CSRF_TOKEN}"
+                    echo "儲存的 JSESSIONID: ${env.JSESSIONID}"
+                }
+            }
+        }
+        
+        stage('Prepare API Call') {
+            steps {
+                script {
+                    echo "=== 準備 API 呼叫資料 ==="
+                    
+                    // 檢查tokens
+                    if (!env.CSRF_TOKEN?.trim()) {
+                        error "ERROR: CSRF Token 未正確獲取"
+                    }
+                    if (!env.JSESSIONID?.trim()) {
+                        error "ERROR: JSESSIONID 未正確獲取"
+                    }
+                    
+                    // 準備 JSON 數據
+                    def jsonData = """{"username":"${params.username}","password":"${params.password}","function":"${params.function}"}"""
+                    env.JSON_DATA = jsonData
+                    
+                    echo "準備的 JSON 數據: ${jsonData}"
+                    echo "=== API 呼叫準備完成 ==="
+                }
+            }
+        }
+        
         stage('Call Agent API') {
             steps {
                 script {
-                    // 1. 取得 CSRF Token 和 Session ID
-                    def tokenResponse = sh(script: """
-                        curl -i -X GET "${CSRF_URL}"
-                    """, returnStdout: true).trim()
-                    
-                    def csrfToken = sh(script: """echo '${tokenResponse}' | grep 'X-CSRF-TOKEN' | cut -d' ' -f2""", returnStdout: true).trim()
-                    def jsessionId = sh(script: """echo '${tokenResponse}' | grep 'JSESSIONID' | cut -d';' -f1""", returnStdout: true).trim()
-                    
-                    echo "CSRF Token: ${csrfToken}"
-                    echo "Session ID: ${jsessionId}"
-                    
-                    // 2. 準備 JSON 數據
-                    def jsonData = """
-                        {
-                            "username": "${params.username}",
-                            "password": "${params.password}",
-                            "function": "${params.function}"
-                        }
-                    """
-                    
-                    // 3. 使用完全符合Java程式碼的方式呼叫 API
-                    def response = sh(script: """
-                        curl -X POST \
-                        "${API_URL}" \
-                        -H 'Content-Type: application/x-www-form-urlencoded' \
-                        -H 'X-CSRF-TOKEN: ${csrfToken}' \
-                        -H 'Cookie: ${jsessionId}' \
-                        -H 'Accept: */*' \
-                        --data "jsonString=${jsonData}"
-                    """, returnStdout: true).trim()
-                    
-                    echo "API Response: ${response}"
-                    
-                    // 為了debug，顯示完整的請求內容
-                    echo "Debug - Full request:"
-                    echo "URL: ${API_URL}"
-                    echo "Headers:"
+                    echo "=== 開始呼叫 Agent API ==="
+                    echo "目標 URL: ${API_URL}"
+                    echo "使用的 Headers:"
+                    echo "- X-CSRF-TOKEN: ${env.CSRF_TOKEN}"
+                    echo "- Cookie: ${env.JSESSIONID}"
                     echo "- Content-Type: application/x-www-form-urlencoded"
-                    echo "- X-CSRF-TOKEN: ${csrfToken}"
-                    echo "- Cookie: ${jsessionId}"
-                    echo "Request Body:"
-                    echo "jsonString=${jsonData}"
+                    echo "Request Body: jsonString=${env.JSON_DATA}"
+                    
+                    // 執行API呼叫
+                    def response = sh(script: """
+                        curl -X POST "${API_URL}" \
+                        -H 'Content-Type: application/x-www-form-urlencoded' \
+                        -H 'X-CSRF-TOKEN: ${env.CSRF_TOKEN}' \
+                        -H 'Cookie: ${env.JSESSIONID}' \
+                        --data-urlencode 'jsonString=${env.JSON_DATA}' \
+                        -v 2>&1
+                    """, returnStdout: true).trim()
+                    
+                    echo "=== API 呼叫完成 ==="
+                    echo "完整回應內容:"
+                    echo response
                 }
             }
+        }
+    }
+    
+    post {
+        always {
+            echo "=== Pipeline 執行完成 ==="
+            echo "執行結果: ${currentBuild.result}"
+        }
+        success {
+            echo "Pipeline 成功執行完畢！"
+        }
+        failure {
+            echo "Pipeline 執行失敗，請檢查上方日誌查找錯誤原因"
         }
     }
 }
