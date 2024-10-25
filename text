@@ -1,34 +1,34 @@
 pipeline {
     agent any
-
     environment {
-        API_URL = "http://localhost:8091/atgt/api/execJsonAndFile"  // 你的 API endpoint
-        CSRF_URL = "http://localhost:8091/atgt/api/csrf"  // 你的 CSRF URL
-        API_KEY = "abcde"
-        USER_ID = "12345"
-        TOKEN = "xyz"
+        API_URL = "http://localhost:8091/atgt/api/execJsonAndFile"
     }
-
+    parameters {
+        string(name: 'username', defaultValue: 'ABCDE', description: '使用者名稱')
+        string(name: 'password', defaultValue: '12345', description: '密碼')
+        string(name: 'function', defaultValue: 'xyz', description: '功能代碼')
+    }
     stages {
         stage('Call Agent API') {
             steps {
                 script {
-                    // 獲取 CSRF Token
-                    def csrfToken = sh(script: "curl -X GET ${CSRF_URL}", returnStdout: true).trim()
-                    echo "CSRF Token: ${csrfToken}"
-
-                    // 使用 curl 呼叫 API
+                    // 準備 JSON 數據，使用參數
+                    def jsonData = """
+                        {
+                            "username": "${params.username}",
+                            "password": "${params.password}",
+                            "function": "${params.function}"
+                        }
+                    """
+                    
+                    // 使用 curl 呼叫 API，加入 jsonString 參數
                     def response = sh(script: """
-                        curl -X POST ${API_URL} \
-                        -H 'Content-Type: application/json' \
-                        -H 'X-CSRF-Token: ${csrfToken}' \
-                        -d '{
-                            "apiKey": "${API_KEY}",
-                            "userId": "${USER_ID}",
-                            "token": "${TOKEN}"
-                        }'
+                        curl -X POST \
+                        "${API_URL}" \
+                        -H 'Content-Type: application/x-www-form-urlencoded' \
+                        --data-urlencode 'jsonString=${jsonData}'
                     """, returnStdout: true).trim()
-
+                    
                     echo "API Response: ${response}"
                 }
             }
