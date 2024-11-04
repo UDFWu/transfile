@@ -1,13 +1,48 @@
-===請將以下資訊通知與會人員===
-T24 CI/CD流程討論會議
-由 上海商業儲蓄銀行 主持
+SFTP RemoteHost
+[Pipeline] echo
+------------------------------
+[Pipeline] script
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $SFTP_KEY
+[Pipeline] {
+[Pipeline] sh
++ cd scsb-ach-log
++ pwd
+/datam/jenkins/workspace/ncbs_ach/DEV_scsb-ach-log/scsb-ach-log
++ ls -al ./target/logModule-exec.war
+-rw-rw-r--+ 1 jenkins jenkins 53386658 Nov  1 17:20 ./target/logModule-exec.war
++ sftp -i **** dacha01@10.21.106.160
+Permission denied, please try again.
+Permission denied, please try again.
+dacha01@10.21.106.160: Permission denied (publickey,password).
 
-https://scsbtw.webex.com/scsbtw/j.php?MTID=m94b9ec3b92782a4bbfcff0ac73b098c6
-2024年11月4日星期一 上午 09:00 | 1 小時 | （UTC+08:00）台北
-會議號： 2511 815 0253
-密碼： S*Xt2563
+Connection closed.  
+Connection closed
 
 
-
-zoomforscsb.conf@gmail.com
-Pukii#03036306
+stage('SFTP RemoteHost'){
+			steps{
+				echo 'SFTP RemoteHost'
+				echo '------------------------------'                
+                script{
+					withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-sftp-agent', keyFileVariable: 'SFTP_KEY')]) {
+					sh '''
+                        cd scsb-ach-log
+		                pwd
+		                ls -al ./target/logModule-exec.war
+		                sftp -i ${SFTP_KEY} dacha01@10.21.106.160 <<< 'put ./target/logModule-exec.war /home/dacha01/'
+					'''					    
+                    }
+				}
+				echo '------------------------------'
+			}
+			post{
+		       failure {
+					echo 'SSH RemoteHost 失敗'
+				}
+				success {
+					echo 'SSH RemoteHost 成功'            	
+				} 
+		    }
+		}
