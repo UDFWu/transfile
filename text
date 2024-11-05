@@ -11,30 +11,35 @@ Masking supported pattern matches of $SFTP_KEY
 + pwd
 /datam/jenkins/workspace/ncbs_ach/DEV_scsb-ach-log/scsb-ach-log
 + ls -al ./target/logModule-exec.war
--rw-rw-r--+ 1 jenkins jenkins 53386658 Nov  1 17:20 ./target/logModule-exec.war
-+ sftp -i **** dacha01@10.21.106.160
-Permission denied, please try again.
-Permission denied, please try again.
-dacha01@10.21.106.160: Permission denied (publickey,password).
+-rw-rw-r--+ 1 jenkins jenkins 53386658 Nov  5 11:48 ./target/logModule-exec.war
++ sftp -i **** version@DACH001
+Host key verification failed.
+Connection closed
 
 Connection closed.  
-Connection closed
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // script
+Post stage
+[Pipeline] echo
+SSH RemoteHost 失敗
 
 
 stage('SFTP RemoteHost'){
 			steps{
 				echo 'SFTP RemoteHost'
 				echo '------------------------------'                
-                script{
+				script{
 					withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-sftp-agent', keyFileVariable: 'SFTP_KEY')]) {
 					sh '''
-                        cd scsb-ach-log
-		                pwd
-		                ls -al ./target/logModule-exec.war
-		                sftp -i ${SFTP_KEY} dacha01@10.21.106.160 <<< 'put ./target/logModule-exec.war /home/dacha01/'
+						cd scsb-ach-log
+						pwd
+						ls -al ./target/logModule-exec.war
+						sftp -i ${SFTP_KEY} version@DACH001 <<< 'put ./target/logModule-exec.war /home/dacha01/'
 					'''					    
-                    }
-				}
+					}
+				}				    
 				echo '------------------------------'
 			}
 			post{
