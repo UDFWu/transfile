@@ -1,53 +1,30 @@
-SFTP RemoteHost
-[Pipeline] echo
-------------------------------
-[Pipeline] script
-[Pipeline] {
-[Pipeline] withCredentials
-Masking supported pattern matches of $SFTP_KEY
-[Pipeline] {
-[Pipeline] sh
-+ cd scsb-ach-log
-+ pwd
-/datam/jenkins/workspace/ncbs_ach/DEV_scsb-ach-log/scsb-ach-log
-+ ls -al ./target/logModule-exec.war
--rw-rw-r--+ 1 jenkins jenkins 53386658 Nov  5 11:48 ./target/logModule-exec.war
-+ sftp -i **** version@DACH001
-Host key verification failed.
-Connection closed
-
-Connection closed.  
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // script
-Post stage
-[Pipeline] echo
-SSH RemoteHost 失敗
-
-
-stage('SFTP RemoteHost'){
-			steps{
-				echo 'SFTP RemoteHost'
-				echo '------------------------------'                
-				script{
-					withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-sftp-agent', keyFileVariable: 'SFTP_KEY')]) {
-					sh '''
-						cd scsb-ach-log
-						pwd
-						ls -al ./target/logModule-exec.war
-						sftp -i ${SFTP_KEY} version@DACH001 <<< 'put ./target/logModule-exec.war /home/dacha01/'
-					'''					    
-					}
-				}				    
-				echo '------------------------------'
-			}
-			post{
-		       failure {
-					echo 'SSH RemoteHost 失敗'
-				}
-				success {
-					echo 'SSH RemoteHost 成功'            	
-				} 
-		    }
-		}
+pipeline {
+    agent any
+    stages {
+        stage('Download WAR from Nexus on Target Server') {
+            steps {
+                echo 'Starting download on target server dacha01'
+                echo '------------------------------'
+                script {
+                    // Jenkins 直接在 target server 上執行 wget 指令
+                    sh '''
+                        ssh dacha01@10.21.106.160 <<EOF
+                            cd /home/dacha01
+                            wget --user=username --password=password http://nexus.server/repository/your-repo/logModule-exec.war -O logModule-exec.war
+                            ls -al logModule-exec.war
+                        EOF
+                    '''
+                }
+                echo '------------------------------'
+            }
+            post {
+                failure {
+                    echo 'Download failed on target server'
+                }
+                success {
+                    echo 'Download succeeded on target server'
+                }
+            }
+        }
+    }
+}
