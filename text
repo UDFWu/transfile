@@ -1,19 +1,18 @@
-pipeline {
-    agent any
-    stages {
-        stage('Download WAR from Nexus on Target Server') {
+stage('Download WAR from Nexus on Target Server') {
             steps {
                 echo 'Starting download on target server dacha01'
                 echo '------------------------------'
                 script {
-                    // Jenkins 直接在 target server 上執行 wget 指令
-                    sh '''
-                        ssh dacha01@10.21.106.160 <<EOF
-                            cd /home/dacha01
-                            wget --user=username --password=password http://nexus.server/repository/your-repo/logModule-exec.war -O logModule-exec.war
-                            ls -al logModule-exec.war
-                        EOF
-                    '''
+                    // 使用 Jenkins 憑證來隱藏 Nexus 認證資訊
+                    withCredentials([usernamePassword(credentialsId: 'jenkinsdev', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                        sh '''
+                            ssh dacha01@10.21.106.160 <<EOF
+                                cd /home/dacha01
+                                wget --user=${NEXUS_USER} --password=${NEXUS_PASS} http://nexus.server/repository/your-repo/logModule-exec.war -O logModule-exec.war
+                                ls -al logModule-exec.war
+                            EOF
+                        '''
+                    }
                 }
                 echo '------------------------------'
             }
@@ -26,5 +25,3 @@ pipeline {
                 }
             }
         }
-    }
-}
