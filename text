@@ -1,50 +1,6 @@
-Starting download on target server dacha01
-[Pipeline] echo
-------------------------------
-[Pipeline] script
-[Pipeline] {
-[Pipeline] withCredentials
-Masking supported pattern matches of $NEXUS_PASS
-[Pipeline] {
-[Pipeline] sh
-/datam/jenkins/workspace/ncbs_ach/DEV_ach-apic-gateway@tmp/durable-fc13168a/script.sh: line 10: warning: here-document at line 2 delimited by end-of-file (wanted `EOF')
-+ ssh dacha01@10.21.106.160
-++ date + %Y-%m-%d
-date: extra operand ‘%Y-%m-%d’
-Try 'date --help' for more information.
-Pseudo-terminal will not be allocated because stdin is not a terminal.
-Permission denied, please try again.
-Permission denied, please try again.
-dacha01@10.21.106.160: Permission denied (publickey,password).
+https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialandsavingsbank.my/j.php?MTID=md382c48c855a4cfd433d7ff61052b5bc
 
+2024年11月8日星期五 下午 03:30 | 1 小時 30 分鐘 | （UTC+08:00）台北
 
-stage('Download WAR from Nexus on Target Server') {
-            steps {
-                echo 'Starting download on target server dacha01'
-                echo '------------------------------'
-                script {
-                    // 使用 Jenkins 憑證來隱藏 Nexus 認證資訊
-                    withCredentials([usernamePassword(credentialsId: 'nexus-user', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-                        sh '''
-                            ssh dacha01@10.21.106.160 <<EOF
-                                cd /home/dacha01
-								CURRENT_DATE=$(date + "%Y-%m-%d")
-								echo "process execution date: ${CURRENT_DATE}"
-								mkdir -p /home/dacha01/deploy/${CURRENT_DATE}
-                                wget --user=${NEXUS_USER} --password=${NEXUS_PASS} https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/com/pershing/scsb-ach-apic-gateway/1.0/scsb-ach-apic-gateway-1.0.war -O apicGw.war
-                                ls -al apicGw.war
-                            EOF
-                        '''
-                    }
-                }
-                echo '------------------------------'
-            }
-            post {
-                failure {
-                    echo 'Download failed on target server'
-                }
-                success {
-                    echo 'Download succeeded on target server'
-                }
-            }
-        }
+會議號： 2556 339 0796
+密碼： 3zbE#Mvr
