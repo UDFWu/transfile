@@ -1,9 +1,25 @@
-https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialandsavingsbank.my/j.php?MTID=md382c48c855a4cfd433d7ff61052b5bc
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Check Tag)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $GIT_PASSWORD
+[Pipeline] {
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [GIT_PASSWORD]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ git -c http.sslVerify=false ls-remote --tags https://jenkins:****@ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git
+[Pipeline] echo
+6d928aaba76c706ccea638c7eaf913907f36ed21	refs/tags/v20240320.001
+cad53959f51a8190a7d242c8e6d38464d6c7b80b	refs/tags/v20240328.001
+a830714fe8b708a8faeb4309017447ffdc19974b	refs/tags/v20240328.001^{}
+[Pipeline] input
+Are you sure to deploy v20240328.001 version?
+Proceed or Abort
+Approved by 吳宗樺
 
-2024年11月8日星期五 下午 03:30 | 1 小時 30 分鐘 | （UTC+08:00）台北
-
-會議號： 2556 339 0796
-密碼： 3zbE#Mvr
 
 
 stage('Check Tag') { // for display purposes
@@ -11,11 +27,11 @@ stage('Check Tag') { // for display purposes
 		        script {
     	            //withCredentials([usernamePassword(credentialsId: 'fepgitlab', passwordVariable: 'ppass', usernameVariable: 'uname')]){
                     //withCredentials([usernamePassword(credentialsId: 'gitlab-user', passwordVariable: 'ppass', usernameVariable: 'nbawovenboxer951951')]){
-                    withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
+                    withCredentials([usernamePassword(credentialsId: 'gitlab-user', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         //def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${uname}:${ppass}@${GIT_REPO_URL}.git", returnStdout: true).trim()
     	                //def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${selectedUsername}:${selectedPassword}@${git_repo_department_url}.git", returnStdout: true).trim()
     	                //def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${nbawovenboxer951951}:${ppass}@ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git", returnStdout: true).trim()
-                        def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git", returnStdout: true).trim()
+                        def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${GIT_USERNAME}:${GIT_PASSWORD}@ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git", returnStdout: true).trim()
                         
                         if (!env.Tag) {
     						error("*** Build failed, Tag can't no be empty.")
@@ -50,29 +66,3 @@ stage('Check Tag') { // for display purposes
 				}   
 			}
 		}
-		
-		
-		Selected Git installation does not exist. Using Default
- > git --version # timeout=10
- > git --version # 'git version 2.43.5'
-Masking supported pattern matches of $GIT_PASSWORD or $GIT_ASKPASS
-[Pipeline] {
-[Pipeline] sh
-+ git -c http.sslVerify=false ls-remote --tags https://ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git
-[Pipeline] echo
-6d928aaba76c706ccea638c7eaf913907f36ed21	refs/tags/v20240320.001
-cad53959f51a8190a7d242c8e6d38464d6c7b80b	refs/tags/v20240328.001
-a830714fe8b708a8faeb4309017447ffdc19974b	refs/tags/v20240328.001^{}
-[Pipeline] input
-Are you sure to deploy v20240328.001 version?
-Proceed or Abort
-Approved by 吳宗樺
-[Pipeline] }
-[Pipeline] // withCredentials
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (取得 Source Code)
-Stage "取得 Source Code" skipped due to earlier failure(s)
