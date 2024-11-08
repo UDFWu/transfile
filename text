@@ -4,3 +4,75 @@ https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialan
 
 會議號： 2556 339 0796
 密碼： 3zbE#Mvr
+
+
+stage('Check Tag') { // for display purposes
+			steps {
+		        script {
+    	            //withCredentials([usernamePassword(credentialsId: 'fepgitlab', passwordVariable: 'ppass', usernameVariable: 'uname')]){
+                    //withCredentials([usernamePassword(credentialsId: 'gitlab-user', passwordVariable: 'ppass', usernameVariable: 'nbawovenboxer951951')]){
+                    withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
+                        //def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${uname}:${ppass}@${GIT_REPO_URL}.git", returnStdout: true).trim()
+    	                //def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${selectedUsername}:${selectedPassword}@${git_repo_department_url}.git", returnStdout: true).trim()
+    	                //def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${nbawovenboxer951951}:${ppass}@ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git", returnStdout: true).trim()
+                        def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git", returnStdout: true).trim()
+                        
+                        if (!env.Tag) {
+    						error("*** Build failed, Tag can't no be empty.")
+    					} else if (!check_tag) {
+    						error('*** Tag does not exist.')
+    					} else {
+    					    echo "${check_tag}"
+    						env.APP_VERSION = env.Tag
+    						input "Are you sure to deploy ${env.Tag} version?"
+    					}
+    					//sh 'git checkout SIT_PHASE1'
+    					//sh 'git ls-remote --tags https://${uname}:${ppass}@${GIT_REPO_URL}'
+    					//env.GIT_PREVIOUS_COMMIT = sh(script: "git rev-parse SIT_PHASE1", returnStdout: true).trim()
+    					//env.GIT_COMMIT = sh(script: "git -c http.sslVerify=false ls-remote --tags  https://${uname}:${ppass}@${GIT_REPO_URL}.git | grep ${env.Tag} | awk '{print \$1}'", returnStdout: true).trim()
+    					//env.GIT_COMMIT = sh(script: "git -c http.sslVerify=false ls-remote --tags  https://${selectedUsername}:${selectedPassword}@${git_repo_department_url}.git | grep ${env.Tag} | awk '{print \$1}'", returnStdout: true).trim()
+                        env.GIT_COMMIT = sh(script: "git -c http.sslVerify=false ls-remote --tags  https://${nbawovenboxer951951}:${ppass}@ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git | grep ${env.Tag} | awk '{print \$1}'", returnStdout: true).trim()
+                        
+                        //if (!env.GIT_PREVIOUS_COMMIT){
+    					//	env.GIT_PREVIOUS_COMMIT = env.GIT_COMMIT
+    					//}
+    					echo "${env.GIT_COMMIT}"
+    
+    					//sh(script: "echo do Declarative: Checkout SCM", returnStdout: false)
+    
+    					//checkout([$class: 'GitSCM',
+    					//	branches: [[name: "${env.GIT_COMMIT}"]],
+    					//	userRemoteConfigs: [[url: "https://${GIT_REPO_URL}", credentialsId: 'fepgitlab']]
+    					//])
+    					//env.GIT_COMMIT_SHORT = sh(script: "git rev-parse --short ${GIT_COMMIT}", returnStdout: true).trim()
+    					//sh 'git clone --branch ${env.tag} https://${uname}:${ppass}@${GIT_REPO_URL}'
+    	            }
+				}   
+			}
+		}
+		
+		
+		Selected Git installation does not exist. Using Default
+ > git --version # timeout=10
+ > git --version # 'git version 2.43.5'
+Masking supported pattern matches of $GIT_PASSWORD or $GIT_ASKPASS
+[Pipeline] {
+[Pipeline] sh
++ git -c http.sslVerify=false ls-remote --tags https://ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git
+[Pipeline] echo
+6d928aaba76c706ccea638c7eaf913907f36ed21	refs/tags/v20240320.001
+cad53959f51a8190a7d242c8e6d38464d6c7b80b	refs/tags/v20240328.001
+a830714fe8b708a8faeb4309017447ffdc19974b	refs/tags/v20240328.001^{}
+[Pipeline] input
+Are you sure to deploy v20240328.001 version?
+Proceed or Abort
+Approved by 吳宗樺
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (取得 Source Code)
+Stage "取得 Source Code" skipped due to earlier failure(s)
