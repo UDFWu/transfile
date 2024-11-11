@@ -1,68 +1,214 @@
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Check Tag)
-[Pipeline] script
-[Pipeline] {
-[Pipeline] withCredentials
-Masking supported pattern matches of $GIT_PASSWORD
-[Pipeline] {
-[Pipeline] sh
-Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
-		 Affected argument(s) used the following variable(s): [GIT_PASSWORD]
-		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
-+ git -c http.sslVerify=false ls-remote --tags https://jenkins:****@ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git
-[Pipeline] echo
-6d928aaba76c706ccea638c7eaf913907f36ed21	refs/tags/v20240320.001
-cad53959f51a8190a7d242c8e6d38464d6c7b80b	refs/tags/v20240328.001
-a830714fe8b708a8faeb4309017447ffdc19974b	refs/tags/v20240328.001^{}
-[Pipeline] input
-Are you sure to deploy v20240328.001 version?
-Proceed or Abort
-Approved by 吳宗樺
-
-
-
-stage('Check Tag') { // for display purposes
+pipeline {
+    agent any
+    tools{
+        jdk 'Java 17'
+    }
+    environment {
+		GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_ach/ach-apic-gateway.git'
+        GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:ncbs_ach/ach-apic-gateway.git'
+        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
+		SONAR_PROJECT_KEY = 'ncbs-ach'
+		PROJECT_NAME='scsb-ach-apic-gateway'
+        RELEASE_TAG = ''
+        RELEASE_TIMESTAMP = ''
+        RELEASE_VERSION = ''
+        APP_VERSION = '1.0.0'
+        BATCH_SERVER = '10.21.109.220'
+        CICDAPISERVICE_URL = 'http://ddpsg01.cbsd.scsb.com.tw:5001'
+		CURRENT_DATE = ''
+    }
+    stages {
+		stage('check env') {
 			steps {
-		        script {
-    	            //withCredentials([usernamePassword(credentialsId: 'fepgitlab', passwordVariable: 'ppass', usernameVariable: 'uname')]){
-                    //withCredentials([usernamePassword(credentialsId: 'gitlab-user', passwordVariable: 'ppass', usernameVariable: 'nbawovenboxer951951')]){
-                    withCredentials([usernamePassword(credentialsId: 'gitlab-user', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        //def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${uname}:${ppass}@${GIT_REPO_URL}.git", returnStdout: true).trim()
-    	                //def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${selectedUsername}:${selectedPassword}@${git_repo_department_url}.git", returnStdout: true).trim()
-    	                //def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${nbawovenboxer951951}:${ppass}@ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git", returnStdout: true).trim()
-                        def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${GIT_USERNAME}:${GIT_PASSWORD}@ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git", returnStdout: true).trim()
-                        
-                        if (!env.Tag) {
-    						error("*** Build failed, Tag can't no be empty.")
-    					} else if (!check_tag) {
-    						error('*** Tag does not exist.')
-    					} else {
-    					    echo "${check_tag}"
-    						env.APP_VERSION = env.Tag
-    						input "Are you sure to deploy ${env.Tag} version?"
-    					}
-    					//sh 'git checkout SIT_PHASE1'
-    					//sh 'git ls-remote --tags https://${uname}:${ppass}@${GIT_REPO_URL}'
-    					//env.GIT_PREVIOUS_COMMIT = sh(script: "git rev-parse SIT_PHASE1", returnStdout: true).trim()
-    					//env.GIT_COMMIT = sh(script: "git -c http.sslVerify=false ls-remote --tags  https://${uname}:${ppass}@${GIT_REPO_URL}.git | grep ${env.Tag} | awk '{print \$1}'", returnStdout: true).trim()
-    					//env.GIT_COMMIT = sh(script: "git -c http.sslVerify=false ls-remote --tags  https://${selectedUsername}:${selectedPassword}@${git_repo_department_url}.git | grep ${env.Tag} | awk '{print \$1}'", returnStdout: true).trim()
-                        env.GIT_COMMIT = sh(script: "git -c http.sslVerify=false ls-remote --tags  https://${nbawovenboxer951951}:${ppass}@ddpsg01.cbsd.scsb.com.tw/ncbs_ctm/ctm.git | grep ${env.Tag} | awk '{print \$1}'", returnStdout: true).trim()
-                        
-                        //if (!env.GIT_PREVIOUS_COMMIT){
-    					//	env.GIT_PREVIOUS_COMMIT = env.GIT_COMMIT
-    					//}
-    					echo "${env.GIT_COMMIT}"
-    
-    					//sh(script: "echo do Declarative: Checkout SCM", returnStdout: false)
-    
-    					//checkout([$class: 'GitSCM',
-    					//	branches: [[name: "${env.GIT_COMMIT}"]],
-    					//	userRemoteConfigs: [[url: "https://${GIT_REPO_URL}", credentialsId: 'fepgitlab']]
-    					//])
-    					//env.GIT_COMMIT_SHORT = sh(script: "git rev-parse --short ${GIT_COMMIT}", returnStdout: true).trim()
-    					//sh 'git clone --branch ${env.tag} https://${uname}:${ppass}@${GIT_REPO_URL}'
-    	            }
-				}   
+				echo 'check env'
+				echo '------------------------------'
+				sh 'pwd'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+				echo sh(script: 'env|sort', returnStdout: true)
+				echo '------------------------------'
+				sh 'java -version'
+				echo '------------------------------'
+				sh 'mvn -version'
+				echo '------------------------------'
+				sh 'git --version'
+				echo '------------------------------'
+				sh 'df -h' //Show Disk space
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'check env 失敗'
+				}
+				success {
+					echo 'check env 成功'            	
+				}
 			}
 		}
+		stage('WORKSPACE init') {
+			steps {
+				echo 'WORKSPACE init'
+				echo '------------------------------'
+				sh 'rm -rf *'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'WORKSPACE init 失敗'
+				}
+				success {
+					echo 'WORKSPACE init 成功'            	
+				}
+			}
+		}
+		
+		stage('git clone'){
+		    steps{
+				echo 'git clone'
+				echo '------------------------------'
+				withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
+					sh '''
+						git clone --branch dev ${GIT_REPO_SSH_URL}
+						ls -al
+						pwd
+					'''
+				}
+		    }
+		    post{
+				failure {
+					echo 'git clone 失敗'
+				}
+				success {
+					echo 'git clone 成功'            	
+				} 
+		    }
+		}
+		
+		stage('maven package'){
+		    steps{
+		        echo 'maven package'
+		        echo '------------------------------'
+		        
+		        sh '''
+		            cd ach-apic-gateway
+		            pwd
+		            mvn clean
+		            mvn package
+				'''
+				echo '------------------------------'
+		    }
+		    post{
+		       failure {
+					echo 'maven package 失敗'
+				}
+				success {
+					echo 'maven package 成功'
+				} 
+		    }
+		}
+		
+		stage('Publish to nexus(spring)') { 
+			steps {
+				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'pending'
+				dir("ach-apic-gateway"){
+									script {
+						pom = readMavenPom file: "pom.xml";
+						filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+						echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+						artifactPath = filesByGlob[0].path;
+						artifactExists = fileExists artifactPath;
+						if(artifactExists) {
+							echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+							nexusArtifactUploader(
+								credentialsId: 'nexus-user',
+								nexusUrl: 'ddpsn01.cbsd.scsb.com.tw',
+								nexusVersion: 'nexus3',
+								protocol: 'https',
+								repository: 'maven-releases',
+								groupId: pom.groupId,
+								version: pom.version,
+								artifacts: [
+									[
+										artifactId: pom.artifactId,
+										classifier: '',
+										file: artifactPath,
+										type: pom.packaging
+									],
+									[
+										artifactId: pom.artifactId,
+										classifier: '',
+										file: "pom.xml",
+										type: "pom"
+									]
+								]
+							);
+						} else {
+							error "*** File: ${artifactPath}, could not be found";
+						}
+					}
+				}
+				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'success'
+			}
+		}
+		
+		stage('Download WAR from Nexus on Target Server') {
+            steps {
+                echo 'Starting download on target server dacha01'
+                echo '------------------------------'
+                script {
+                    // 使用 Jenkins 憑證來隱藏 Nexus 認證資訊
+                    withCredentials([usernamePassword(credentialsId: 'nexus-user', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                        sh '''
+							CURRENT_DATE=$(date "+%Y-%m-%d")
+							echo "process execution date: ${CURRENT_DATE}"
+                            ssh -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa dacha01@10.21.106.160 <<EOF
+                                cd /home/dacha01
+								mkdir -p /home/dacha01/deploy/${CURRENT_DATE}
+								pwd
+								cd deploy/${CURRENT_DATE}
+                                wget --user=${NEXUS_USER} --password=${NEXUS_PASS} --no-check-certificate https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/com/pershing/scsb-ach-apic-gateway/1.0/scsb-ach-apic-gateway-1.0.war -O apicGw.war
+                                ls -al apicGw.war
+                                exit
+                            EOF
+                        '''
+                    }
+                }
+                echo '------------------------------'
+            }
+            post {
+                failure {
+                    echo 'Download failed on target server'
+                }
+                success {
+                    echo 'Download succeeded on target server'
+                }
+            }
+        }
+		
+		stage('deploy and restart application'){
+			steps{
+				echo 'stop apicGw'
+				sh '''
+				    CURRENT_DATE=$(date "+%Y-%m-%d")
+					ssh -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa dacha01@10.21.106.160 <<EOF
+					    cd /ctl/ach/jboss-eap-8.0/bin/cicd
+					    sh apicGw_version_upgrade.sh "${CURRENT_DATE}"
+					    exit
+					EOF
+				'''
+			}
+			
+			post{
+		       failure {
+					echo '換版 失敗'
+				}
+				success {
+					echo '換版 成功'            	
+				} 
+		    }
+		}
+    }
+}
