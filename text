@@ -2,18 +2,17 @@ pipeline {
     agent any
     
     environment {
-        CX_URL = 'http://10.10.2.164'  // Checkmarx URL
-        CX_CREDENTIALS_ID = 'checkmarx-server'  // 你在 Jenkins 中設置的憑證 ID
-        PROJECT_NAME = 'atms' //設定Checkmarx上對應的專案名稱
-        TEAM_NAME = 'CxServer\\SP\\SCSB\\planning' //預設小組名稱
+        CX_URL = 'http://10.10.2.164'
+        CX_CREDENTIALS_ID = 'checkmarx-server'
+        PROJECT_NAME = 'atms'
+        TEAM_NAME = 'CxServer\\SP\\SCSB\\planning'
     }
-            
+    
     stages {
         stage('Checkout') {
             steps {
-                // 從 GitLab 檢出專案
-                checkout([$class: 'GitSCM', 
-                    branches: [[name: '*/main']], 
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '/main']],
                     userRemoteConfigs: [[
                         url: 'https://10.10.32.10/auto_test/scsb_automated_test_server.git',
                         credentialsId: 'south-gitlab-root-user'
@@ -21,43 +20,80 @@ pipeline {
                 ])
             }
         }
-
+        
         stage('Checkmarx scan') {
             steps {
-                step([$class: 'CxScanBuilder', comment: '', credentialsId: 'checkmarx-server', excludeFolders: '', 
-                excludeOpenSourceFolders: '', exclusionsSetting: 'global', failBuildOnNewResults: false, 
-                failBuildOnNewSeverity: 'HIGH', 
-                filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*,   !**/.hg/**/*,   !**/.git/**/*,  !**/.bzr/**/*, !**/bin/**/*,
-                !**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr,     !**/*.iws,
-                !**/*.bak,     !**/*.tmp,       !**/*.aac,      !**/*.aif,      !**/*.iff,     !**/*.m3u, !**/*.mid, !**/*.mp3,
-                !**/*.mpa,     !**/*.ra,        !**/*.wav,      !**/*.wma,      !**/*.3g2,     !**/*.3gp, !**/*.asf, !**/*.asx,
-                !**/*.avi,     !**/*.flv,       !**/*.mov,      !**/*.mp4,      !**/*.mpg,     !**/*.rm,  !**/*.swf, !**/*.vob,
-                !**/*.wmv,     !**/*.bmp,       !**/*.gif,      !**/*.jpg,      !**/*.png,     !**/*.psd, !**/*.tif, !**/*.swf,
-                !**/*.jar,     !**/*.zip,       !**/*.rar,      !**/*.exe,      !**/*.dll,     !**/*.pdb, !**/*.7z,  !**/*.gz,
-                !**/*.tar.gz,  !**/*.tar,       !**/*.gz,       !**/*.ahtm,     !**/*.ahtml,   !**/*.fhtml, !**/*.hdm,
-                !**/*.hdml,    !**/*.hsql,      !**/*.ht,       !**/*.hta,      !**/*.htc,     !**/*.htd, !**/*.war, !**/*.ear,
-                !**/*.htmls,   !**/*.ihtml,     !**/*.mht,      !**/*.mhtm,     !**/*.mhtml,   !**/*.ssi, !**/*.stm,
-                !**/*.stml,    !**/*.ttml,      !**/*.txn,      !**/*.xhtm,     !**/*.xhtml,   !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*''', 
-                fullScanCycle: 10, generatePdfReport: true, generateXmlReport: false, groupId: '6', includeOpenSourceFolders: '', 
-                osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz', osaInstallBeforeScan: false, 
-                password: '{AQAAABAAAAAQax2RkWSCqvL7HG7i/JVm9LIimk2n+Nxi2QfY9WGoPX0=}', preset: '36', projectName: 'Test Folder', 
-                sastEnabled: true, serverUrl: 'http://10.10.2.164/', sourceEncoding: '1', username: '', 
-                vulnerabilityThresholdResult: 'FAILURE', waitForResultsEnabled: true])
+                script {
+                    try {
+                        def scanResults = step([$class: 'CxScanBuilder',
+                            comment: '',
+                            credentialsId: 'checkmarx-server',
+                            excludeFolders: '',
+                            excludeOpenSourceFolders: '',
+                            exclusionsSetting: 'global',
+                            // 設定高風險和中風險的閾值為 0
+                            highThreshold: 0,
+                            mediumThreshold: 0,
+                            // 低風險可以設定較寬鬆的閾值，這裡設為 100 為例
+                            lowThreshold: 100,
+                            filterPattern: '''!/_cvs//, !/.svn//, !/.hg//, !/.git//, !/.bzr//, !/bin//, !/obj//, !/backup//, !/.idea//, !/*.DS_Store, !/.ipr, !**/.iws, !/*.bak, !/.tmp, !**/.aac, !/*.aif, !/.iff, !**/.m3u, !/*.mid, !/.mp3, !**/.mpa, !/*.ra, !/.wav, !**/.wma, !/*.3g2, !/.3gp, !**/.asf, !/*.asx, !/.avi, !**/.flv, !/*.mov, !/.mp4, !**/.mpg, !/*.rm, !/.swf, !**/.vob, !/*.wmv, !/.bmp, !**/.gif, !/*.jpg, !/.png, !**/.psd, !/*.tif, !/.swf, !**/.jar, !/*.zip, !/.rar, !**/.exe, !/*.dll, !/.pdb, !**/.7z, !/*.gz, !/.tar.gz, !**/.tar, !/*.gz, !/.ahtm, !**/.ahtml, !/*.fhtml, !/.hdm, !**/.hdml, !/*.hsql, !/.ht, !**/.hta, !/*.htc, !/.htd, !**/.war, !/*.ear, !/.htmls, !**/.ihtml, !/*.mht, !/.mhtm, !**/.mhtml, !/*.ssi, !/.stm, !**/.stml, !/*.ttml, !/*.txn, !**/.xhtm, !/*.xhtml, !/.class, !**/.iml, !Checkmarx/Reports/.''',
+                            fullScanCycle: 10,
+                            generatePdfReport: true,
+                            generateXmlReport: true,
+                            groupId: '6',
+                            includeOpenSourceFolders: '',
+                            osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz',
+                            osaInstallBeforeScan: false,
+                            password: '{AQAAABAAAAAQax2RkWSCqvL7HG7i/JVm9LIimk2n+Nxi2QfY9WGoPX0=}',
+                            preset: '36',
+                            projectName: "${PROJECT_NAME}",
+                            sastEnabled: true,
+                            serverUrl: "${CX_URL}",
+                            sourceEncoding: '1',
+                            username: '',
+                            // 設定閾值超過時的結果為失敗
+                            vulnerabilityThresholdResult: 'FAILURE',
+                            // 等待掃描結果
+                            waitForResultsEnabled: true
+                        ])
+                        
+                        // 取得掃描結果並進行判斷
+                        if (scanResults.hasHighVulnerability || scanResults.hasMediumVulnerability) {
+                            currentBuild.result = 'FAILURE'
+                            error("Security scan failed: Found High/Medium risk vulnerabilities")
+                        }
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Security scan failed: ${e.message}")
+                    }
+                }
             }
         }
-
+        
         stage('Dependency Check') {
+            // 只有當前面的步驟都成功時才執行
+            when {
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
             steps {
-                // 執行 Dependency Check
-                dependencyCheck additionalArguments: '--data /opt/dependency-check/data -f HTML JSON --noupdate --disableNodeAudit --disableCentral --disableOssIndex', nvdCredentialsId: 'NVD-API-KEY', odcInstallation: 'owasp_check'
+                dependencyCheck additionalArguments: '--data /opt/dependency-check/data -f HTML JSON --noupdate --disableNodeAudit --disableCentral --disableOssIndex',
+                    nvdCredentialsId: 'NVD-API-KEY',
+                    odcInstallation: 'owasp_check'
             }
         }
     }
-
+    
     post {
         always {
-            // 歸檔報告
-            archiveArtifacts artifacts: '**/dependency-check-report.html, **/checkmarx-report.pdf', allowEmptyArchive: true
+            archiveArtifacts artifacts: '**/dependency-check-report.html, **/checkmarx-report.pdf',
+                allowEmptyArchive: true
+        }
+        failure {
+            script {
+                // 發送失敗通知
+                echo "安全掃描失敗：發現高風險或中風險漏洞"
+                // 這裡可以添加郵件通知或其他通知機制
+            }
         }
     }
 }
