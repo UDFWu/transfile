@@ -1,87 +1,12 @@
-pipeline {
-    agent any
-    
-    environment {
-        CX_URL = 'http://10.10.2.164'  // Checkmarx URL
-        CX_CREDENTIALS_ID = 'checkmarx-server'  // 你在 Jenkins 中設置的憑證 ID
-        PROJECT_NAME = 'Jenkins-scan' //設定Checkmarx上對應的專案名稱
-        TEAM_NAME = 'CxServer\\SP\\SCSB\\planning' //預設小組名稱
-    }
-            
-    stages {
-        stage('Checkout') {
-            steps {
-                // 從 GitLab 檢出專案
-                checkout([$class: 'GitSCM', 
-                    branches: [[name: '*/main']], 
-                    userRemoteConfigs: [[
-                        url: 'https://10.10.32.10/auto_test/atms.git',
-                        credentialsId: 'south-gitlab-root-user'
-                    ]]
-                ])
-            }
-        }
+Hi 宗樺,
 
-        stage('Checkmarx scan') {
-            steps {
-                script {
-                    try {
-                        step([$class: 'CxScanBuilder', 
-                        comment: '', 
-                        credentialsId: 'checkmarx-server',
-                        sourceEncoding: '1', 
-                        excludeFolders: '', 
-                        excludeOpenSourceFolders: '', 
-                        exclusionsSetting: 'global', 
-                        highThreshold: 0, //高風險限制
-                        mediumThreshold: 0, //中風險限制
-                        lowThreshold: 10, //低風險限制
-                        vulnerabilityThresholdResult: 'FAILURE', //設定pipeline偵測到超過閥值時失敗
-                        waitForResultsEnabled: true, //等待掃描結果回傳
-                        vulnerabilityThresholdEnabled: true, //設定風險閥值開啟
-                        fullScanCycle: 100, //每個多少次執行一次完整掃描
-                        groupId: '6', 
-                        projectName: "${PROJECT_NAME}", 
-                        preset: '36', sastEnabled: true, serverUrl: 'http://10.10.2.164/',
-                        generatePdfReport: true, generateXmlReport: false, 
-                        osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz', osaInstallBeforeScan: false, 
-                        filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*, !**/.hg/**/*, !**/.git/**/*, !**/.bzr/**/*, !**/bin/**/*,
-                        !**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr, !**/*.iws, !**/*.bak, !**/*.tmp, !**/*.aac, !**/*.aif, !**/*.iff, !**/*.m3u, !**/*.mid, !**/*.mp3,
-                        !**/*.mpa, !**/*.ra, !**/*.wav, !**/*.wma, !**/*.3g2, !**/*.3gp, !**/*.asf, !**/*.asx, !**/*.avi, !**/*.flv, !**/*.mov, !**/*.mp4, !**/*.mpg, !**/*.rm, !**/*.swf, !**/*.vob, !**/*.wmv, 
-                        !**/*.bmp, !**/*.gif, !**/*.jpg, !**/*.png, !**/*.psd, !**/*.tif, !**/*.swf, !**/*.jar, !**/*.zip, !**/*.rar, !**/*.exe, !**/*.dll, !**/*.pdb, !**/*.7z,  !**/*.gz, !**/*.tar.gz, 
-                        !**/*.tar, !**/*.gz, !**/*.ahtm, !**/*.ahtml, !**/*.fhtml, !**/*.hdm, !**/*.hdml, !**/*.hsql, !**/*.ht, !**/*.hta, !**/*.htc, !**/*.htd, !**/*.war, !**/*.ear,
-                        !**/*.htmls,   !**/*.ihtml, !**/*.mht, !**/*.mhtm, !**/*.mhtml, !**/*.ssi, !**/*.stm, !**/*.stml, !**/*.ttml, !**/*.txn, !**/*.xhtm, !**/*.xhtml, !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*'''
-                        ])
-                        
-                        // 取得掃描結果並進行判斷
-                        if (scanResults.hasHighVulnerability || scanResults.hasMediumVulnerability) { 
-                            currentBuild.result = 'FAILURE'
-                        } else if (scanResults.lowVulnerabilityCount > 10) {
-                            currentBuild.result = 'FAILURE'
-                        }
-                        
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        error("Checkmarx scan failed: ${e.message}")
-                    }
-                }
-                
-            }
-        }
-        
-        stage('Dependency Check') {
-            steps {
-                // 執行 Dependency Check
-                dependencyCheck additionalArguments: '--data /opt/dependency-check/data -f HTML JSON --noupdate --disableNodeAudit --disableCentral --disableOssIndex', nvdCredentialsId: 'NVD-API-KEY', odcInstallation: 'owasp_check'
-            }
-        }
-        
-    }
+請協助申請檔案上傳，需要填寫 Notes 申請單給服務處家毓，資訊如下，謝謝！
 
-    post {
-        always {
-            // 歸檔報告
-            archiveArtifacts artifacts: '**/dependency-check-report.html, **/checkmarx-report.pdf', allowEmptyArchive: true
-        }
-    }
-}
+申請標題  STAGE, PROD Jenkins 以及 Java17 升級、OCP 外掛更新
+
+申請檔案上傳資訊
+ddpsj01.cbsd.scsb.com.tw(10.21.109.120) 的 /datam/backup/20241018_Jenkins_plugin_installer_backup.tar.xz
+需要放到 sdpsj01.cbsd.scsb.com.tw(10.22.109.120)  跟 pdpsj01.cbsd.scsb.com.tw(10.23.109.120)
+請協助把以上檔案傳送至對應主機，放置於 /home/ansible 目錄就可以了，謝謝。
+
+若有任何疑問，請與我們聯繫，謝謝！
