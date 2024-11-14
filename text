@@ -4,7 +4,7 @@ pipeline {
     environment {
         CX_URL = 'http://10.10.2.164'  // Checkmarx URL
         CX_CREDENTIALS_ID = 'checkmarx-server'  // 你在 Jenkins 中設置的憑證 ID
-        PROJECT_NAME = 'atms' //設定Checkmarx上對應的專案名稱
+        PROJECT_NAME = 'Jenkins-scan' //設定Checkmarx上對應的專案名稱
         TEAM_NAME = 'CxServer\\SP\\SCSB\\planning' //預設小組名稱
     }
             
@@ -26,40 +26,40 @@ pipeline {
             steps {
                 script {
                     try {
-                        step([$class: 'CxScanBuilder', comment: '', credentialsId: 'checkmarx-server', 
+                        step([$class: 'CxScanBuilder', 
+                        comment: '', 
+                        credentialsId: 'checkmarx-server',
+                        sourceEncoding: '1', 
                         excludeFolders: '', 
                         excludeOpenSourceFolders: '', 
                         exclusionsSetting: 'global', 
-                        //failBuildOnNewResults: false, 
-                        //failBuildOnNewSeverity: 'HIGH',
-                        highThreshold: 0,
-                        mediumThreshold: 0,
-                        lowThreshold: 100,
+                        highThreshold: 0, //高風險限制
+                        mediumThreshold: 0, //中風險限制
+                        lowThreshold: 10, //低風險限制
                         vulnerabilityThresholdResult: 'FAILURE', //設定pipeline偵測到超過閥值時失敗
                         waitForResultsEnabled: true, //等待掃描結果回傳
                         vulnerabilityThresholdEnabled: true, //設定風險閥值開啟
-                        fullScanCycle: 10, generatePdfReport: true, generateXmlReport: false, groupId: '6', includeOpenSourceFolders: '', 
+                        fullScanCycle: 100, //每個多少次執行一次完整掃描
+                        groupId: '6', 
+                        projectName: "${PROJECT_NAME}", 
+                        preset: '36', sastEnabled: true, serverUrl: 'http://10.10.2.164/',
+                        generatePdfReport: true, generateXmlReport: false, 
                         osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz', osaInstallBeforeScan: false, 
-                        password: '{AQAAABAAAAAQax2RkWSCqvL7HG7i/JVm9LIimk2n+Nxi2QfY9WGoPX0=}', preset: '36', projectName: 'Test Folder', 
-                        sastEnabled: true, serverUrl: 'http://10.10.2.164/', sourceEncoding: '1', username: '', 
-                        filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*,   !**/.hg/**/*,   !**/.git/**/*,  !**/.bzr/**/*, !**/bin/**/*,
-                        !**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr,     !**/*.iws,
-                        !**/*.bak,     !**/*.tmp,       !**/*.aac,      !**/*.aif,      !**/*.iff,     !**/*.m3u, !**/*.mid, !**/*.mp3,
-                        !**/*.mpa,     !**/*.ra,        !**/*.wav,      !**/*.wma,      !**/*.3g2,     !**/*.3gp, !**/*.asf, !**/*.asx,
-                        !**/*.avi,     !**/*.flv,       !**/*.mov,      !**/*.mp4,      !**/*.mpg,     !**/*.rm,  !**/*.swf, !**/*.vob,
-                        !**/*.wmv,     !**/*.bmp,       !**/*.gif,      !**/*.jpg,      !**/*.png,     !**/*.psd, !**/*.tif, !**/*.swf,
-                        !**/*.jar,     !**/*.zip,       !**/*.rar,      !**/*.exe,      !**/*.dll,     !**/*.pdb, !**/*.7z,  !**/*.gz,
-                        !**/*.tar.gz,  !**/*.tar,       !**/*.gz,       !**/*.ahtm,     !**/*.ahtml,   !**/*.fhtml, !**/*.hdm,
-                        !**/*.hdml,    !**/*.hsql,      !**/*.ht,       !**/*.hta,      !**/*.htc,     !**/*.htd, !**/*.war, !**/*.ear,
-                        !**/*.htmls,   !**/*.ihtml,     !**/*.mht,      !**/*.mhtm,     !**/*.mhtml,   !**/*.ssi, !**/*.stm,
-                        !**/*.stml,    !**/*.ttml,      !**/*.txn,      !**/*.xhtm,     !**/*.xhtml,   !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*'''
+                        filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*, !**/.hg/**/*, !**/.git/**/*, !**/.bzr/**/*, !**/bin/**/*,
+                        !**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr, !**/*.iws, !**/*.bak, !**/*.tmp, !**/*.aac, !**/*.aif, !**/*.iff, !**/*.m3u, !**/*.mid, !**/*.mp3,
+                        !**/*.mpa, !**/*.ra, !**/*.wav, !**/*.wma, !**/*.3g2, !**/*.3gp, !**/*.asf, !**/*.asx, !**/*.avi, !**/*.flv, !**/*.mov, !**/*.mp4, !**/*.mpg, !**/*.rm, !**/*.swf, !**/*.vob, !**/*.wmv, 
+                        !**/*.bmp, !**/*.gif, !**/*.jpg, !**/*.png, !**/*.psd, !**/*.tif, !**/*.swf, !**/*.jar, !**/*.zip, !**/*.rar, !**/*.exe, !**/*.dll, !**/*.pdb, !**/*.7z,  !**/*.gz, !**/*.tar.gz, 
+                        !**/*.tar, !**/*.gz, !**/*.ahtm, !**/*.ahtml, !**/*.fhtml, !**/*.hdm, !**/*.hdml, !**/*.hsql, !**/*.ht, !**/*.hta, !**/*.htc, !**/*.htd, !**/*.war, !**/*.ear,
+                        !**/*.htmls,   !**/*.ihtml, !**/*.mht, !**/*.mhtm, !**/*.mhtml, !**/*.ssi, !**/*.stm, !**/*.stml, !**/*.ttml, !**/*.txn, !**/*.xhtm, !**/*.xhtml, !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*'''
                         ])
                         
                         // 取得掃描結果並進行判斷
-                        if (scanResults.hasHighVulnerability || scanResults.hasMediumVulnerability) {
+                        if (scanResults.hasHighVulnerability || scanResults.hasMediumVulnerability) { 
                             currentBuild.result = 'FAILURE'
-                            error("Security scan failed: Found High/Medium risk vulnerabilities")
+                        } else if (scanResults.lowVulnerabilityCount > 10) {
+                            currentBuild.result = 'FAILURE'
                         }
+                        
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         error("Checkmarx scan failed: ${e.message}")
