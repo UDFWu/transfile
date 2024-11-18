@@ -1,12 +1,1 @@
-Hi 宗樺,
-
-請協助申請檔案上傳，需要填寫 Notes 申請單給服務處家毓，資訊如下，謝謝！
-
-申請標題  STAGE, PROD Jenkins 以及 Java17 升級、OCP 外掛更新
-
-申請檔案上傳資訊
-ddpsj01.cbsd.scsb.com.tw(10.21.109.120) 的 /datam/backup/20241018_Jenkins_plugin_installer_backup.tar.xz
-需要放到 sdpsj01.cbsd.scsb.com.tw(10.22.109.120)  跟 pdpsj01.cbsd.scsb.com.tw(10.23.109.120)
-請協助把以上檔案傳送至對應主機，放置於 /home/ansible 目錄就可以了，謝謝。
-
-若有任何疑問，請與我們聯繫，謝謝！
+API Key: 565ea7c4-6908-419b-bc5d-60e15490fa8a  
