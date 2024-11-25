@@ -1,14 +1,14 @@
-SIT環境 包版機資訊
+Some plugins could not be loaded due to unsatisfied dependencies. Fix these issues and restart Jenkins to re-enable these plugins.
 
-Microsoft Windows Server 2022 (64-bit)
+Dependency errors:
 
-製版機IP：10.21.105.141
-administrator // 1qaz@WSX3edc
+Config File Provider Plugin (973.vb_a_80ecb_9a_4d0)
+Update required: Folders Plugin (cloudbees-folder 6.848.ve3b_fd7839a_81) to be updated to 6.858.v898218f3609d or higher
+Update required: Token Macro Plugin (token-macro 384.vf35b_f26814ec) to be updated to 400.v35420b_922dcb_ or higher
+Update required: Credentials Binding Plugin (credentials-binding 636.v55f1275c7b_27) to be updated to 657.v2b_19db_7d6e6d or higher
+Some of the above failures also result in additional indirectly dependent plugins not being able to load.
 
-這個私鑰應該是 jenkins server 產出的?
-然後設定在 Passphrase 上 
-然後把公鑰丟到包板機
-請問是否理解正確
+Indirectly dependent plugins:
 
-這邊鑰請服務處同仁協助建立公司鑰
-然後再把公鑰匯入到包板機
+NodeJS Plugin (1.6.2)
+Failed to load: Config File Provider Plugin (config-file-provider 973.vb_a_80ecb_9a_4d0)
