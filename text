@@ -1,14 +1,23 @@
-Some plugins could not be loaded due to unsatisfied dependencies. Fix these issues and restart Jenkins to re-enable these plugins.
-
-Dependency errors:
-
-Config File Provider Plugin (973.vb_a_80ecb_9a_4d0)
-Update required: Folders Plugin (cloudbees-folder 6.848.ve3b_fd7839a_81) to be updated to 6.858.v898218f3609d or higher
-Update required: Token Macro Plugin (token-macro 384.vf35b_f26814ec) to be updated to 400.v35420b_922dcb_ or higher
-Update required: Credentials Binding Plugin (credentials-binding 636.v55f1275c7b_27) to be updated to 657.v2b_19db_7d6e6d or higher
-Some of the above failures also result in additional indirectly dependent plugins not being able to load.
-
-Indirectly dependent plugins:
-
-NodeJS Plugin (1.6.2)
-Failed to load: Config File Provider Plugin (config-file-provider 973.vb_a_80ecb_9a_4d0)
+Recommendation Letter
+To Whom It May Concern,
+I am pleased to have the opportunity to provide a reference for Jing, Ye and I hly
+recommend her to study at National Cheng Kung University. I am Jing's line manager,
+so I can take the chance to closely observe her work performance, and evaluate her
+interpersonal skills and her attitudes toward future. As a whole, Jing is indeed an
+outstanding colleague in all respects, and I will list out my understanding to her in the
+following paragraphs.
+Jing was employed as a software engineer with our company. Although Jing did
+not graduate from information technology-related field, I still can observe that she has
+strong passion for finance technology. After she completed two projects, she definitely
+can get a handle on system development. Jing frequently does multi-dimension thinking
+and engages in discussion with senior colleagues to improve herself and learn new
+technique. She has shown a strong sense of responsibility, and has completed assigned
+tasks on time. Jing is going to take on automated testing project and the application of
+AI on data security project. It is a great opportunity for her to take advanced studies at
+NCKU and contribute the learned knowledge to work.
+In conclusion, Jing's hard work and my understanding to her suggest that she has
+the potential and willingness to study as well as her characteristics of enthusiasm and
+engagement. I would therefore highly recommend Jing. Thank you for giving me an
+opportunity to introduce such a special, distinguished and outstanding colleague.
+If I can be of any further assistance, or provide you with any further information,
+please do not hesitate to contact me.
