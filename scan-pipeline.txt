@@ -1,0 +1,137 @@
+pipeline {
+    agent any
+    
+    environment {
+        CX_URL = 'http://10.10.2.164'  // Checkmarx URL
+        CX_CREDENTIALS_ID = 'checkmarx-server-user-login'  // 你在 Jenkins 中設置的憑證 ID
+        PROJECT_NAME = 'CICD' //設定Checkmarx上對應的專案名稱
+        TEAM_NAME = 'CxServer\\SP\\SCSB\\planning' //預設小組名稱
+    }
+            
+    stages {
+        stage('check env') {
+			steps {
+				echo 'check env'
+				echo '------------------------------'
+				sh 'pwd'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+				echo sh(script: 'env|sort', returnStdout: true)
+				echo '------------------------------'
+				sh 'java -version'
+				echo '------------------------------'
+				sh 'mvn -version'
+				echo '------------------------------'
+				sh 'git --version'
+				echo '------------------------------'
+				sh 'df -h' //Show Disk space
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'check env 失敗'
+				}
+				success {
+					echo 'check env 成功'            	
+				}
+			}
+		}
+		
+		stage('WORKSPACE init') {
+			steps {
+				echo 'WORKSPACE init'
+				echo '------------------------------'
+				//sh 'rm -rf *'
+				// 此指令會保留 checkmarx 檔案, 其餘刪除
+				sh 'find * | grep checkmarx | xargs rm'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'WORKSPACE init 失敗'
+				}
+				success {
+					echo 'WORKSPACE init 成功'            	
+				}
+			}
+		}
+		
+        stage('Checkout') {
+            steps {
+                // 從 GitLab 檢出專案
+                checkout([$class: 'GitSCM', 
+                    branches: [[name: '*/main']], 
+                    userRemoteConfigs: [[
+                        url: 'https://ddpsg01.cbsd.scsb.com.tw/autotest/atms.git',
+                        credentialsId: 'gitlab-user'
+                    ]]
+                ])
+            }
+        }
+
+        stage('Checkmarx scan') {
+            steps {
+                script {
+                    try {
+                        step([$class: 'CxScanBuilder', 
+                        comment: '', 
+                        credentialsId: 'checkmarx-server',
+                        sourceEncoding: '1', 
+                        excludeFolders: '', 
+                        excludeOpenSourceFolders: '', 
+                        exclusionsSetting: 'global', 
+                        highThreshold: 0, //高風險限制
+                        mediumThreshold: 0, //中風險限制
+                        lowThreshold: 0, //低風險限制
+                        vulnerabilityThresholdResult: 'FAILURE', //設定pipeline偵測到超過閥值時失敗
+                        waitForResultsEnabled: true, //等待掃描結果回傳
+                        vulnerabilityThresholdEnabled: true, //設定風險閥值開啟
+                        fullScanCycle: 0, //每間隔多少次執行一次完整掃描
+                        groupId: '6', 
+                        projectName: 'CICD', 
+                        preset: '36', sastEnabled: true, serverUrl: 'http://10.10.2.164/',
+                        generatePdfReport: true, generateXmlReport: false, 
+                        osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz', osaInstallBeforeScan: false, 
+                        filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*, !**/.hg/**/*, !**/.git/**/*, !**/.bzr/**/*, !**/bin/**/*,
+                        !**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr, !**/*.iws, !**/*.bak, !**/*.tmp, !**/*.aac, !**/*.aif, !**/*.iff, !**/*.m3u, !**/*.mid, !**/*.mp3,
+                        !**/*.mpa, !**/*.ra, !**/*.wav, !**/*.wma, !**/*.3g2, !**/*.3gp, !**/*.asf, !**/*.asx, !**/*.avi, !**/*.flv, !**/*.mov, !**/*.mp4, !**/*.mpg, !**/*.rm, !**/*.swf, !**/*.vob, !**/*.wmv, 
+                        !**/*.bmp, !**/*.gif, !**/*.jpg, !**/*.png, !**/*.psd, !**/*.tif, !**/*.swf, !**/*.jar, !**/*.zip, !**/*.rar, !**/*.exe, !**/*.dll, !**/*.pdb, !**/*.7z,  !**/*.gz, !**/*.tar.gz, 
+                        !**/*.tar, !**/*.gz, !**/*.ahtm, !**/*.ahtml, !**/*.fhtml, !**/*.hdm, !**/*.hdml, !**/*.hsql, !**/*.ht, !**/*.hta, !**/*.htc, !**/*.htd, !**/*.war, !**/*.ear,
+                        !**/*.htmls,   !**/*.ihtml, !**/*.mht, !**/*.mhtm, !**/*.mhtml, !**/*.ssi, !**/*.stm, !**/*.stml, !**/*.ttml, !**/*.txn, !**/*.xhtm, !**/*.xhtml, !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*'''
+                        ])
+                        
+                        // 取得掃描結果並進行判斷
+                        if (scanResults.hasHighVulnerability || scanResults.hasMediumVulnerability) { 
+                            currentBuild.result = 'FAILURE'
+                        } else if (scanResults.lowVulnerabilityCount > 0) {
+                            currentBuild.result = 'FAILURE'
+                        }
+                        
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Checkmarx scan failed: ${e.message}")
+                    }
+                }
+                
+            }
+        }
+        
+        stage('Dependency Check') {
+            steps {
+                // 執行 Dependency Check
+                dependencyCheck additionalArguments: '--data /opt/dependency-check/data -f HTML JSON --noupdate --disableNodeAudit --disableCentral --disableOssIndex', nvdCredentialsId: 'NVD-API-KEY', odcInstallation: 'owasp_check'
+            }
+        }
+        
+    }
+
+    post {
+        always {
+            // 歸檔報告
+            archiveArtifacts artifacts: '**/dependency-check-report.html, **/checkmarx-report.pdf', allowEmptyArchive: true
+        }
+    }
+}
