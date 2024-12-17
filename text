@@ -1,5 +1,8 @@
-SCSB NCBS OCP CICD 說明會議
+## 載入 Image
+podman load < RedHat-UBI-8.tar
 
-https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZGY5NzU4ZTYtNDcwNi00NzQ4LTljY2YtYTU5ZTU4NWU5MmQ4%40thread.v2/0?context=%7b%22Tid%22%3a%22fcf67057-50c9-4ad4-98f3-ffca64add9e9%22%2c%22Oid%22%3a%225ccc3c6f-ce88-4cec-9fc1-a91a57ead5ce%22%7d>
-會議識別碼: 225 926 896 999
-密碼: uC7AG6K7
+## 為此專案標記映像檔
+podman tag registry.access.redhat.com/ubi8/ubi:8.10-1132.1733300785 docph01.cbsd.scsb.com.tw/base-image:8.10-1132.1733300785
+
+## 推送映像檔至 Harbor
+podman push docph01.cbsd.scsb.com.tw/base-image:8.10-1132.1733300785
