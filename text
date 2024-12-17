@@ -1,8 +1,5 @@
-## 載入 Image
-podman load < RedHat-UBI-8.tar
-
 ## 為此專案標記映像檔
-podman tag registry.access.redhat.com/ubi8/ubi:8.10-1132.1733300785 docph01.cbsd.scsb.com.tw/base-image:8.10-1132.1733300785
+podman tag registry.access.redhat.com/ubi8/ubi:8.10-1132.1733300785 docph01.cbsd.scsb.com.tw/base-image/redhat-ubi:8.10-1132.1733300785
 
 ## 推送映像檔至 Harbor
-podman push docph01.cbsd.scsb.com.tw/base-image:8.10-1132.1733300785
+podman push docph01.cbsd.scsb.com.tw/base-image/redhat-ubi:8.10-1132.1733300785
