@@ -1,5 +1,5 @@
-## 為此專案標記映像檔
-podman tag registry.access.redhat.com/ubi8/ubi:8.10-1132.1733300785 docph01.cbsd.scsb.com.tw/base-image/redhat-ubi:8.10-1132.1733300785
+## 載入 Image
+docker load < redhat-ubi8-openjdk-11.tar
 
 ## 推送映像檔至 Harbor
-podman push docph01.cbsd.scsb.com.tw/base-image/redhat-ubi:8.10-1132.1733300785
+docker push docph01.cbsd.scsb.com.tw/base-image/redhat-ubi:1.21-1.1733300806
