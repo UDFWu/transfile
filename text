@@ -1,14 +1,15 @@
-Hi 宗樺,
+【海外新eLoan專案CICD流程討論：2024.12.24(二) 15:30】
 
-CICD UAT 腳本請您先協助上傳至 DEV的 ddpsj01.cbsd.scsb.com.tw(10.21.109.120) 的 /home/ansible/ 目錄下
+各位長官、專案團隊夥伴們，大家好
 
-再協助發信給家毓申請將此檔案上傳至 UAT Jenkins，謝謝！
+一、會議主題：【海外新eLoan專案CICD流程討論】
 
-申請標題
-CI/CD 腳本檔案上傳
-申請檔案上傳資訊
-ddpsj01.cbsd.scsb.com.tw(10.21.109.120) 的 /home/ansible/ 目錄下的 UAT-Jenkins-20241223
-需要放到 sdpsj01.cbss.scsb.com.tw(10.22.119.120)
-請協助把以上檔案傳送至對應主機，放置於 /home/ansible 目錄就可以了，謝謝。
+二、會議時間： 2024.12.24(二) 15:30-17:30
 
-若有任何疑問，請與我們聯繫，謝謝！
+三、會議資料：
+
+四、會議連結:
+
+不便參與實體會議的同事，可用Teams一同參與討論
+
+https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZDBiODU0ODktNjZhNi00ZWNkLWE4NzMtNTg1NzhkOTk3MWFi%40thread.v2/0?context=%7b%22Tid%22%3a%22fcf67057-50c9-4ad4-98f3-ffca64add9e9%22%2c%22Oid%22%3a%22c95c9c37-3361-4b75-9168-0299990a998b%22%7d
