@@ -1,5 +1,14 @@
-## 載入 Image
-docker load < redhat-ubi8-openjdk-11-devel-amd64.tar
+Hi 宗樺,
 
-## 推送映像檔至 Harbor
-docker push docph01.cbsd.scsb.com.tw/base-image/redhat-ubi:1.21-1.1733300800
+CICD UAT 腳本請您先協助上傳至 DEV的 ddpsj01.cbsd.scsb.com.tw(10.21.109.120) 的 /home/ansible/ 目錄下
+
+再協助發信給家毓申請將此檔案上傳至 UAT Jenkins，謝謝！
+
+申請標題
+CI/CD 腳本檔案上傳
+申請檔案上傳資訊
+ddpsj01.cbsd.scsb.com.tw(10.21.109.120) 的 /home/ansible/ 目錄下的 UAT-Jenkins-20241223
+需要放到 sdpsj01.cbss.scsb.com.tw(10.22.119.120)
+請協助把以上檔案傳送至對應主機，放置於 /home/ansible 目錄就可以了，謝謝。
+
+若有任何疑問，請與我們聯繫，謝謝！
