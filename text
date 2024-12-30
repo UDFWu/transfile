@@ -1,9 +1,15 @@
-各位長官、專案團隊夥伴們，大家好
+Hi 育盛經理,
 
-一、會議主題：【API安全與管理專案】資拓宏宇專案補充說明
+ 
 
-二、會議時間： 12/26 (四) 14:00-17:00       
+中台需在Stage安裝 redis cluster，需麻煩您協助申請上傳 helm 腳本
 
-三、會議地點： 六樓大會議室
+ 
 
-四、線上會議連結；https://teams.live.com/meet/9373673384831?p=dHRnHkXDqWby736pNi
+腳本放在  10.21.109.200:/home/dmida02/redis-cluster.zip
+
+上傳至MID存取Stage OCP的機器 桌面即可 (以下兩台ip)
+
+SOCPJ01 / 10.22.107.101
+
+SOCPJ02 / 10.22.107.102
