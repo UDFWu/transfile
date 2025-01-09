@@ -1,15 +1,25 @@
-Hi 育盛經理,
+Hi 育盛經理, 
 
- 
+中台這邊更新DEV 環境OCP入住申請單，
 
-中台需在Stage安裝 redis cluster，需麻煩您協助申請上傳 helm 腳本
+有兩部分需要請育盛經理協助，
 
- 
+第一部分為協助開notes給家毓，
 
-腳本放在  10.21.109.200:/home/dmida02/redis-cluster.zip
+中台更新內容如下：
 
-上傳至MID存取Stage OCP的機器 桌面即可 (以下兩台ip)
+在Firewall、Network Policy sheet 新增HMS server的設定
 
-SOCPJ01 / 10.22.107.101
+在Image sheet 新增Temporal所需要的image
 
-SOCPJ02 / 10.22.107.102
+在Storage sheet 新增Temporal所需要的PVC
+
+在email sheet 更新清單
+
+第二部分為協助產生的yaml到GitLab，
+
+中台這次新增的服務為dep-rpt、len-rpt
+
+有任何問題，請隨時與我聯繫，
+
+再麻煩了，謝謝!!
