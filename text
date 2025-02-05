@@ -1,7 +1,14 @@
-@上海-黃育盛經理 Hill 您好，有個問題請教：
+===請將以下資訊通知與會人員===
+南區資訊中心2月月會
+由 上海商業儲蓄銀行 主持
 
-在同一個 Namespace 中，若 Image Registry 來源相同，是否仍需要針對 Service Account 做進一步的規劃？
+https://scsbtw.webex.com/scsbtw/j.php?MTID=m780b0a1b25bb3a65f9299a1ab333b70d
+2025年2月6日星期四 上午 09:00 | 1 小時 | （UTC+08:00）台北
+會議號： 2515 543 9800
+密碼： Nn+E4713
 
-具體來說，假設目前已有一個 Service Account cicd，用於操作相關的作業。如果需要從 Registry 中拉取鏡像（pull image），是否還需要創建額外的 Service Account，還是可以繼續使用 default 的 Service Account？此外，誰應該負責將 pull secret 綁定到 Service Account？
 
-另外，若需要將 pull secret 與 Service Account 綁定，這樣一來，Secret 的密碼將暴露在 Service Account 的配置中。如果出現配置錯誤，如何進行調試和溝通？此外，印象中 Kubernetes 中的 Secret 是無法加密的，金管會若查是否會有問題？
+
+zoomforscsb.conf@gmail.com
+Pukii#03036306
+
