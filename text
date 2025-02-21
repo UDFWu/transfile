@@ -1,14 +1,12 @@
-===請將以下資訊通知與會人員===
-南區資訊中心2月月會
-由 上海商業儲蓄銀行 主持
+Hi 宗樺, 
 
-https://scsbtw.webex.com/scsbtw/j.php?MTID=m780b0a1b25bb3a65f9299a1ab333b70d
-2025年2月6日星期四 上午 09:00 | 1 小時 | （UTC+08:00）台北
-會議號： 2515 543 9800
-密碼： Nn+E4713
+不好意思排版亂掉重新寄一次，
+因 CICD APIService 需要更新。 
+麻煩協助發信給家毓申請將此檔案上傳至 UAT Jenkins，謝謝！ 
 
-
-
-zoomforscsb.conf@gmail.com
-Pukii#03036306
-
+申請標題 
+CI/CD 腳本檔案上傳 
+申請檔案上傳資訊 
+ddpsj01.cbsd.scsb.com.tw(10.21.109.120) 的 /home/ansible/ 目錄下的 cicd-apiservice:v1.5-oracle.tar 
+需要放到 sdpsa01.cbss.scsb.com.tw(10.22.119.121) 
+請協助把以上檔案傳送至對應主機，放置於 /home/ansible 目錄就可以了，謝謝。
