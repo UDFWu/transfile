@@ -1,12 +1,264 @@
-Hi 宗樺, 
+Repository:maven-releases
+Downloading: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/com/scsb/eloan/eloan-viewer/0.0.1-SNAPSHOT/maven-metadata.xml
+Uploading: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/com/scsb/eloan/eloan-viewer/0.0.1-SNAPSHOT/eloan-viewer-0.0.1-20250227.033337-1.war
+10 % completed (4.7 MB / 43 MB).
+20 % completed (8.9 MB / 43 MB).
+30 % completed (13 MB / 43 MB).
+40 % completed (17 MB / 43 MB).
+50 % completed (22 MB / 43 MB).
+60 % completed (26 MB / 43 MB).
+70 % completed (30 MB / 43 MB).
+80 % completed (35 MB / 43 MB).
+90 % completed (39 MB / 43 MB).
+100 % completed (43 MB / 43 MB).
+Uploading: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/com/scsb/eloan/eloan-viewer/0.0.1-SNAPSHOT/eloan-viewer-0.0.1-20250227.033337-1.pom
+Failed to deploy artifacts: Could not transfer artifact com.scsb.eloan:eloan-viewer:war:0.0.1-20250227.033337-1 from/to maven-releases (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases): transfer failed for https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/com/scsb/eloan/eloan-viewer/0.0.1-SNAPSHOT/eloan-viewer-0.0.1-20250227.033337-1.war, status: 400 Repository version policy: RELEASE does not allow version: 0.0.1-20250227.033337-1
+Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 19ad597e-0b47-4a1d-999b-f8f1d014e78b
+java.io.IOException: Failed to deploy artifacts: Could not transfer artifact com.scsb.eloan:eloan-viewer:war:0.0.1-20250227.033337-1 from/to maven-releases (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases): transfer failed for https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/com/scsb/eloan/eloan-viewer/0.0.1-SNAPSHOT/eloan-viewer-0.0.1-20250227.033337-1.war, status: 400 Repository version policy: RELEASE does not allow version: 0.0.1-20250227.033337-1
 
-不好意思排版亂掉重新寄一次，
-因 CICD APIService 需要更新。 
-麻煩協助發信給家毓申請將此檔案上傳至 UAT Jenkins，謝謝！ 
 
-申請標題 
-CI/CD 腳本檔案上傳 
-申請檔案上傳資訊 
-ddpsj01.cbsd.scsb.com.tw(10.21.109.120) 的 /home/ansible/ 目錄下的 cicd-apiservice:v1.5-oracle.tar 
-需要放到 sdpsa01.cbss.scsb.com.tw(10.22.119.121) 
-請協助把以上檔案傳送至對應主機，放置於 /home/ansible 目錄就可以了，謝謝。
+pipeline {
+    agent any
+    tools{
+        jdk 'Java 8'
+    }
+    environment {
+		GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/open_eloan-tw/eloan-viewer.git'
+        GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:open_eloan-tw/eloan-viewer.git'
+        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
+		SONAR_PROJECT_KEY = 'ncbs-ach'
+		PROJECT_NAME='eloan-viewer'
+        RELEASE_TAG = ''
+        RELEASE_TIMESTAMP = ''
+        RELEASE_VERSION = ''
+        APP_VERSION = '1.0.0'
+        BATCH_SERVER = '10.21.109.220'
+        CICDAPISERVICE_URL = 'http://ddpsg01.cbsd.scsb.com.tw:5001'
+		CURRENT_DATE = ''
+		GIT_BRANCH = 'master'
+		DEPLOY_RESULT = 'viewer.war'
+    }
+    stages {
+		stage('check env') {
+			steps {
+				echo 'check env'
+				echo '------------------------------'
+				sh 'pwd'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+				echo sh(script: 'env|sort', returnStdout: true)
+				echo '------------------------------'
+				sh 'java -version'
+				echo '------------------------------'
+				sh 'mvn -version'
+				echo '------------------------------'
+				sh 'git --version'
+				echo '------------------------------'
+				sh 'df -h' //Show Disk space
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'check env 失敗'
+				}
+				success {
+					echo 'check env 成功'            	
+				}
+			}
+		}
+		stage('WORKSPACE init') {
+			steps {
+				echo 'WORKSPACE init'
+				echo '------------------------------'
+				sh 'rm -rf *'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'WORKSPACE init 失敗'
+				}
+				success {
+					echo 'WORKSPACE init 成功'            	
+				}
+			}
+		}
+		
+		stage('git clone'){
+		    steps{
+				echo 'git clone'
+				echo '------------------------------'
+				withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
+					sh '''
+						git clone --branch ${GIT_BRANCH} ${GIT_REPO_SSH_URL}
+						ls -al
+						pwd
+					'''
+				}
+		    }
+		    post{
+				failure {
+					echo 'git clone 失敗'
+				}
+				success {
+					echo 'git clone 成功'            	
+				} 
+		    }
+		}
+		
+		stage('maven package'){
+		    steps{
+		        echo 'maven package'
+		        echo '------------------------------'
+		        
+		        sh '''
+		            cd eloan-viewer
+		            pwd
+		            mvn clean package -P deploy
+				'''
+				echo '------------------------------'
+		    }
+		    post{
+		       failure {
+					echo 'maven package 失敗'
+				}
+				success {
+					echo 'maven package 成功'
+				} 
+		    }
+		}
+		
+		stage('Publish to nexus(spring)') { 
+			steps {
+				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'pending'
+				dir("eloan-viewer"){
+				        sh 'pwd'
+						script {
+						pom = readMavenPom file: "pom.xml";
+						filesByGlob = findFiles(glob: "target/${DEPLOY_RESULT}");
+						echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+						artifactPath = filesByGlob[0].path;
+						artifactExists = fileExists artifactPath;
+						if(artifactExists) {
+							echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: war, version ${pom.version}";
+							nexusArtifactUploader(
+								credentialsId: 'nexus-user',
+								nexusUrl: 'ddpsn01.cbsd.scsb.com.tw',
+								nexusVersion: 'nexus3',
+								protocol: 'https',
+								repository: 'maven-releases',
+								groupId: pom.groupId,
+								version: pom.version,
+								artifacts: [
+									[
+										artifactId: pom.artifactId,
+										classifier: '',
+										file: artifactPath,
+										type: "war"
+									],
+									[
+										artifactId: pom.artifactId,
+										classifier: '',
+										file: "pom.xml",
+										type: "pom"
+									]
+								]
+							);
+						} else {
+							error "*** File: ${artifactPath}, could not be found";
+						}
+					}
+				}
+				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'success'
+			}
+		}
+		
+// 		stage('transfer file and deploy') {
+// 		    steps {
+		      //sh 'ping 10.10.8.156'
+		      //  sh 'ssh -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa wasadmin@10.10.8.156'
+// 		    }
+// 		}2
+		
+// 		stage('Download WAR from Nexus on Target Server') {
+//             steps {
+//                 echo 'Starting download on target server dacha01'
+//                 echo '------------------------------'
+//                 script {
+//                     // 使用 Jenkins 憑證來隱藏 Nexus 認證資訊
+//                     withCredentials([usernamePassword(credentialsId: 'nexus-user', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+//                         sh '''
+// 							CURRENT_DATE=$(date "+%Y-%m-%d")
+// 							echo "process execution date: ${CURRENT_DATE}"
+//                             ssh -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa dacha01@10.21.106.160 <<EOF
+//                                 cd /home/dacha01
+// 								mkdir -p /home/dacha01/deploy/${CURRENT_DATE}
+// 								pwd
+// 								cd deploy/${CURRENT_DATE}
+//                                 wget --user=${NEXUS_USER} --password=${NEXUS_PASS} --no-check-certificate https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/com/pershing/scsb-ach-apic-gateway/1.0/scsb-ach-apic-gateway-1.0.war -O apicGw.war
+//                                 ls -al apicGw.war
+//                                 exit
+//                             EOF
+//                         '''
+//                     }
+//                 }
+//                 echo '------------------------------'
+//             }
+//             post {
+//                 failure {
+//                     echo 'Download failed on target server'
+//                 }
+//                 success {
+//                     echo 'Download succeeded on target server'
+//                 }
+//             }
+//         }
+		
+// 		stage('deploy and restart application'){
+// 			steps{
+// 				echo 'stop apicGw'
+// 				sh '''
+// 				    CURRENT_DATE=$(date "+%Y-%m-%d")
+// 					ssh -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa dacha01@10.21.106.160 <<EOF
+// 					    cd /ctl/ach/jboss-eap-8.0/bin/cicd
+// 					    sh apicGw_version_upgrade.sh "${CURRENT_DATE}"
+// 					    exit
+// 					EOF
+// 				'''
+// 			}
+			
+// 			post{
+// 		       failure {
+// 					echo '換版 失敗'
+// 				}
+// 				success {
+// 					echo '換版 成功'            	
+// 				} 
+// 		    }
+// 		}
+
+        stage('clean project') {
+            steps{
+		        echo 'maven clean'
+		        echo '------------------------------'
+		        
+		        sh '''
+		            cd eloan-viewer
+		            pwd
+		            mvn clean
+				'''
+				echo '------------------------------'
+		    }
+		    post{
+		       failure {
+					echo 'maven clean 失敗'
+				}
+				success {
+					echo 'maven clean 成功'
+				} 
+		    }
+        }
+    }
+}
