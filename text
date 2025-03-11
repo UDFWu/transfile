@@ -1,4 +1,16 @@
-目前在執行UAT測試環境的Jenkins上版作業，但有個路徑似乎被移除了，要麻煩您協助確認，謝謝!
-/datam/jenkins/workspace/ncbs_T24/T24-uploadPackage-200-UAT
+您好，說明一下相關問題
+## Workspace 內資料夾不見的問題
+如果檔案來源是 Git，需請 T24 團隊確認 SCM 拉取的時候的選項是否設定為 extensions: [[$class: 'WipeWorkspace']] ，並且確認 Gitlab 上的目錄資料正確存在。
+如果不是的話建議打包好的 Package 放在 Nexus 上。
 
-T24Packages ==> 該資料夾消失
+## 系統上 Workspace 中的相關專案消失的問題
+確認在 pipeline 中是否有使用 deleteDir() 或是 cleanWs()
+根據圖示 T24-uploadPackage-114-SIT1@tmp 目錄存在，但是 T24-uploadPackage-114-SIT1 不存在，與 pipeline 中執行 deleteDir() 或是 cleanWs() 行為類似，所以需要麻煩協助確認一下，謝謝。
+或是因為執行失敗，被清除的策略移除 Workspace。
+
+## WorkspaceCleanup 策略問題
+預設是24小時會檢查一次 30 天未使用的 Workspace
+決定何時檢查的參數: hudson.model.WorkspaceCleanupThread.recurrencePeriodHours
+刪除未使用的參數是: hudson.model.WorkspaceCleanupThread.retainForDays
+調整的話，需在 Jenkins 的啟動參數調整。
+官方文件說明: https://www.jenkins.io/doc/book/managing/system-properties/#hudson-model-workspacecleanupthread-recurrenceperiodhours
