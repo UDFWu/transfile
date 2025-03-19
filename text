@@ -1,38 +1,13 @@
-pipeline {
-    agent any
-    parameters {
-        string(name: 'GITLAB_TAG', defaultValue: 'v1.0.0', description: 'GitLab Tag for Deployment')
-    }
-    environment {
-        OCP_NAMESPACE = "my-namespace"  // 修改為你的 OCP 命名空間
-        DEPLOYMENT_FILE = "deployment.yaml"
-    }
-    stages {
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main', url: 'https://gitlab.com/your-repo.git'
-            }
-        }
-        stage('Update YAML with GitLab Tag') {
-            steps {
-                script {
-                    def yamlContent = readFile("${DEPLOYMENT_FILE}")
-                    yamlContent = yamlContent.replaceAll("IMAGE_TAG_PLACEHOLDER", "${params.GITLAB_TAG}")
-                    writeFile file: "${DEPLOYMENT_FILE}", text: yamlContent
-                }
-            }
-        }
-        stage('Deploy to OpenShift') {
-            steps {
-                script {
-                    sh """
-                        oc login --token=your-token --server=https://your-ocp-cluster:6443
-                        oc project ${OCP_NAMESPACE}
-                        oc apply -f ${DEPLOYMENT_FILE}
-                        oc rollout restart deployment my-app
-                    """
-                }
-            }
-        }
-    }
-}
+zoomforscsb@gmail.com
+Pukii#03036306
+
+
+===請將以下資訊通知與會人員===
+T24 過版至 Stage 環境討論會議
+由 上海商業儲蓄銀行 主持
+
+https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialandsavingsbank.my/j.php?MTID=m3148c1724a331ff503d9c9e7d7ba1159
+2025年3月20日星期四 下午 03:30 | 4 小時 30 分鐘 | （UTC+08:00）台北
+會議號： 2556 187 0313
+密碼： Be+U7526
+
