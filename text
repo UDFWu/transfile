@@ -1,16 +1,38 @@
-您好，說明一下相關問題
-## Workspace 內資料夾不見的問題
-如果檔案來源是 Git，需請 T24 團隊確認 SCM 拉取的時候的選項是否設定為 extensions: [[$class: 'WipeWorkspace']] ，並且確認 Gitlab 上的目錄資料正確存在。
-如果不是的話建議打包好的 Package 放在 Nexus 上。
-
-## 系統上 Workspace 中的相關專案消失的問題
-確認在 pipeline 中是否有使用 deleteDir() 或是 cleanWs()
-根據圖示 T24-uploadPackage-114-SIT1@tmp 目錄存在，但是 T24-uploadPackage-114-SIT1 不存在，與 pipeline 中執行 deleteDir() 或是 cleanWs() 行為類似，所以需要麻煩協助確認一下，謝謝。
-或是因為執行失敗，被清除的策略移除 Workspace。
-
-## WorkspaceCleanup 策略問題
-預設是24小時會檢查一次 30 天未使用的 Workspace
-決定何時檢查的參數: hudson.model.WorkspaceCleanupThread.recurrencePeriodHours
-刪除未使用的參數是: hudson.model.WorkspaceCleanupThread.retainForDays
-調整的話，需在 Jenkins 的啟動參數調整。
-官方文件說明: https://www.jenkins.io/doc/book/managing/system-properties/#hudson-model-workspacecleanupthread-recurrenceperiodhours
+pipeline {
+    agent any
+    parameters {
+        string(name: 'GITLAB_TAG', defaultValue: 'v1.0.0', description: 'GitLab Tag for Deployment')
+    }
+    environment {
+        OCP_NAMESPACE = "my-namespace"  // 修改為你的 OCP 命名空間
+        DEPLOYMENT_FILE = "deployment.yaml"
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://gitlab.com/your-repo.git'
+            }
+        }
+        stage('Update YAML with GitLab Tag') {
+            steps {
+                script {
+                    def yamlContent = readFile("${DEPLOYMENT_FILE}")
+                    yamlContent = yamlContent.replaceAll("IMAGE_TAG_PLACEHOLDER", "${params.GITLAB_TAG}")
+                    writeFile file: "${DEPLOYMENT_FILE}", text: yamlContent
+                }
+            }
+        }
+        stage('Deploy to OpenShift') {
+            steps {
+                script {
+                    sh """
+                        oc login --token=your-token --server=https://your-ocp-cluster:6443
+                        oc project ${OCP_NAMESPACE}
+                        oc apply -f ${DEPLOYMENT_FILE}
+                        oc rollout restart deployment my-app
+                    """
+                }
+            }
+        }
+    }
+}
