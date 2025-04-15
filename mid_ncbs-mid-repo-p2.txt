@@ -1,0 +1,366 @@
+def deployProjects = []
+def projectVersions = [:] // 在腳本作用域中宣告變數
+
+pipeline {
+    agent any
+    
+    tools {
+        oc 'OpenShift CLI'
+    }
+
+    environment {
+        GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/mid/ncbs-mid-repo-p2.git'
+        GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:mid/ncbs-mid-repo-p2.git'
+        CONTAINER_REGISTRY = 'docph01.cbsd.scsb.com.tw'
+        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
+        CICDAPISERVICE_URL = 'http://sdpsa01.cbss.scsb.com.tw'
+        OPENSHIFT_SERVER = 'cicd-example'
+    }
+
+    stages {
+        stage('Get Selection') {
+            steps {
+                script {
+                    if (!params.DEPLOY_PROJECTS ||params.DEPLOY_PROJECTS.trim().isEmpty()) {
+                        error "請至少選擇一個專案部屬"
+                    }
+
+                    // 將收到的參數設置爲環境變數
+                    deployProjects = params.DEPLOY_PROJECTS.split(',') // 將結果存入全局變數
+                    env.NAMESPACE = params.NAMESPACE
+                    env.TAG = params.TAG
+                    env.TYPE = params.TYPE
+
+                    //檢查訊息
+                    echo "Deploy Projects: ${deployProjects}"
+                    echo "NAMESPACE: ${env.NAMESPACE}"
+                    echo "TYPE: ${env.TYPE}"
+                    echo "TAG: ${env.TAG}"
+                }
+            }
+        }
+        
+        // 處理 app 專案
+        // 處理 app 專案
+        // 處理 app 專案
+        stage('Declarative: Checkout APP SCM') {
+            when {
+                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+            }
+
+            steps {
+                checkout scmGit(
+                    branches: [[name: '*/sit']], 
+                    browser: github("${GIT_REPO_URL}"), 
+                    extensions: [], 
+                    userRemoteConfigs: [[credentialsId: '6c14edec-6672-4160-a4c5-c9de7c038284', url: "${GIT_REPO_SSH_URL}"]]
+                )
+            }
+        }
+
+        stage('Delete APP mid-core and fabric dependencies') {
+            when {
+                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+            }
+
+            steps {
+                script {
+                    sh """
+                        rm -rf ~/.m2/repository/com/ibm/cbmp/*
+                        rm -rf ~/.m2/repository/com/ibm/ncbs/mid-foundation-core/*
+                        rm -rf ~/.m2/repository/com/ibm/ncbs/ncbs-mid-foundation/*
+                        rm -rf ~/.m2/repository/com/ibm/ncbs/ncbs-mid-jasypt/*
+                    """
+                }
+            }
+        }
+
+        stage('Build APP Code') {
+            when {
+                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+            }
+
+            steps {
+                script {
+                    for (project in deployProjects) {
+                        echo "Building ${project}-${env.TYPE} code"
+
+                        def projectVersion = sh(
+                            script: "mvn -q -DforceStdout help:evaluate -Dexpression=project.version -pl :${project}-${env.TYPE}",
+                            returnStdout: true
+                        ).trim()
+                        projectVersions[project] = projectVersion
+
+                        sh """
+                            mvn -U clean install \\
+                            -pl :${project}-${env.TYPE} \\
+                            -am -Dnexus-url=${NEXUS_URL} \\
+                            -Dmaven.test.skip=true \\
+                            -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \\
+                            -Dmaven.wagon.http.ssl.insecure=true \\
+                            -Dmaven.wagon.http.ssl.allowall=true
+                        """
+                    }
+                    echo "${projectVersions}"
+                }
+            }
+        }
+
+        stage('Build APP Image') {
+            when {
+                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+            }
+
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'harbor-user', passwordVariable: 'HARBOR_PASSWORD', usernameVariable: 'HARBOR_USER')]) {
+                        // 先登入 Harbor，爲了拉取 base image
+                        sh "podman login ${CONTAINER_REGISTRY} -u '${HARBOR_USER}' -p '${HARBOR_PASSWORD}'"
+                        for (project in deployProjects) {
+                            echo "Building ${project}-${env.TYPE} image"
+
+                            sh """
+                                podman images | grep ${project}-${env.TYPE} | awk '{print \$3}' | xargs podman rmi --force || true
+                                cd ${env.WORKSPACE}/${project}/${project}-${env.TYPE}
+                                podman build --build-arg CONTAINER_REGISTRY=${CONTAINER_REGISTRY} -f ./Dockerfile -t ${CONTAINER_REGISTRY}/mid/${project}-${env.TYPE}:${env.TAG} .
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        // stage('Checkmarx scan') {
+        //     when {
+        //         expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+        //     }
+
+        //     steps {
+        //         script {
+        //             try {
+        //                 step([$class: 'CxScanBuilder', 
+        //                 comment: '', 
+        //                 credentialsId: 'checkmarx-server',
+        //                 sourceEncoding: '1', 
+        //                 excludeFolders: '', 
+        //                 excludeOpenSourceFolders: '', 
+        //                 exclusionsSetting: 'global', 
+        //                 highThreshold: 0, //高風險限制
+        //                 mediumThreshold: 0, //中風險限制
+        //                 lowThreshold: 0, //低風險限制
+        //                 vulnerabilityThresholdResult: 'FAILURE', //設定pipeline偵測到超過閥值時失敗
+        //                 waitForResultsEnabled: true, //等待掃描結果回傳
+        //                 vulnerabilityThresholdEnabled: true, //設定風險閥值開啟
+        //                 fullScanCycle: 0, //每間隔多少次執行一次完整掃描
+        //                 groupId: '6', 
+        //                 projectName: 'CICD', 
+        //                 preset: '36', sastEnabled: true, serverUrl: 'http://10.10.2.164/',
+        //                 generatePdfReport: true, generateXmlReport: false, 
+        //                 osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz', osaInstallBeforeScan: false, 
+        //                 filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*, !**/.hg/**/*, !**/.git/**/*, !**/.bzr/**/*, !**/bin/**/*,!**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr, !**/*.iws, !**/*.bak, !**/*.tmp, !**/*.aac, !**/*.aif, !**/*.iff, !**/*.m3u, !**/*.mid, !**/*.mp3,!**/*.mpa, !**/*.ra, !**/*.wav, !**/*.wma, !**/*.3g2, !**/*.3gp, !**/*.asf, !**/*.asx, !**/*.avi, !**/*.flv, !**/*.mov, !**/*.mp4, !**/*.mpg, !**/*.rm, !**/*.swf, !**/*.vob, !**/*.wmv,!**/*.bmp, !**/*.gif, !**/*.jpg, !**/*.png, !**/*.psd, !**/*.tif, !**/*.swf, !**/*.jar, !**/*.zip, !**/*.rar, !**/*.exe, !**/*.dll, !**/*.pdb, !**/*.7z,  !**/*.gz, !**/*.tar.gz,!**/*.tar, !**/*.gz, !**/*.ahtm, !**/*.ahtml, !**/*.fhtml, !**/*.hdm, !**/*.hdml, !**/*.hsql, !**/*.ht, !**/*.hta, !**/*.htc, !**/*.htd, !**/*.war, !**/*.ear,!**/*.htmls,!**/*.ihtml, !**/*.mht, !**/*.mhtm, !**/*.mhtml, !**/*.ssi, !**/*.stm, !**/*.stml, !**/*.ttml, !**/*.txn, !**/*.xhtm, !**/*.xhtml, !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*'''
+        //                 ])
+                        
+        //                 // 取得掃描結果並進行判斷
+        //                 if (scanResults.hasHighVulnerability || scanResults.hasMediumVulnerability) { 
+        //                     currentBuild.result = 'FAILURE'
+        //                 } else if (scanResults.lowVulnerabilityCount > 0) {
+        //                     currentBuild.result = 'FAILURE'
+        //                 }
+                        
+        //             } catch (Exception e) {
+        //                 currentBuild.result = 'FAILURE'
+        //                 error("Checkmarx scan failed: ${e.message}")
+        //             }
+        //         }
+        //     }
+        // }
+        
+        stage('Dependency Check') {
+            when {
+                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+            }
+
+            steps {
+                // 執行 Dependency Check
+                dependencyCheck additionalArguments: '--data /opt/dependency-check/data -f HTML JSON --noupdate --disableNodeAudit --disableCentral --disableOssIndex', nvdCredentialsId: 'NVD-API-KEY', odcInstallation: 'owasp_check'
+            }
+        }
+
+        stage('Trivy scan APP image') {
+            when {
+                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+            }
+
+            steps {
+                script {
+                    for (project in deployProjects) {
+                        sh 'mkdir -p reports'
+                        // 使用 Trivy 進行掃描 image
+                        // --skip-db-update: 跳過更新 Trivy 的資料庫
+                        // --skip-java-db-update: 跳過更新 Java 的資料庫
+                        // --offline-scan: 離線掃描
+                        // --skip-check-update: 跳過檢查更新
+                        // --format template: 輸出格式為 template
+                        // --template '@/usr/local/share/trivy/templates/html.tpl': 使用 HTML 的格式
+                        // template 要有讀的權限
+                        // -o reports/trivy-image-report.html: 輸出檔案為 reports/trivy-image-report.html
+                        reportFile = "reports/${env.NAMESPACE}-${project}-${env.TYPE}-report.html"
+                        sh "trivy image --skip-db-update \
+                            --skip-java-db-update \
+                            --offline-scan \
+                            --skip-check-update \
+                            --format template \
+                            --template '@/usr/local/share/trivy/templates/html.tpl' \
+                            -o ${reportFile} \
+                            ${CONTAINER_REGISTRY}/${env.NAMESPACE}/${project}-${env.TYPE}:${env.TAG}"
+                        // 上傳報告到 Jenkins
+                        publishHTML([
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'reports',
+                            reportFiles: "${project}-${env.TYPE}-report.html",
+                            reportName: "${project}-${env.TYPE} Report",
+                            reportTitles: "${project}-${env.TYPE} Report",
+                            useWrapperFileDirectly: true
+                        ])
+                    }
+                }
+            }
+        }
+
+        stage('Release APP Image') {
+            when {
+                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+            }
+
+            steps {
+                script {
+                    // 上傳 image 到 Harbor
+                    for (project in deployProjects) {
+                        echo "Releaseing ${project}-${env.TYPE} image"
+
+                        //取得 RepoDigest
+                        def repoDigest = sh(returnStdout: true, script: "podman inspect -f '{{index .RepoDigests 0}}' ${CONTAINER_REGISTRY}/${env.NAMESPACE}/${project}-${env.TYPE}:${env.TAG}").trim()
+                        // 上傳 repoDigest 到 Harbor
+                        sh "podman push ${repoDigest}"
+                        // 上傳 image 到 Harbor
+                        sh "podman push ${CONTAINER_REGISTRY}/mid/${project}-${env.TYPE}:${env.TAG}"
+                        sh "podman tag ${project}-${TYPE}:${TAG} ${CONTAINER_REGISTRY}/mid/${project}-${TYPE}:latest"
+                        sh "podman push ${CONTAINER_REGISTRY}/mid/${project}-${TYPE}:latest"
+                        withCredentials([file(credentialsId: 'cosign-private-key', variable: 'COSIGN_PRIVATE_KEY'), string(credentialsId: 'cosign-password', variable: 'COSIGN_PASSWORD')]) {
+                            println(repoDigest)
+                            // 使用 cosign 簽名
+                            sh "cosign sign --key '${COSIGN_PRIVATE_KEY}' --tlog-upload=false --allow-insecure-registry=true ${repoDigest}"
+                        }
+                    }
+                    
+                    sh "podman logout ${CONTAINER_REGISTRY}"
+                }
+            }
+        }
+
+        stage('Rollout Deployment') {
+            when {
+                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+            }
+
+            steps {
+                script {
+                    openshift.withCluster(OPENSHIFT_SERVER) {
+                        openshift.withProject("${env.NAMESPACE}") {
+                            def rolloutSuccess = true
+
+                            for (project in deployProjects) {
+                                echo "Rollout ${project} for version ${TAG}"
+                                def currentTimestamp = sh(
+                                    script: "date +%Y-%m-%d\\ %H:%M:%S",
+                                    returnStdout: true
+                                ).trim()
+                                def projectVersion = "${projectVersions[project]}"
+                                echo "Rollout ${project}-${TYPE} for version ${projectVersion} version"
+
+                                try {
+                                    // 導入最新image(latest) 到imageStream (${env.NAMESPACE}-${project}-${TYPE}:1.0.0)
+                                    openshift.raw('import-image', "${env.NAMESPACE}-${project}-${TYPE}:1.0.0", 
+                                        "--from=${CONTAINER_REGISTRY}/mid/${project}-${TYPE}:latest", '--confirm')
+
+                                    // 更新 deployment 的 imageStream 和環境變數
+                                    openshift.raw('set', 'image', "deployment/${env.NAMESPACE}-${project}-${TYPE}", 
+                                        "${env.NAMESPACE}-${project}-${TYPE}=${CONTAINER_REGISTRY}/mid/${project}-${TYPE}:${env.TAG}")
+                                    openshift.raw('set', 'env', "deployment/${env.NAMESPACE}-${project}-${TYPE}", 
+                                        "RELEASE-VERSION=${projectVersion}", 
+                                        "RELEASE-TAG=${TAG}", 
+                                        "RELEASE-TIMESTAMP='${currentTimestamp}'")
+
+                                    // 重啓 deployment
+                                    openshift.raw('rollout', 'restart', "deployment/${env.NAMESPACE}-${project}-${TYPE}")
+                                    echo "Rollout of ${env.NAMESPACE}-${project}-${TYPE} succeeded!"
+                                } catch (Exception e) {
+                                    echo "Rollout of ${env.NAMESPACE}-${project}-${TYPE} failed: ${e.getMessage()}"
+                                    rolloutSuccess = false // 設爲失敗
+                                }
+                            }
+
+                            // 確認所有 Rollout 狀態
+                            if (rolloutSuccess) {
+                                echo 'Rollout successful!'
+                            } else {
+                                error('One or more Rollout checks failed.')
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Check Deployment and Pod Status') {
+            when {
+                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+            }
+
+            steps {
+                script {
+                    openshift.withCluster(OPENSHIFT_SERVER) {
+                        openshift.withProject("${env.NAMESPACE}") {
+                            for (project in deployProjects) {
+                                echo "Check ${project} deployment and Pod status"
+
+                                try {
+                                    def deployment = openshift.selector('deployment', "${env.NAMESPACE}-${project}-${env.TYPE}")
+                                    def deploymentObject = openshift.selector('deployment', "${env.NAMESPACE}-${project}-${env.TYPE}").object()
+                                    // 5分鐘 timeout
+                                    def rolloutStatus = timeout(5) {deployment.rollout().status()}
+
+                                    // 判斷是否成功
+                                    if (rolloutStatus.out.contains('successfully rolled out')) {
+                                        echo "Deployment ${env.NAMESPACE}-${project}-${env.TYPE} has successfully rolled out."
+                                        echo "rolloutStatus: ${rolloutStatus.out}"
+                                    } else {
+                                        // 提供更詳細的錯誤資訊
+                                        echo "Rollout of ${env.NAMESPACE}-${project}-${env.TYPE} failed. Status: ${deploymentObject}"
+                                        error("Rollout of ${env.NAMESPACE}-${project}-${env.TYPE} failed. Status: ${deployment}")
+                                    }
+                                } catch (Exception e) {
+                                    echo "Deployment or Pod check for ${env.NAMESPACE}-${project}-${env.TYPE} failed: ${e.getMessage()}"
+                                    error("Rollout of ${env.NAMESPACE}-${project}-${env.TYPE} failed. Status: ${deployment}")
+                                    break // 停止檢查，直接退出迴圈
+                                } finally {
+                                    // openshift.verbose(false) // 關閉 verbose 模式
+                                }
+                            }
+                            echo 'All deployments and Pods are successful!'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // 歸檔報告
+            archiveArtifacts artifacts: '**/dependency-check-report.html, **/checkmarx-report.pdf', allowEmptyArchive: true
+        }
+    }
+}
