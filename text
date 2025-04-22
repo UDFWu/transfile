@@ -1,1 +1,91 @@
-error: updateMCheckRT(@javax.validation.constraints.NotNull Long,@javax.validation.constraints.NotNull LocalDate,@javax.validation.constraints.NotBlank String) has private access in CbrFileService
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] 1 problem was encountered while building the effective model for org.javassist:javassist:jar:3.20.0-GA
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ cbr-service ---
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] Copying 3 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.10.1:compile (default-compile) @ cbr-service ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 318 source files to D:\repo_south_gitlab\MID\ncbs-mid-repo-training\cbr\cbr-service\target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] Picked up JAVA_TOOL_OPTIONS: -agentlib:jvmhook
+Picked up _JAVA_OPTIONS: -Xrunjvmhook -Xbootclasspath/a:"C:\Program Files (x86)\Micro Focus\UFT One\bin\java_shared\classes\jasmine.jar"
+D:\repo_south_gitlab\MID\ncbs-mid-repo-training\cbr\cbr-service\src\main\java\com\scsb\ncbs\cbr\service\file\CbrFileCompilationService.java:[628,16] error: updateMCheckTX(@javax.validation.constraints.NotNull Long,@javax.validation.constraints.NotNull LocalDate) has private access in CbrFileService
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for ncbs-mid-parent 0.0.1-SNAPSHOT:
+[INFO] 
+[INFO] ncbs-mid-parent .................................... SUCCESS [  0.006 s]
+[INFO] cbr ................................................ SUCCESS [  0.002 s]
+[INFO] cbr-service ........................................ FAILURE [ 22.994 s]
+[INFO] cbr-app ............................................ SKIPPED
+[INFO] cbr-bat ............................................ SKIPPED
+[INFO] dep ................................................ SKIPPED
+[INFO] dep-service ........................................ SKIPPED
+[INFO] dep-app ............................................ SKIPPED
+[INFO] dep-rpt ............................................ SKIPPED
+[INFO] dep-bat ............................................ SKIPPED
+[INFO] xau ................................................ SKIPPED
+[INFO] xau-service ........................................ SKIPPED
+[INFO] xau-app ............................................ SKIPPED
+[INFO] len ................................................ SKIPPED
+[INFO] len-service ........................................ SKIPPED
+[INFO] len-app ............................................ SKIPPED
+[INFO] len-bat ............................................ SKIPPED
+[INFO] len-rpt ............................................ SKIPPED
+[INFO] rem ................................................ SKIPPED
+[INFO] rem-service ........................................ SKIPPED
+[INFO] rem-app ............................................ SKIPPED
+[INFO] rem-bat ............................................ SKIPPED
+[INFO] rds ................................................ SKIPPED
+[INFO] rds-service ........................................ SKIPPED
+[INFO] rds-app ............................................ SKIPPED
+[INFO] cmn ................................................ SKIPPED
+[INFO] cmn-service ........................................ SKIPPED
+[INFO] cmn-app ............................................ SKIPPED
+[INFO] cmn-bat ............................................ SKIPPED
+[INFO] reml-app ........................................... SKIPPED
+[INFO] remm ............................................... SKIPPED
+[INFO] remm-service ....................................... SKIPPED
+[INFO] remm-app ........................................... SKIPPED
+[INFO] remb ............................................... SKIPPED
+[INFO] remb-service ....................................... SKIPPED
+[INFO] remb-app ........................................... SKIPPED
+[INFO] rems ............................................... SKIPPED
+[INFO] rems-service ....................................... SKIPPED
+[INFO] rems-app ........................................... SKIPPED
+[INFO] gla ................................................ SKIPPED
+[INFO] gla-service ........................................ SKIPPED
+[INFO] gla-app ............................................ SKIPPED
+[INFO] gla-bat ............................................ SKIPPED
+[INFO] try ................................................ SKIPPED
+[INFO] try-service ........................................ SKIPPED
+[INFO] try-app ............................................ SKIPPED
+[INFO] try-batch .......................................... SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  23.905 s
+[INFO] Finished at: 2025-04-22T15:50:51+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:compile (default-compile) on project cbr-service: Compilation failure
+[ERROR] Picked up JAVA_TOOL_OPTIONS: -agentlib:jvmhook
+[ERROR] Picked up _JAVA_OPTIONS: -Xrunjvmhook -Xbootclasspath/a:"C:\Program Files (x86)\Micro Focus\UFT One\bin\java_shared\classes\jasmine.jar"
+[ERROR] D:\repo_south_gitlab\MID\ncbs-mid-repo-training\cbr\cbr-service\src\main\java\com\scsb\ncbs\cbr\service\file\CbrFileCompilationService.java:[628,16] error: updateMCheckTX(@javax.validation.constraints.NotNull Long,@javax.validation.constraints.NotNull LocalDate) has private access in CbrFileService
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :cbr-service
+
+Process finished with exit code 1
