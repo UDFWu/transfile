@@ -1,12 +1,13 @@
--Xmx768m
--Dmaven.test.skip=true
--Dmaven.javadoc.skip=true
--Dnexus-url=https://ddpsn01.cbsd.scsb.com.tw
--Drelease-repository=maven-releases
--Dsnapshot-repository=maven-snapshots
--Dmaven.wagon.http.ssl.insecure=true
--Dmaven.wagon.http.ssl.allowall=true
--Dmaven.wagon.http.ssl.ignore.validity.dates=true
--Dmaven.resolver.transport=wagon
--Daether.connector.https.securityMode=insecure
--Dmaven.repo.local=D:\chip-m2.mid\.m2.mid\repository
+凱翔 您好
+
+我之前也沒有操作過 pipeline 複製到另外一台的 Jenkins
+查了一下GPT, 有三種方式, 如附件
+剛剛在南區測試環境有試過方法一, 可以使用 , 
+方法二要下載插件, 插件也要求升級 Jenkins 版本才能使用, 要請寬橋評估
+方法三我不確定, 要詢問寬橋
+
+
+
+以上方法可以試試看, 
+不過要操作 Stage 的 Jenkins 要請服務處協助
+謝謝.
