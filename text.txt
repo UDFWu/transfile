@@ -1,8 +1,55 @@
-剛剛先找你說明的內容就是下面這些，要請你協助一下，有任何問題請隨時跟我說
+stage('Download WAR from Nexus on Target Server') {
+            steps {
+                echo 'Starting download on target server kycrr_1'
+                echo '------------------------------'
+                script {
+                     sh """
+                        # 檢查主機密鑰是否已存在
+                        if ssh-keygen -F "10.10.9.206" > /dev/null 2>&1; then
+                            echo "Host key for 10.10.9.206 already exists."
+                        else
+                            echo "Host key for 10.10.9.206 not found."
+                            ssh-keyscan -p 22 -H 10.10.9.206 >>  /var/lib/jenkins/.ssh/known_hosts
+                            echo "Host key added."
+                        fi
+                    """
+                    // 使用 Jenkins 憑證來隱藏 Nexus 認證資訊
+                    withCredentials([usernamePassword(credentialsId: 'nexus-user', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+						sh '''
+                            ssh -t -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa ebank@10.10.9.206  <<EOF
+                                :: "ssh connection successful"
+								chcp 65001
+                                
+                                cd ${TOMCAT_PATH}
+                                curl -k -O -u ${NEXUS_USER}:${NEXUS_PASS} ${NEXUS_URL}/repository/maven-releases/com/scsb/ebank/1.0.0/ibap-1.0.0.war
+                            EOF
+                        '''
+                    }  
+                }
+                echo '------------------------------'
+            }
+            post {
+                failure {
+                    echo 'Download failed on target server'
+                }
+                success {
+                    echo 'Download succeeded on target server'
+                }
+            }
+        }
 
-中台開始要進行SIT 批次測試，所以要透過EFT跟外圍系統做檔案交換
-要請你協助開一個申請單，指給研發陳建成
 
-SIT EFT: 10.10.8.50要申請一個帳號給中台使用
-因為中台沒有申請過，也要請你幫忙確認
-有新批次要上線的時候，新資料夾的建立以及讀寫的權限要重新申請嗎??
+
++ ssh-keygen -F 10.10.9.206
++ echo 'Host key for 10.10.9.206 already exists.'
+Host key for 10.10.9.206 already exists.
+[Pipeline] withCredentials
+Masking supported pattern matches of $NEXUS_PASS
+[Pipeline] {
+[Pipeline] sh
+/datam/jenkins/workspace/ncbs_ebank/env_test@tmp/durable-7e793018/script.sh: line 9: warning: here-document at line 2 delimited by end-of-file (wanted `EOF')
++ ssh -t -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa ebank@10.10.9.206
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Permission denied, please try again.
+Permission denied, please try again.
+ebank@10.10.9.206: Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).
