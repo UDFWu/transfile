@@ -1,55 +1,11 @@
-stage('Download WAR from Nexus on Target Server') {
-            steps {
-                echo 'Starting download on target server kycrr_1'
-                echo '------------------------------'
-                script {
-                     sh """
-                        # 檢查主機密鑰是否已存在
-                        if ssh-keygen -F "10.10.9.206" > /dev/null 2>&1; then
-                            echo "Host key for 10.10.9.206 already exists."
-                        else
-                            echo "Host key for 10.10.9.206 not found."
-                            ssh-keyscan -p 22 -H 10.10.9.206 >>  /var/lib/jenkins/.ssh/known_hosts
-                            echo "Host key added."
-                        fi
-                    """
-                    // 使用 Jenkins 憑證來隱藏 Nexus 認證資訊
-                    withCredentials([usernamePassword(credentialsId: 'nexus-user', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-						sh '''
-                            ssh -t -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa ebank@10.10.9.206  <<EOF
-                                :: "ssh connection successful"
-								chcp 65001
-                                
-                                cd ${TOMCAT_PATH}
-                                curl -k -O -u ${NEXUS_USER}:${NEXUS_PASS} ${NEXUS_URL}/repository/maven-releases/com/scsb/ebank/1.0.0/ibap-1.0.0.war
-                            EOF
-                        '''
-                    }  
-                }
-                echo '------------------------------'
-            }
-            post {
-                failure {
-                    echo 'Download failed on target server'
-                }
-                success {
-                    echo 'Download succeeded on target server'
-                }
-            }
-        }
+===請將以下資訊通知與會人員===
+CICD討論會議
+由 上海商業儲蓄銀行 主持
+
+https://theshanghaicommercialandsavingsbank.my.webex.com/theshanghaicommercialandsavingsbank.my/j.php?MTID=m65a7ce333d1e3bce382a9fa13c98c255
+2025年5月28日星期三 上午 09:00 | 1 小時 | （UTC+08:00）台北
+會議號： 2550 321 2912
+密碼： m@Rc9357
 
 
-
-+ ssh-keygen -F 10.10.9.206
-+ echo 'Host key for 10.10.9.206 already exists.'
-Host key for 10.10.9.206 already exists.
-[Pipeline] withCredentials
-Masking supported pattern matches of $NEXUS_PASS
-[Pipeline] {
-[Pipeline] sh
-/datam/jenkins/workspace/ncbs_ebank/env_test@tmp/durable-7e793018/script.sh: line 9: warning: here-document at line 2 delimited by end-of-file (wanted `EOF')
-+ ssh -t -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa ebank@10.10.9.206
-Pseudo-terminal will not be allocated because stdin is not a terminal.
-Permission denied, please try again.
-Permission denied, please try again.
-ebank@10.10.9.206: Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).
+Pukii#03036306
