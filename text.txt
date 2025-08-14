@@ -1,14 +1,165 @@
-7/22 sonatype教育訓練(開發者)附加檔
-會議連結(Microsoft Teams )
-https://teams.microsoft.com/l/meetup-join/19%3ameeting_YzQzYjExMWUtODc2ZC00MWQ1LWJiMjQtYjM2OTE5ZTBiMGFj%40thread.v2/0?context=%7b%22Tid%22%3a%22e72f6de0-ea11-4959-a70e-136aacd3cf4f%22%2c%22Oid%22%3a%227c3e4a3b-06d0-47ea-a5de-8bb6b7122fc2%22%7d
+git clone
+[Pipeline] echo
+------------------------------
+[Pipeline] withCredentials
+Selected Git installation does not exist. Using Default
+ > git --version # timeout=10
+ > git --version # 'git version 2.43.5'
+Masking supported pattern matches of $GIT_PASSWORD or $GIT_ASKPASS
+[Pipeline] {
+[Pipeline] sh
++ git clone --branch test git@ddpsg01.cbsd.scsb.com.tw:open_unlts/unlts.git
+Cloning into 'unlts'...
++ git diff --name-only test main
+error: Could not access 'test'
+[Pipeline] }
+[Pipeline] // withCredentials
+Post stage
+[Pipeline] echo
+git clone 失敗
 
-會議識別碼: 443 411 874 003 3
-密碼: dK9Mm9pp
 
 
-7/24 sonatype教育訓練(管理者)
-會議連結(Microsoft Teams，應該跟上面一樣 )
-https://teams.microsoft.com/l/meetup-join/19%3ameeting_YWFkNDExNzEtMDg2YS00MTU2LWFlMDYtYjAxZGU2Y2Y2MDk4%40thread.v2/0?context=%7b%22Tid%22%3a%22e72f6de0-ea11-4959-a70e-136aacd3cf4f%22%2c%22Oid%22%3a%227c3e4a3b-06d0-47ea-a5de-8bb6b7122fc2%22%7d
+pipeline {
+	//表示這個 Pipeline 可以在任何可用的 Jenkins 代理節點上執行。
+    agent any 
 
-會議識別碼: 460 701 406 736 4
-密碼: U7EY2SA7
+    tools{
+        jdk 'Java 17'
+        maven 'Maven 3.9.7'
+    }
+    environment {
+		// Git Lab的 SSH URL。
+        GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:open_unlts/unlts.git'
+        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
+		PROJECT_NAME='unlts'
+        AP_SERVER = '10.10.8.225'
+		TOMCAT_PATH = 'C:\\Users\\Administrator\\Desktop\\unlts'
+		// 這裡要看專案設定檔是用properties還是yaml
+		APPLICATION_PROPERTIES = '.\\unlts\\src\\main\\resources\\application-dev.properties'
+    }
+	// Pipeline 中所有依序執行的獨立階段
+    stages {
+		stage('check env') {
+			steps {
+				echo 'check env'
+				echo '------------------------------'
+				sh 'pwd'
+				echo '------------------------------'
+				// 列出當前目錄下所有檔案和子目錄的詳細資訊
+				sh 'ls -al'
+				echo '------------------------------'
+				// 執行 Shell 命令 env|sort，列出所有環境變數並按字母順序排序，然後將其輸出到 Jenkins 日誌。
+				echo sh(script: 'env|sort', returnStdout: true)
+				echo '------------------------------'
+
+				// 版本資訊
+				sh 'java -version'
+				echo '------------------------------'
+				sh 'mvn -version'
+				echo '------------------------------'
+				sh 'git --version'
+				echo '------------------------------'
+				// 顯示當前系統的磁碟空間使用情況 Show Disk space
+				sh 'df -h' 
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'check env 失敗'
+				}
+				success {
+					echo 'check env 成功'            	
+				}
+			}
+		}
+
+
+		stage('WORKSPACE init') {
+			steps {
+				echo 'WORKSPACE init'
+				echo '------------------------------'
+				sh 'rm -rf *'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'WORKSPACE init 失敗'
+				}
+				success {
+					echo 'WORKSPACE init 成功'            	
+				}
+			}
+		}
+        stage('git clone') {
+		    steps{
+				echo 'git clone'
+				echo '------------------------------'
+				withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
+					sh '''
+						git clone --branch test ${GIT_REPO_SSH_URL}
+						git diff --name-only test main > diff_files.txt
+						git diff test main > diff_detail.txt
+						ls -al
+						pwd
+					'''
+				}
+            }
+            post{
+				failure {
+					echo 'git clone 失敗'
+				}
+				success {
+					echo 'git clone 成功'            	
+				} 
+            }
+		}
+		
+		stage('Checkmarx scan') {
+            when {
+                expression { return false } //false 跳過
+            }
+            steps {
+                script {
+                    try {
+                        step([$class: 'CxScanBuilder', 
+                        comment: 'OPEN_UNLTS', 
+                        credentialsId: 'checkmarx-server',
+                        sourceEncoding: '1', 
+                        excludeFolders: '', 
+                        excludeOpenSourceFolders: '', 
+                        exclusionsSetting: 'global', 
+                        highThreshold: 0, //高風險限制
+                        mediumThreshold: 0, //中風險限制
+                        lowThreshold: 0, //低風險限制
+                        vulnerabilityThresholdResult: 'FAILURE', //設定pipeline偵測到超過閥值時失敗
+                        waitForResultsEnabled: true, //等待掃描結果回傳
+                        vulnerabilityThresholdEnabled: true, //設定風險閥值開啟
+                        fullScanCycle: 0, //每間隔多少次執行一次完整掃描
+                        groupId: '6', 
+                        projectName: 'CICD', 
+                        preset: '36', sastEnabled: true, serverUrl: 'http://10.10.2.164/',
+                        generatePdfReport: true, generateXmlReport: false, 
+                        osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz', osaInstallBeforeScan: false, 
+                        filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*, !**/.hg/**/*, !**/.git/**/*, !**/.bzr/**/*, !**/bin/**/*,!**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr, !**/*.iws, !**/*.bak, !**/*.tmp, !**/*.aac, !**/*.aif, !**/*.iff, !**/*.m3u, !**/*.mid, !**/*.mp3,!**/*.mpa, !**/*.ra, !**/*.wav, !**/*.wma, !**/*.3g2, !**/*.3gp, !**/*.asf, !**/*.asx, !**/*.avi, !**/*.flv, !**/*.mov, !**/*.mp4, !**/*.mpg, !**/*.rm, !**/*.swf, !**/*.vob, !**/*.wmv,!**/*.bmp, !**/*.gif, !**/*.jpg, !**/*.png, !**/*.psd, !**/*.tif, !**/*.swf, !**/*.jar, !**/*.zip, !**/*.rar, !**/*.exe, !**/*.dll, !**/*.pdb, !**/*.7z,  !**/*.gz, !**/*.tar.gz,!**/*.tar, !**/*.gz, !**/*.ahtm, !**/*.ahtml, !**/*.fhtml, !**/*.hdm, !**/*.hdml, !**/*.hsql, !**/*.ht, !**/*.hta, !**/*.htc, !**/*.htd, !**/*.war, !**/*.ear,!**/*.htmls,!**/*.ihtml, !**/*.mht, !**/*.mhtm, !**/*.mhtml, !**/*.ssi, !**/*.stm, !**/*.stml, !**/*.ttml, !**/*.txn, !**/*.xhtm, !**/*.xhtml, !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*'''
+                        ])
+                     
+                        // 取得掃描結果並進行判斷
+                        if (scanResults.hasHighVulnerability || scanResults.hasMediumVulnerability) { 
+                            currentBuild.result = 'FAILURE'
+                        } else if (scanResults.lowVulnerabilityCount > 0) {
+                            currentBuild.result = 'FAILURE'
+                        }
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                         error("Checkmarx scan failed: ${e.message}")
+                    }
+                }
+            }
+        }
+		
+
+    }
+}
