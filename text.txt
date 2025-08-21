@@ -1,55 +1,36 @@
-environment {
-    // GitLab 的 SSH URL
-    GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:open_unlts/unlts.git'
-
-    // 舊 Nexus
-    NEXUS_URL = 'ddpsn01.cbsd.scsb.com.tw'
-    NEXUS_PROTOCOL = 'https'
-    NEXUS_REPO = 'maven-releases'
-
-    // 新 Nexus
-    NEXUS_URL_NEW = '10.21.114.106:443'
-    NEXUS_PROTOCOL_NEW = 'http'
-    NEXUS_REPO_NEW = 'maven-releases'
-
-    PROJECT_NAME='unlts'
-    AP_SERVER = '10.10.8.225'
-    TOMCAT_PATH = 'C:\\Users\\Administrator\\Desktop\\unlts'
-    APPLICATION_PROPERTIES = '.\\unlts\\src\\main\\resources\\application-dev.properties'
-}
-
-
-stage('Publish to new Nexus') {
-    steps {
-        updateGitlabCommitStatus name: 'Publish to new Nexus', state: 'pending'
-        dir("unlts"){
-            script {
-                pom = readMavenPom file: "pom.xml"
-                filesByGlob = findFiles(glob: "target/*.${pom.packaging}")
-                artifactPath = filesByGlob[0].path
-                artifactExists = fileExists artifactPath
-                if(artifactExists) {
-                    env.WAR_NAME = "${pom.artifactId}-${pom.version}.${pom.packaging}"
-                    env.WAR_VERSION = "${pom.version}"
-
-                    nexusArtifactUploader(
-                        credentialsId: 'nexus-user',
-                        nexusUrl: "${NEXUS_URL_NEW}",
-                        nexusVersion: 'nexus3',
-                        protocol: "${NEXUS_PROTOCOL_NEW}",
-                        repository: "${NEXUS_REPO_NEW}",
-                        groupId: pom.groupId,
-                        version: pom.version,
-                        artifacts: [
-                            [artifactId: pom.artifactId, classifier: '', file: artifactPath, type: pom.packaging],
-                            [artifactId: pom.artifactId, classifier: '', file: "pom.xml", type: "pom"]
-                        ]
-                    )
-                } else {
-                    error "*** File: ${artifactPath}, could not be found"
-                }
-            }
-        }
-        updateGitlabCommitStatus name: 'Publish to new Nexus', state: 'success'
+stage('Nexus IQ Policy Evaluation') {
+  steps {
+    // （可選）將 GitLab 狀態標成進行中
+    script { if (currentBuild.rawBuild) { try { updateGitlabCommitStatus name: 'Nexus IQ', state: 'pending' } catch(ignore){} } }
+    
+    // 進行 IQ 掃描
+    nexusPolicyEvaluation(
+      advancedProperties: '',                 // 需要額外 CLI 參數時再填
+      enableDebugLogging: false,              // 除錯時可改 true
+      failBuildOnNetworkError: false,         // 網路錯誤是否讓建置失敗（視你的策略調整）
+      iqApplication: selectedApplication('webgoat'), // 或直接給字串 'webgoat'
+      iqInstanceId: 'sonatype-dev',           // 在 Manage Jenkins > System 設定的 IQ Instance ID
+      iqStage: 'build',                       // 可用：build / stage-release / release
+      jobCredentialsId: 'sonatype-lifecycle-scan', // Jenkins Credentials（IQ 的帳密或 Token）
+      // 新版參數名稱為 scanPatterns（舊版是 iqScanPatterns）
+      scanPatterns: [
+        [scanPattern: '**/target/*.jar'],
+        [scanPattern: '**/target/*.war']      // 若不用 war，移除此列
+      ]
+    )
+  }
+  post {
+    success {
+      script { if (currentBuild.rawBuild) { try { updateGitlabCommitStatus name: 'Nexus IQ', state: 'success' } catch(ignore){} } }
+      echo 'Nexus IQ 掃描完成（符合政策或允許通過）。'
     }
+    unstable {
+      script { if (currentBuild.rawBuild) { try { updateGitlabCommitStatus name: 'Nexus IQ', state: 'failed' } catch(ignore){} } }
+      echo 'Nexus IQ 掃描結果為 Unstable（請查看政策違反細節）。'
+    }
+    failure {
+      script { if (currentBuild.rawBuild) { try { updateGitlabCommitStatus name: 'Nexus IQ', state: 'failed' } catch(ignore){} } }
+      echo 'Nexus IQ 掃描失敗，請檢查 Jenkins 日誌與 IQ 伺服器。'
+    }
+  }
 }
