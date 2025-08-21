@@ -1,61 +1,109 @@
-stage('Probe Nexus Repository') {
-  steps {
-    withCredentials([usernamePassword(credentialsId: 'nexus-cred', usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
-      sh '''
-        echo "[1] DNS & 連線 + 狀態 API"
-        # 200 代表 OK；若有自簽憑證，請先把 CA 裝進 Jenkins/agent 系統，不要用 -k
-        CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-          -u "$NUSER:$NPASS" \
-          "${NEXUS_URL}/service/rest/v1/status")
-        echo "Nexus REST status code: $CODE"
-        test "$CODE" = "200"
-
-        echo "[2] 列出 repositories 確認授權"
-        curl -s -u "$NUSER:$NPASS" "${NEXUS_URL}/service/rest/v1/repositories" | head -c 500; echo
-
-        echo "[3] （可選）對 raw-hosted 上傳/刪除一個測試檔以驗證讀寫"
-        REPO=raw-hosted               # 改成你有權限的 hosted repo
-        PATH_IN_REPO=connectivity/jenkins-probe.txt
-        echo "hello from jenkins $(date)" > probe.txt
-
-        # 上傳（Nexus3：Raw repo 建議使用 Components API）
-        UP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-          -u "$NUSER:$NPASS" \
-          -F "raw.directory=connectivity" \
-          -F "raw.asset1=@probe.txt;type=text/plain" \
-          "${NEXUS_URL}/service/rest/v1/components?repository=${REPO}")
-        echo "Upload code: $UP_CODE"
-        test "$UP_CODE" = "204" -o "$UP_CODE" = "201"
-
-        # 下載驗證
-        DL_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-          -u "$NUSER:$NPASS" \
-          "${NEXUS_URL}/repository/${REPO}/${PATH_IN_REPO}")
-        echo "Download code: $DL_CODE"
-        test "$DL_CODE" = "200"
-
-        # （可選）清理：需要 blob store 清理權限或直接保留亦可
-        # curl -X DELETE -u "$NUSER:$NPASS" "${NEXUS_URL}/repository/${REPO}/${PATH_IN_REPO}"
-      '''
+ environment {
+		// Git Lab的 SSH URL。
+        GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:open_unlts/unlts.git'
+        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
+        NEXUS_URL_NEW = 'http://10.21.114.106:443/'
+		PROJECT_NAME='unlts'
+        AP_SERVER = '10.10.8.225'
+		TOMCAT_PATH = 'C:\\Users\\Administrator\\Desktop\\unlts'
+		// 這裡要看專案設定檔是用properties還是yaml
+		APPLICATION_PROPERTIES = '.\\unlts\\src\\main\\resources\\application-dev.properties'
     }
-  }
-}
 
+stage('Publish to nexus(spring)') { 
+			steps {
+				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'pending'
+				dir("unlts"){
+					script {
+						pom = readMavenPom file: "pom.xml";
+						filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+						echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+						artifactPath = filesByGlob[0].path;
+						artifactExists = fileExists artifactPath;
+						if(artifactExists) {
+							echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+							env.WAR_NAME = "${pom.artifactId}-${pom.version}.${pom.packaging}"
+							env.WAR_VERSION = "${pom.version}"
+							echo "WAR_NAME: ${WAR_NAME}"
+							echo "WAR_VERSION: ${WAR_VERSION}"
 
-stage('Probe Nexus IQ Server (API)') {
-  steps {
-    withCredentials([usernamePassword(credentialsId: 'iq-cred', usernameVariable: 'IQUSER', passwordVariable: 'IQPASS')]) {
-      sh '''
-        IQ_URL="${IQ_URL:-https://iq.company.com:8070}"
+							nexusArtifactUploader(
+								credentialsId: 'nexus-user',
+								nexusUrl: 'ddpsn01.cbsd.scsb.com.tw',
+								nexusVersion: 'nexus3',
+								protocol: 'https',
+								repository: 'maven-releases',
+								groupId: pom.groupId,
+								version: pom.version,
+								artifacts: [
+									[
+										artifactId: pom.artifactId,
+										classifier: '',
+										file: artifactPath,
+										type: pom.packaging
+									],
+									[
+										artifactId: pom.artifactId,
+										classifier: '',
+										file: "pom.xml",
+										type: "pom"
+									]
+								]
+							);
+						} else {
+							error "*** File: ${artifactPath}, could not be found";
+						}
+					}
+				}
+				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'success'
+			}
+		}
+		
+		stage('Publish to nexus(spring)') { 
+			steps {
+				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'pending'
+				dir("unlts"){
+					script {
+						pom = readMavenPom file: "pom.xml";
+						filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+						echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+						artifactPath = filesByGlob[0].path;
+						artifactExists = fileExists artifactPath;
+						if(artifactExists) {
+							echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+							env.WAR_NAME = "${pom.artifactId}-${pom.version}.${pom.packaging}"
+							env.WAR_VERSION = "${pom.version}"
+							echo "WAR_NAME: ${WAR_NAME}"
+							echo "WAR_VERSION: ${WAR_VERSION}"
 
-        echo "[1] 狀態 API"
-        CODE=$(curl -s -o /dev/null -w "%{http_code}" -u "$IQUSER:$IQPASS" "${IQ_URL}/api/v2/status")
-        echo "IQ status code: $CODE"
-        test "$CODE" = "200"
-
-        echo "[2] 列出 applications（驗證授權）"
-        curl -s -u "$IQUSER:$IQPASS" "${IQ_URL}/api/v2/applications" | head -c 500; echo
-      '''
-    }
-  }
-}
+							nexusArtifactUploader(
+								credentialsId: 'nexus-user',
+								nexusUrl: '10.21.114.106:443',
+								nexusVersion: 'nexus3',
+								protocol: 'http',
+								repository: 'maven-releases',
+								groupId: pom.groupId,
+								version: pom.version,
+								artifacts: [
+									[
+										artifactId: pom.artifactId,
+										classifier: '',
+										file: artifactPath,
+										type: pom.packaging
+									],
+									[
+										artifactId: pom.artifactId,
+										classifier: '',
+										file: "pom.xml",
+										type: "pom"
+									]
+								]
+							);
+						} else {
+							error "*** File: ${artifactPath}, could not be found";
+						}
+					}
+				}
+				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'success'
+			}
+		}
