@@ -1,109 +1,55 @@
- environment {
-		// Git Lab的 SSH URL。
-        GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:open_unlts/unlts.git'
-        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
-        NEXUS_URL_NEW = 'http://10.21.114.106:443/'
-		PROJECT_NAME='unlts'
-        AP_SERVER = '10.10.8.225'
-		TOMCAT_PATH = 'C:\\Users\\Administrator\\Desktop\\unlts'
-		// 這裡要看專案設定檔是用properties還是yaml
-		APPLICATION_PROPERTIES = '.\\unlts\\src\\main\\resources\\application-dev.properties'
+environment {
+    // GitLab 的 SSH URL
+    GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:open_unlts/unlts.git'
+
+    // 舊 Nexus
+    NEXUS_URL = 'ddpsn01.cbsd.scsb.com.tw'
+    NEXUS_PROTOCOL = 'https'
+    NEXUS_REPO = 'maven-releases'
+
+    // 新 Nexus
+    NEXUS_URL_NEW = '10.21.114.106:443'
+    NEXUS_PROTOCOL_NEW = 'http'
+    NEXUS_REPO_NEW = 'maven-releases'
+
+    PROJECT_NAME='unlts'
+    AP_SERVER = '10.10.8.225'
+    TOMCAT_PATH = 'C:\\Users\\Administrator\\Desktop\\unlts'
+    APPLICATION_PROPERTIES = '.\\unlts\\src\\main\\resources\\application-dev.properties'
+}
+
+
+stage('Publish to new Nexus') {
+    steps {
+        updateGitlabCommitStatus name: 'Publish to new Nexus', state: 'pending'
+        dir("unlts"){
+            script {
+                pom = readMavenPom file: "pom.xml"
+                filesByGlob = findFiles(glob: "target/*.${pom.packaging}")
+                artifactPath = filesByGlob[0].path
+                artifactExists = fileExists artifactPath
+                if(artifactExists) {
+                    env.WAR_NAME = "${pom.artifactId}-${pom.version}.${pom.packaging}"
+                    env.WAR_VERSION = "${pom.version}"
+
+                    nexusArtifactUploader(
+                        credentialsId: 'nexus-user',
+                        nexusUrl: "${NEXUS_URL_NEW}",
+                        nexusVersion: 'nexus3',
+                        protocol: "${NEXUS_PROTOCOL_NEW}",
+                        repository: "${NEXUS_REPO_NEW}",
+                        groupId: pom.groupId,
+                        version: pom.version,
+                        artifacts: [
+                            [artifactId: pom.artifactId, classifier: '', file: artifactPath, type: pom.packaging],
+                            [artifactId: pom.artifactId, classifier: '', file: "pom.xml", type: "pom"]
+                        ]
+                    )
+                } else {
+                    error "*** File: ${artifactPath}, could not be found"
+                }
+            }
+        }
+        updateGitlabCommitStatus name: 'Publish to new Nexus', state: 'success'
     }
-
-stage('Publish to nexus(spring)') { 
-			steps {
-				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'pending'
-				dir("unlts"){
-					script {
-						pom = readMavenPom file: "pom.xml";
-						filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
-						echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
-						artifactPath = filesByGlob[0].path;
-						artifactExists = fileExists artifactPath;
-						if(artifactExists) {
-							echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
-							env.WAR_NAME = "${pom.artifactId}-${pom.version}.${pom.packaging}"
-							env.WAR_VERSION = "${pom.version}"
-							echo "WAR_NAME: ${WAR_NAME}"
-							echo "WAR_VERSION: ${WAR_VERSION}"
-
-							nexusArtifactUploader(
-								credentialsId: 'nexus-user',
-								nexusUrl: 'ddpsn01.cbsd.scsb.com.tw',
-								nexusVersion: 'nexus3',
-								protocol: 'https',
-								repository: 'maven-releases',
-								groupId: pom.groupId,
-								version: pom.version,
-								artifacts: [
-									[
-										artifactId: pom.artifactId,
-										classifier: '',
-										file: artifactPath,
-										type: pom.packaging
-									],
-									[
-										artifactId: pom.artifactId,
-										classifier: '',
-										file: "pom.xml",
-										type: "pom"
-									]
-								]
-							);
-						} else {
-							error "*** File: ${artifactPath}, could not be found";
-						}
-					}
-				}
-				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'success'
-			}
-		}
-		
-		stage('Publish to nexus(spring)') { 
-			steps {
-				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'pending'
-				dir("unlts"){
-					script {
-						pom = readMavenPom file: "pom.xml";
-						filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
-						echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
-						artifactPath = filesByGlob[0].path;
-						artifactExists = fileExists artifactPath;
-						if(artifactExists) {
-							echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
-							env.WAR_NAME = "${pom.artifactId}-${pom.version}.${pom.packaging}"
-							env.WAR_VERSION = "${pom.version}"
-							echo "WAR_NAME: ${WAR_NAME}"
-							echo "WAR_VERSION: ${WAR_VERSION}"
-
-							nexusArtifactUploader(
-								credentialsId: 'nexus-user',
-								nexusUrl: '10.21.114.106:443',
-								nexusVersion: 'nexus3',
-								protocol: 'http',
-								repository: 'maven-releases',
-								groupId: pom.groupId,
-								version: pom.version,
-								artifacts: [
-									[
-										artifactId: pom.artifactId,
-										classifier: '',
-										file: artifactPath,
-										type: pom.packaging
-									],
-									[
-										artifactId: pom.artifactId,
-										classifier: '',
-										file: "pom.xml",
-										type: "pom"
-									]
-								]
-							);
-						} else {
-							error "*** File: ${artifactPath}, could not be found";
-						}
-					}
-				}
-				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'success'
-			}
-		}
+}
