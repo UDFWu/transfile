@@ -1,3 +1,61 @@
-mvn -U clean install -T 4 -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dnexus-url=https://128.168.139.111/nexus/ -Drelease-repository=maven-releases/ -Dsnapshot-repository=maven-snapshots/ -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true -Dmaven.resolver.transport=wagon
+stage('Probe Nexus Repository') {
+  steps {
+    withCredentials([usernamePassword(credentialsId: 'nexus-cred', usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
+      sh '''
+        echo "[1] DNS & 連線 + 狀態 API"
+        # 200 代表 OK；若有自簽憑證，請先把 CA 裝進 Jenkins/agent 系統，不要用 -k
+        CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+          -u "$NUSER:$NPASS" \
+          "${NEXUS_URL}/service/rest/v1/status")
+        echo "Nexus REST status code: $CODE"
+        test "$CODE" = "200"
 
-https://ddpsn01.cbsd.scsb.com.tw/#browse/welcome
+        echo "[2] 列出 repositories 確認授權"
+        curl -s -u "$NUSER:$NPASS" "${NEXUS_URL}/service/rest/v1/repositories" | head -c 500; echo
+
+        echo "[3] （可選）對 raw-hosted 上傳/刪除一個測試檔以驗證讀寫"
+        REPO=raw-hosted               # 改成你有權限的 hosted repo
+        PATH_IN_REPO=connectivity/jenkins-probe.txt
+        echo "hello from jenkins $(date)" > probe.txt
+
+        # 上傳（Nexus3：Raw repo 建議使用 Components API）
+        UP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+          -u "$NUSER:$NPASS" \
+          -F "raw.directory=connectivity" \
+          -F "raw.asset1=@probe.txt;type=text/plain" \
+          "${NEXUS_URL}/service/rest/v1/components?repository=${REPO}")
+        echo "Upload code: $UP_CODE"
+        test "$UP_CODE" = "204" -o "$UP_CODE" = "201"
+
+        # 下載驗證
+        DL_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+          -u "$NUSER:$NPASS" \
+          "${NEXUS_URL}/repository/${REPO}/${PATH_IN_REPO}")
+        echo "Download code: $DL_CODE"
+        test "$DL_CODE" = "200"
+
+        # （可選）清理：需要 blob store 清理權限或直接保留亦可
+        # curl -X DELETE -u "$NUSER:$NPASS" "${NEXUS_URL}/repository/${REPO}/${PATH_IN_REPO}"
+      '''
+    }
+  }
+}
+
+
+stage('Probe Nexus IQ Server (API)') {
+  steps {
+    withCredentials([usernamePassword(credentialsId: 'iq-cred', usernameVariable: 'IQUSER', passwordVariable: 'IQPASS')]) {
+      sh '''
+        IQ_URL="${IQ_URL:-https://iq.company.com:8070}"
+
+        echo "[1] 狀態 API"
+        CODE=$(curl -s -o /dev/null -w "%{http_code}" -u "$IQUSER:$IQPASS" "${IQ_URL}/api/v2/status")
+        echo "IQ status code: $CODE"
+        test "$CODE" = "200"
+
+        echo "[2] 列出 applications（驗證授權）"
+        curl -s -u "$IQUSER:$IQPASS" "${IQ_URL}/api/v2/applications" | head -c 500; echo
+      '''
+    }
+  }
+}
