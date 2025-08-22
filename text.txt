@@ -1,36 +1,83 @@
-stage('Nexus IQ Policy Evaluation') {
-  steps {
-    // （可選）將 GitLab 狀態標成進行中
-    script { if (currentBuild.rawBuild) { try { updateGitlabCommitStatus name: 'Nexus IQ', state: 'pending' } catch(ignore){} } }
-    
-    // 進行 IQ 掃描
-    nexusPolicyEvaluation(
-      advancedProperties: '',                 // 需要額外 CLI 參數時再填
-      enableDebugLogging: false,              // 除錯時可改 true
-      failBuildOnNetworkError: false,         // 網路錯誤是否讓建置失敗（視你的策略調整）
-      iqApplication: selectedApplication('webgoat'), // 或直接給字串 'webgoat'
-      iqInstanceId: 'sonatype-dev',           // 在 Manage Jenkins > System 設定的 IQ Instance ID
-      iqStage: 'build',                       // 可用：build / stage-release / release
-      jobCredentialsId: 'sonatype-lifecycle-scan', // Jenkins Credentials（IQ 的帳密或 Token）
-      // 新版參數名稱為 scanPatterns（舊版是 iqScanPatterns）
-      scanPatterns: [
-        [scanPattern: '**/target/*.jar'],
-        [scanPattern: '**/target/*.war']      // 若不用 war，移除此列
-      ]
-    )
-  }
-  post {
-    success {
-      script { if (currentBuild.rawBuild) { try { updateGitlabCommitStatus name: 'Nexus IQ', state: 'success' } catch(ignore){} } }
-      echo 'Nexus IQ 掃描完成（符合政策或允許通過）。'
-    }
-    unstable {
-      script { if (currentBuild.rawBuild) { try { updateGitlabCommitStatus name: 'Nexus IQ', state: 'failed' } catch(ignore){} } }
-      echo 'Nexus IQ 掃描結果為 Unstable（請查看政策違反細節）。'
-    }
-    failure {
-      script { if (currentBuild.rawBuild) { try { updateGitlabCommitStatus name: 'Nexus IQ', state: 'failed' } catch(ignore){} } }
-      echo 'Nexus IQ 掃描失敗，請檢查 Jenkins 日誌與 IQ 伺服器。'
-    }
-  }
-}
+
+        stage('Nexus Evaluate') { 
+            steps {
+                nexusPolicyEvaluation advancedProperties: '', //如果要傳遞額外參數才使用,預設留空白
+                enableDebugLogging: true, //是否開啟Debug log
+                failBuildOnNetworkError: true, //如果連不上IQ Server 是否中斷 build
+                iqApplication: selectedApplication('webgoat'), //指定哪一個 IQ Server application 做掃描 
+                iqInstanceId: 'sonatype-dev',
+                iqScanPatterns: [[scanPattern: '**/target/*.jar'], [scanPattern: '**/target/*.war']], //要掃描的檔案路徑(這裡指掃描所有Target下面的 Jar file)
+                iqStage: 'build',
+                jobCredentialsId: 'sonatype-lifecycle-scan' 
+            }
+            post {
+                failure {
+                    echo 'Nexus Evaluate failed'
+                }
+                success {
+                    echo 'Nexus Evaluate succeeded'
+                }
+            }
+        } 
+
+Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 1fc4a166-aefc-44ad-8f75-2c4bc5e4c3fa
+java.lang.NullPointerException
+	at com.google.common.base.Preconditions.checkNotNull(Preconditions.java:906)
+	at com.google.common.base.Preconditions$checkNotNull.callStatic(Unknown Source)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqClientFactory.findCredentials(IqClientFactory.groovy:81)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:98)
+	at org.codehaus.groovy.runtime.callsite.StaticMetaMethodSite$StaticMetaMethodSiteNoUnwrapNoCoerce.invoke(StaticMetaMethodSite.java:151)
+	at org.codehaus.groovy.runtime.callsite.StaticMetaMethodSite.callStatic(StaticMetaMethodSite.java:102)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callStatic(AbstractCallSite.java:225)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqClientFactory.getIqClient(IqClientFactory.groovy:49)
+	at org.sonatype.nexus.ci.iq.IqClientFactory$getIqClient.call(Unknown Source)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.memoizedMethodPriv$getIqClient(IqPolicyEvaluatorCallable.groovy:173)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:98)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:325)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:352)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1034)
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.callCurrent(PogoMetaClassSite.java:68)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent(AbstractCallSite.java:161)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable$_closure3.doCall(IqPolicyEvaluatorCallable.groovy)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable$_closure3.doCall(IqPolicyEvaluatorCallable.groovy)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:98)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:325)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:264)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1034)
+	at groovy.lang.Closure.call(Closure.java:420)
+	at org.codehaus.groovy.runtime.memoize.Memoize$MemoizeFunction.call(Memoize.java:135)
+	at groovy.lang.Closure.call(Closure.java:414)
+	at java_util_concurrent_Callable$call$0.call(Unknown Source)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.getIqClient(IqPolicyEvaluatorCallable.groovy)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:98)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:325)
+	at org.codehaus.groovy.runtime.metaclass.MethodMetaProperty$GetBeanMethodMetaProperty.getProperty(MethodMetaProperty.java:76)
+	at org.codehaus.groovy.runtime.callsite.GetEffectivePogoPropertySite.callGroovyObjectGetProperty(GetEffectivePogoPropertySite.java:68)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy:203)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy)
+	at java_util_concurrent_Callable$call$0.call(Unknown Source)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy:54)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy)
+	at PluginClassLoader for workflow-step-api//org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution.lambda$start$0(SynchronousNonBlockingStepExecution.java:47)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Finished: FAILURE
