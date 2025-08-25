@@ -1,3 +1,49 @@
+
+		stage('maven package'){
+            steps{
+                echo 'maven package'
+                echo '------------------------------'
+                sh '''
+                    export PATH=/usr/lib/apache-maven-3.9.7/bin:$PATH
+                    mvn --version
+                    cd ${PROJECT_NAME}
+                    pwd
+                    mvn clean
+                    mvn package
+                '''
+                echo '------------------------------'
+            }
+            post{
+                failure {
+                    echo 'maven package 失敗'
+                }
+                success {
+					echo 'maven package 成功'
+				} 
+		    }
+		}
+
+        stage('Nexus Evaluate') { 
+            steps {
+                nexusPolicyEvaluation advancedProperties: '', //如果要傳遞額外參數才使用,預設留空白
+                enableDebugLogging: true, //是否開啟Debug log
+                failBuildOnNetworkError: true, //如果連不上IQ Server 是否中斷 build
+                iqApplication: selectedApplication('webgoat'), //指定哪一個 IQ Server application 做掃描 
+                iqInstanceId: 'sonatype-dev',
+                iqScanPatterns: [[scanPattern: '**/target/*.jar'], [scanPattern: '**/target/*.war']], //要掃描的檔案路徑(這裡指掃描所有Target下面的 Jar file)
+                iqStage: 'build',
+                jobCredentialsId: 'sonatype-lifecycle-scan' 
+            }
+            post {
+                failure {
+                    echo 'Nexus Evaluate failed'
+                }
+                success {
+                    echo 'Nexus Evaluate succeeded'
+                }
+            }
+        } 
+
 Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 1fc4a166-aefc-44ad-8f75-2c4bc5e4c3fa
 java.lang.NullPointerException
 	at com.google.common.base.Preconditions.checkNotNull(Preconditions.java:906)
