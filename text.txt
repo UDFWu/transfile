@@ -28,7 +28,7 @@
                 nexusPolicyEvaluation advancedProperties: '', //如果要傳遞額外參數才使用,預設留空白
                 enableDebugLogging: true, //是否開啟Debug log
                 failBuildOnNetworkError: true, //如果連不上IQ Server 是否中斷 build
-                iqApplication: selectedApplication('webgoat'), //指定哪一個 IQ Server application 做掃描 
+                iqApplication: selectedApplication('open_unlts'), //指定哪一個 IQ Server application 做掃描 
                 iqInstanceId: 'sonatype-dev',
                 iqScanPatterns: [[scanPattern: '**/target/*.jar'], [scanPattern: '**/target/*.war']], //要掃描的檔案路徑(這裡指掃描所有Target下面的 Jar file)
                 iqStage: 'build',
@@ -44,58 +44,19 @@
             }
         } 
 
-Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 1fc4a166-aefc-44ad-8f75-2c4bc5e4c3fa
-java.lang.NullPointerException
-	at com.google.common.base.Preconditions.checkNotNull(Preconditions.java:906)
-	at com.google.common.base.Preconditions$checkNotNull.callStatic(Unknown Source)
-	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqClientFactory.findCredentials(IqClientFactory.groovy:81)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:98)
-	at org.codehaus.groovy.runtime.callsite.StaticMetaMethodSite$StaticMetaMethodSiteNoUnwrapNoCoerce.invoke(StaticMetaMethodSite.java:151)
-	at org.codehaus.groovy.runtime.callsite.StaticMetaMethodSite.callStatic(StaticMetaMethodSite.java:102)
-	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callStatic(AbstractCallSite.java:225)
-	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqClientFactory.getIqClient(IqClientFactory.groovy:49)
-	at org.sonatype.nexus.ci.iq.IqClientFactory$getIqClient.call(Unknown Source)
-	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.memoizedMethodPriv$getIqClient(IqPolicyEvaluatorCallable.groovy:173)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:98)
-	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:325)
-	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:352)
-	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1034)
-	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.callCurrent(PogoMetaClassSite.java:68)
-	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent(AbstractCallSite.java:161)
-	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable$_closure3.doCall(IqPolicyEvaluatorCallable.groovy)
-	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable$_closure3.doCall(IqPolicyEvaluatorCallable.groovy)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:98)
-	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:325)
-	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:264)
-	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1034)
-	at groovy.lang.Closure.call(Closure.java:420)
-	at org.codehaus.groovy.runtime.memoize.Memoize$MemoizeFunction.call(Memoize.java:135)
-	at groovy.lang.Closure.call(Closure.java:414)
-	at java_util_concurrent_Callable$call$0.call(Unknown Source)
-	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.getIqClient(IqPolicyEvaluatorCallable.groovy)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:98)
-	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:325)
-	at org.codehaus.groovy.runtime.metaclass.MethodMetaProperty$GetBeanMethodMetaProperty.getProperty(MethodMetaProperty.java:76)
-	at org.codehaus.groovy.runtime.callsite.GetEffectivePogoPropertySite.callGroovyObjectGetProperty(GetEffectivePogoPropertySite.java:68)
-	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy:203)
+Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: db3f959d-3b62-42e9-ab11-3ee93a8a4ab8
+java.lang.IllegalArgumentException: The application ID open_unlts is invalid.
+	at com.google.common.base.Preconditions.checkArgument(Preconditions.java:145)
+	at com.google.common.base.Preconditions$checkArgument$1.callStatic(Unknown Source)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallStatic(CallSiteArray.java:55)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callStatic(AbstractCallSite.java:197)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callStatic(AbstractCallSite.java:217)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy:209)
 	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy)
-	at java_util_concurrent_Callable$call$0.call(Unknown Source)
+	at java_util_concurrent_Callable$call.call(Unknown Source)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:116)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:120)
 	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy:54)
 	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy)
 	at PluginClassLoader for workflow-step-api//org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution.lambda$start$0(SynchronousNonBlockingStepExecution.java:47)
