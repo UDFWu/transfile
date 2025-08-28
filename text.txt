@@ -1,18 +1,10 @@
-[INFO] --- resources:3.3.1:resources (default-resources) @ len-bat ---
-[INFO] Copying 1 resource from src/main/resources to target/classes
-[INFO] Copying 6 resources from src/main/resources to target/classes
-[INFO] The encoding used to copy filtered properties files have not been set. This means that the same encoding will be used to copy filtered properties files as when copying other filtered resources. This might not be what you want! Run your build with --debug to see which files might be affected. Read more at https://maven.apache.org/plugins/maven-resources-plugin/examples/filtering-properties-files.html
-[INFO] 
-[INFO] --- compiler:3.10.1:compile (default-compile) @ len-bat ---
-[INFO] Changes detected - recompiling the module!
-[INFO] Compiling 104 source files to /datam/jenkins/workspace/Pipeline_Sample/nexus_connect_test/ncbs-mid-repo-p2/len/len-bat/target/classes
-[INFO] -------------------------------------------------------------
-[ERROR] COMPILATION ERROR : 
-[INFO] -------------------------------------------------------------
-[ERROR] /datam/jenkins/workspace/Pipeline_Sample/nexus_connect_test/ncbs-mid-repo-p2/dep/dep-service/src/main/java/com/scsb/ncbs/dep/service/crr/CrrService.java:[886,44] error: cannot find symbol
-  symbol:   method getSupervisoryBankCode()
-  location: variable entity of type CmnBranchMappingEntity
-[ERROR] /datam/jenkins/workspace/Pipeline_Sample/nexus_connect_test/ncbs-mid-repo-p2/dep/dep-service/src/main/java/com/scsb/ncbs/dep/service/crr/CrrService.java:[886,83] error: cannot find symbol
-  symbol:   method getSupervisoryBankCode()
-  location: variable record of type CmnBranchMappingEntity
-[INFO] 2 errors 
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:2.7.18:start (pre-integration-test) on project len-app: Could not figure out if the application has started: Failed to connect to MBean server at port 46339: Could not invoke shutdown operation: Spring application did not start before the configured timeout (30000ms -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :len-app
