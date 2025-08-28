@@ -8,3 +8,28 @@
 [ERROR] 
 [ERROR] After correcting the problems, you can resume the build with the command
 [ERROR]   mvn <args> -rf :len-app
+
+
+
+	stage('maven package'){
+            steps{
+                echo 'maven package'
+                echo '------------------------------'
+                sh '''
+                    export PATH=/usr/lib/apache-maven-3.9.7/bin:$PATH
+                    mvn --version
+                    cd ${PROJECT_NAME}
+                    pwd
+                    mvn -U clean install -T 4 -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dnexus-url=https://ddpsn01.cbsd.scsb.com.tw/ -Drelease-repository=maven-releases/ -Dsnapshot-repository=maven-snapshots/ -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true -Dmaven.resolver.transport=wagon
+                '''
+                echo '------------------------------'
+            }
+            post{
+                failure {
+                    echo 'maven package 失敗'
+                }
+                success {
+					echo 'maven package 成功'
+				} 
+		    }
+		}
