@@ -1,35 +1,7 @@
-[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:2.7.18:start (pre-integration-test) on project len-app: Could not figure out if the application has started: Failed to connect to MBean server at port 46339: Could not invoke shutdown operation: Spring application did not start before the configured timeout (30000ms -> [Help 1]
-[ERROR] 
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR] 
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
-[ERROR] 
-[ERROR] After correcting the problems, you can resume the build with the command
-[ERROR]   mvn <args> -rf :len-app
+可以參考下面步驟操作
 
-
-
-	stage('maven package'){
-            steps{
-                echo 'maven package'
-                echo '------------------------------'
-                sh '''
-                    export PATH=/usr/lib/apache-maven-3.9.7/bin:$PATH
-                    mvn --version
-                    cd ${PROJECT_NAME}
-                    pwd
-                    mvn -U clean install -T 4 -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dnexus-url=https://ddpsn01.cbsd.scsb.com.tw/ -Drelease-repository=maven-releases/ -Dsnapshot-repository=maven-snapshots/ -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true -Dmaven.resolver.transport=wagon
-                '''
-                echo '------------------------------'
-            }
-            post{
-                failure {
-                    echo 'maven package 失敗'
-                }
-                success {
-					echo 'maven package 成功'
-				} 
-		    }
-		}
+透過 Eclipse 安裝更新站台
+在 Eclipse 選單：Help → Install New Software → Add…
+Name：自訂
+Location：輸入 https://download.sonatype.com/clm/eclipse/releases/
+按 OK，勾選要安裝的 Sonatype IQ for Eclipse 版本，Next → 接受授權 → 完成並重啟 Eclipse。此 URL 僅供 Eclipse 使用，無法直接用瀏覽器開啟。
