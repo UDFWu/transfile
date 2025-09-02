@@ -1,13 +1,69 @@
+[INFO] Replacing main artifact with repackaged archive
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ reml-app ---
+[INFO] Installing D:\repos_north_gitlab\ncbs_mid\ncbs-mid-repo-p2\reml\pom.xml to D:\.m2\com\ibm\ncbs\reml-app\0.0.1-SNAPSHOT\reml-app-0.0.1-SNAPSHOT.pom   
+[INFO] Installing D:\repos_north_gitlab\ncbs_mid\ncbs-mid-repo-p2\reml\target\reml-app-0.0.1-SNAPSHOT.jar to D:\.m2\com\ibm\ncbs\reml-app\0.0.1-SNAPSHOT\rem
+l-app-0.0.1-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for ncbs-mid-parent 0.0.1-SNAPSHOT:
+[INFO]
+[INFO] ncbs-mid-parent .................................... SUCCESS [ 37.030 s]
+[INFO] cbr ................................................ SUCCESS [  0.051 s]
+[INFO] cbr-service ........................................ FAILURE [01:47 min]
+[INFO] cbr-app ............................................ SKIPPED
+[INFO] cbr-bat ............................................ SKIPPED
+[INFO] dep ................................................ SUCCESS [  0.061 s]
+[INFO] dep-service ........................................ FAILURE [01:48 min]
+[INFO] dep-app ............................................ SKIPPED
+[INFO] dep-rpt ............................................ SKIPPED
+[INFO] dep-bat ............................................ SKIPPED
+[INFO] xau ................................................ SUCCESS [  0.074 s]
+[INFO] xau-service ........................................ SKIPPED
+[INFO] xau-app ............................................ SKIPPED
+[INFO] len ................................................ SUCCESS [  0.074 s]
+[INFO] len-service ........................................ FAILURE [01:47 min]
+[INFO] len-app ............................................ SKIPPED
+[INFO] len-bat ............................................ SKIPPED
+[INFO] len-rpt ............................................ SKIPPED
+[INFO] rem ................................................ SUCCESS [  0.068 s]
+[INFO] rem-service ........................................ SKIPPED
+[INFO] rem-app ............................................ SKIPPED
+[INFO] rem-bat ............................................ SKIPPED
+[INFO] rds ................................................ SUCCESS [  0.064 s]
+[INFO] rds-service ........................................ SKIPPED
+[INFO] rds-app ............................................ SKIPPED
+[INFO] cmn ................................................ SUCCESS [  0.064 s]
+[INFO] cmn-service ........................................ SKIPPED
+[INFO] cmn-app ............................................ SKIPPED
+[INFO] cmn-bat ............................................ SKIPPED
+[INFO] reml-app ........................................... SUCCESS [03:40 min]
+[INFO] remm ............................................... SUCCESS [  0.066 s]
+[INFO] remm-service ....................................... SKIPPED
+[INFO] remm-app ........................................... SKIPPED
+[INFO] remb ............................................... SUCCESS [  0.066 s]
+[INFO] remb-service ....................................... SKIPPED
+[INFO] remb-app ........................................... SKIPPED
+[INFO] rems ............................................... SUCCESS [  0.071 s]
+[INFO] rems-service ....................................... SKIPPED
+[INFO] rems-app ........................................... SKIPPED
+[INFO] gla ................................................ SUCCESS [  0.079 s]
+[INFO] gla-service ........................................ SKIPPED
+[INFO] gla-app ............................................ SKIPPED
+[INFO] gla-bat ............................................ SKIPPED
+[INFO] try ................................................ SUCCESS [  0.073 s]
+[INFO] try-service ........................................ SKIPPED
+[INFO] try-app ............................................ SKIPPED
+[INFO] try-batch .......................................... SKIPPED
+[INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  14.796 s (Wall Clock)
-[INFO] Finished at: 2025-09-02T15:47:27+08:00
+[INFO] Total time:  04:28 min (Wall Clock)
+[INFO] Finished at: 2025-09-02T16:07:18+08:00
 [INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:3.7.0:purge-local-repository (purge-local-dependencies) on project ncbs-mid-
-parent: Unable to purge directory: C:\Users\67164\.m2\repository\com\ibm\ncbs -> [Help 1]
+[ERROR] Could not acquire lock(s)
+[ERROR] java.lang.IllegalStateException: Could not acquire lock(s)
+[ERROR] Could not acquire lock(s)
+[ERROR] Could not acquire lock(s)
 [ERROR]
 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
 [ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR]
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
