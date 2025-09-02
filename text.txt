@@ -1,20 +1,36 @@
-C:\Users\67164>mvn -U clean install -T 4 -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dnexus-url=https://ddpsn01.cbsd.scsb.com.tw/ -Drelease-repository
-=maven-releases/ -Dsnapshot-repository=maven-snapshots/ -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ign
-ore.validity.dates=true -Dmaven.resolver.transport=wagon
-Picked up JAVA_TOOL_OPTIONS: -agentlib:jvmhook
-Picked up _JAVA_OPTIONS: -Xrunjvmhook -Xbootclasspath/a:"C:\Program Files (x86)\Micro Focus\UFT One\bin\java_shared\classes\jasmine.jar"
-[INFO] Scanning for projects...
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD FAILURE
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  0.081 s (Wall Clock)
-[INFO] Finished at: 2025-09-02T15:28:27+08:00
-[INFO] ------------------------------------------------------------------------
-[ERROR] The goal you specified requires a project to execute but there is no POM in this directory (C:\Users\67164). Please verify you invoked Maven from th
-e correct directory. -> [Help 1]
-[ERROR] 
+Downloading from nexus: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/com/ibm/ncbs/mid-boot-dependencies/$%7B%60ncbs-mid.version%60%7D/mid-boot-d
+ependencies-$%7B%60ncbs-mid.version%60%7D.pom
+[ERROR] [ERROR] Some problems were encountered while processing the POMs:
+[ERROR] Non-resolvable import POM: The following artifacts could not be resolved: com.ibm.ncbs:mid-boot-dependencies:pom:${`ncbs-mid.version`} (absent): Cou
+ld not find artifact com.ibm.ncbs:mid-boot-dependencies:pom:${`ncbs-mid.version`} in nexus (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/) @ lin
+e 67, column 16
+[ERROR] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is missing. @ line 78, column 15
+[ERROR] 'dependencies.dependency.version' for com.ibm.cbmp:cbmp-fabric-foundation:jar is missing. @ line 83, column 15
+[ERROR] 'dependencies.dependency.version' for com.ibm.ncbs:mid-foundation-core:jar is missing. @ line 87, column 15
+[ERROR] 'dependencies.dependency.version' for org.springdoc:springdoc-openapi-ui:jar is missing. @ line 91, column 15
+[ERROR] 'dependencies.dependency.version' for org.junit.jupiter:junit-jupiter-api:jar is missing. @ line 97, column 15
+[ERROR] 'dependencies.dependency.version' for org.mockito:mockito-core:jar is missing. @ line 102, column 15
+[ERROR] 'dependencies.dependency.version' for org.mockito:mockito-junit-jupiter:jar is missing. @ line 107, column 15
+[ERROR] 'dependencies.dependency.version' for org.mockito:mockito-inline:jar is missing. @ line 112, column 15
+ @
+[ERROR] The build could not read 1 project -> [Help 1]
+[ERROR]
+[ERROR]   The project com.ibm.ncbs:ncbs-mid-parent:0.0.1-SNAPSHOT (D:\repos_north_gitlab\ncbs_mid\ncbs-mid-repo-p2\pom.xml) has 9 errors
+[ERROR]     Non-resolvable import POM: The following artifacts could not be resolved: com.ibm.ncbs:mid-boot-dependencies:pom:${`ncbs-mid.version`} (absent):
+ Could not find artifact com.ibm.ncbs:mid-boot-dependencies:pom:${`ncbs-mid.version`} in nexus (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/) @
+ line 67, column 16 -> [Help 2]
+[ERROR]     'dependencies.dependency.version' for org.projectlombok:lombok:jar is missing. @ line 78, column 15
+[ERROR]     'dependencies.dependency.version' for com.ibm.cbmp:cbmp-fabric-foundation:jar is missing. @ line 83, column 15
+[ERROR]     'dependencies.dependency.version' for com.ibm.ncbs:mid-foundation-core:jar is missing. @ line 87, column 15
+[ERROR]     'dependencies.dependency.version' for org.springdoc:springdoc-openapi-ui:jar is missing. @ line 91, column 15
+[ERROR]     'dependencies.dependency.version' for org.junit.jupiter:junit-jupiter-api:jar is missing. @ line 97, column 15
+[ERROR]     'dependencies.dependency.version' for org.mockito:mockito-core:jar is missing. @ line 102, column 15
+[ERROR]     'dependencies.dependency.version' for org.mockito:mockito-junit-jupiter:jar is missing. @ line 107, column 15
+[ERROR]     'dependencies.dependency.version' for org.mockito:mockito-inline:jar is missing. @ line 112, column 15
+[ERROR]
 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
 [ERROR] Re-run Maven using the -X switch to enable full debug logging.
 [ERROR]
 [ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MissingProjectException
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/ProjectBuildingException
+[ERROR] [Help 2] http://cwiki.apache.org/confluence/display/MAVEN/UnresolvableModelException
