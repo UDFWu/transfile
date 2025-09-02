@@ -1,7 +1,20 @@
-可以參考下面步驟操作
-
-透過 Eclipse 安裝更新站台
-在 Eclipse 選單：Help → Install New Software → Add…
-Name：自訂
-Location：輸入 https://download.sonatype.com/clm/eclipse/releases/
-按 OK，勾選要安裝的 Sonatype IQ for Eclipse 版本，Next → 接受授權 → 完成並重啟 Eclipse。此 URL 僅供 Eclipse 使用，無法直接用瀏覽器開啟。
+C:\Users\67164>mvn -U clean install -T 4 -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dnexus-url=https://ddpsn01.cbsd.scsb.com.tw/ -Drelease-repository
+=maven-releases/ -Dsnapshot-repository=maven-snapshots/ -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ign
+ore.validity.dates=true -Dmaven.resolver.transport=wagon
+Picked up JAVA_TOOL_OPTIONS: -agentlib:jvmhook
+Picked up _JAVA_OPTIONS: -Xrunjvmhook -Xbootclasspath/a:"C:\Program Files (x86)\Micro Focus\UFT One\bin\java_shared\classes\jasmine.jar"
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.081 s (Wall Clock)
+[INFO] Finished at: 2025-09-02T15:28:27+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] The goal you specified requires a project to execute but there is no POM in this directory (C:\Users\67164). Please verify you invoked Maven from th
+e correct directory. -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MissingProjectException
