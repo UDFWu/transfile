@@ -1,20 +1,13 @@
-C:\Users\67164>mvn -U clean install -T 4 -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dnexus-url=https://ddpsn01.cbsd.scsb.com.tw/ -Drelease-repository
-=maven-releases/ -Dsnapshot-repository=maven-snapshots/ -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ign
-ore.validity.dates=true -Dmaven.resolver.transport=wagon
-Picked up JAVA_TOOL_OPTIONS: -agentlib:jvmhook
-Picked up _JAVA_OPTIONS: -Xrunjvmhook -Xbootclasspath/a:"C:\Program Files (x86)\Micro Focus\UFT One\bin\java_shared\classes\jasmine.jar"
-[INFO] Scanning for projects...
-[INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  0.081 s (Wall Clock)
-[INFO] Finished at: 2025-09-02T15:28:27+08:00
+[INFO] Total time:  14.796 s (Wall Clock)
+[INFO] Finished at: 2025-09-02T15:47:27+08:00
 [INFO] ------------------------------------------------------------------------
-[ERROR] The goal you specified requires a project to execute but there is no POM in this directory (C:\Users\67164). Please verify you invoked Maven from th
-e correct directory. -> [Help 1]
-[ERROR] 
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:3.7.0:purge-local-repository (purge-local-dependencies) on project ncbs-mid-
+parent: Unable to purge directory: C:\Users\67164\.m2\repository\com\ibm\ncbs -> [Help 1]
+[ERROR]
 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
 [ERROR] Re-run Maven using the -X switch to enable full debug logging.
 [ERROR]
 [ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MissingProjectException
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
