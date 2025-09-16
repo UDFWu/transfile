@@ -1,1 +1,81 @@
-https://plugins.jetbrains.com/plugin/14692-sonatype-nexus-iq/versions/stable
+pipeline {
+  agent any
+  environment {
+    IQ_URL = 'https://iq.example.com'       // 你的 IQ Server
+    IQ_CREDS = 'iq-server-creds'            // Jenkins Credentials (使用者/密碼或 Token)
+  }
+  stages {
+    stage('IQ Policy Evaluation') {
+      steps {
+        script {
+          // 1) 不中斷 pipeline，但把這個 stage 標紅（或建置結果標失敗）
+          catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+            def iq = nexusPolicyEvaluation(
+              iqApplication: 'your-app-id-or-name',
+              iqStage: 'build',                       // develop / build / release 皆可
+              iqScanPatterns: [[scanPattern: 'pom.xml']],  // Maven 專案可用此；也可改 paths
+              failBuildOnNetworkError: false,              // 網路錯誤不直接終止
+              // 也可在全域設定裡指定 Server URL 與憑證，這裡就可省略
+            )
+
+            // 2) 取得報告連結（實際欄位名稱依外掛版本，常見有下列幾種）
+            // println iq  // 你可以先印出來看有哪些 key
+            env.IQ_REPORT_URL = iq?.applicationReportUrl ?: iq?.applicationCompositionReportUrl
+            env.IQ_RAW_URL    = iq?.rawResultsUrl
+          }
+        }
+      }
+    }
+
+    stage('Fetch & Archive IQ Report') {
+      steps {
+        script {
+          withCredentials([usernamePassword(credentialsId: IQ_CREDS,
+                                            usernameVariable: 'IQ_USER',
+                                            passwordVariable: 'IQ_PASS')]) {
+            // 3) 嘗試抓「原始 JSON 結果」
+            // 有些外掛會直接給 rawResultsUrl；沒有就略過
+            sh """
+              set -e
+              rm -rf iq-report || true
+              mkdir -p iq-report
+              if [ ! -z "${env.IQ_RAW_URL}" ]; then
+                curl -sS -u "$IQ_USER:$IQ_PASS" "${env.IQ_RAW_URL}" -o iq-report/iq-report.json || true
+              fi
+            """
+
+            // 4) 也可以把「可閱讀的 HTML 或 PDF 報告」抓下來（若你的 IQ 有對應端點）
+            // （不同版本端點不同；若抓不到，就保留上面的 JSON 方案）
+            sh """
+              if [ ! -z "${env.IQ_REPORT_URL}" ]; then
+                # 例：抓 PDF（若無 PDF 端點可略）
+                # curl -sS -u "$IQ_USER:$IQ_PASS" "${env.IQ_REPORT_URL}.pdf" -o iq-report/iq-report.pdf || true
+
+                # 例：保存可點擊的 URL（建置頁面也會顯示）
+                echo "${env.IQ_REPORT_URL}" > iq-report/iq-report.url || true
+              fi
+            """
+          }
+        }
+      }
+      post {
+        always {
+          // 5) 無論掃描結果如何，一律歸檔
+          archiveArtifacts artifacts: 'iq-report/**', allowEmptyArchive: true, onlyIfSuccessful: false
+          // 也可把連結放在建置描述
+          script {
+            if (env.IQ_REPORT_URL) {
+              currentBuild.description = "IQ Report: ${env.IQ_REPORT_URL}"
+              echo "IQ Report: ${env.IQ_REPORT_URL}"
+            }
+          }
+        }
+      }
+    }
+  }
+  post {
+    always {
+      echo "Pipeline finished. IQ report archived (if available)."
+    }
+  }
+}
