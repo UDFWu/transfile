@@ -1,109 +1,41 @@
-pipeline {
-    agent any
+stage('Compare list') {
+  steps {
+    script {
+      url = sh(script: "echo ${UAT_GIT_REPO_URL} | sed 's,https://,,g'", returnStdout: true).trim()
+      group_id = sh(script: "echo ${url} | cut -d/ -f2", returnStdout: true).trim()
+      project_id = sh(script: "echo ${url} | cut -d/ -f3 | sed 's,.git,,g'", returnStdout: true).trim()
+      gitlab_url = sh(script: "echo ${url} | cut -d/ -f1", returnStdout: true).trim()
 
-    environment {
-        DEV_GIT_REPO_URL = "https://ddpsg01.cbsd.scsb.com.tw/${env.Git_GroupID}/${env.Git_ProjectID}"
-        UAT_GIT_REPO_URL = "https://sdpsg01.cbss.scsb.com.tw/${env.Git_GroupID}/${env.Git_ProjectID}"
-        CICDAPISERVICE_URL = 'https://sdpsa01.cbss.scsb.com.tw'
-        APP_VERSION = "${env.Tag}"
-        SYNC_BRANCH = "main"
+      // 確保抓到所有 tags
+      sh "git fetch --tags --force >/dev/null 2>&1"
+
+      // 找出 APP_VERSION 的上一個 tag（若沒有就回傳空字串）
+      previous_version = sh(
+        script: "git describe --tags --abbrev=0 ${APP_VERSION}^ 2>/dev/null || true",
+        returnStdout: true
+      ).trim()
+
+      if (!previous_version) {
+        // 沒有前一版：第一次上版
+        env.COMPARE_FILE = "${Git_GroupID}-${Git_ProjectID}.txt"
+        sh "echo '沒有前一版本的紀錄，若是第一次上版，請忽略此訊息。' | tee ${env.COMPARE_FILE}"
+
+        // 若想從初始 commit 比對，改用下列兩行（選用）
+        // first_commit = sh(script: "git rev-list --max-parents=0 HEAD | tail -1", returnStdout: true).trim()
+        // sh "git diff ${first_commit} ${APP_VERSION} 2>&1 | tee ${env.COMPARE_FILE}"
+      } else {
+        env.PROD_VERSION = previous_version
+        env.COMPARE_URL = "https://${gitlab_url}/${group_id}/${project_id}/-/compare/${previous_version}...${APP_VERSION}"
+        echo "PROD_VERSION: ${env.PROD_VERSION}"
+        echo "COMPARE_URL: ${env.COMPARE_URL}"
+        echo "Compare list: ${env.COMPARE_URL}"
+
+        env.COMPARE_FILE = "${Git_GroupID}-${Git_ProjectID}.txt"
+        sh "git diff ${previous_version} ${APP_VERSION} 2>&1 | tee ${env.COMPARE_FILE}"
+
+        env.COMPARE_FILENAME = "${Git_GroupID}-diff_file.txt"
+        sh "git diff ${previous_version} ${APP_VERSION} --name-status 2>&1 | tee ${env.COMPARE_FILENAME}"
+      }
     }
-
-    stages {
-
-        stage('Checkout') { 
-            steps {
-               withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',
-                 gitToolName: 'git-tool')]) {
-                    script {
-                        def check_tag = sh(script: "git ls-remote --tags  ${DEV_GIT_REPO_URL} | grep ${APP_VERSION} || true", returnStdout: true).trim()
-			
-			            if (!DEV_GIT_REPO_URL || !UAT_GIT_REPO_URL ) {
-                            error("*** Build failed, git group or project id can't no be empty.")
-                        }
-
-                        if (!env.Tag) {
-                            error("*** Build failed, Version can't no be empty.")
-                        } else if (!check_tag) {
-                            error('*** Tag does not exist.')
-                        } else {
-                            //env.APP_VERSION = sh(script: "echo ${APP_VERSION} | sed -e 's/${VERSION_REGEX}/\\1/'", returnStdout: true).trim()
-                            env.APP_VERSION = env.Tag
-                            //input "Are you sure to deploy ${APP_VERSION} version?"
-                            currentBuild.description = "Version: ${APP_VERSION}"
-                        }
-
-                        //env.GIT_PREVIOUS_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                        env.GIT_COMMIT = sh(script: "git ls-remote --tags  ${DEV_GIT_REPO_URL} | grep ${APP_VERSION} | awk '{print \$1}'", returnStdout: true).trim()
-                        //if (!env.GIT_PREVIOUS_COMMIT){
-                        //    env.GIT_PREVIOUS_COMMIT = env.GIT_COMMIT
-                        //}
-                        checkout([$class: 'GitSCM',
-                            branches: [[name: "${APP_VERSION}"]],
-                            userRemoteConfigs: [[url: "${DEV_GIT_REPO_URL}", credentialsId: 'gitlab-user']],
-                            extensions: [[$class: 'WipeWorkspace'], cloneOption(noTags: false, reference: '', shallow: false)]
-                        ])
-                        //env.GIT_COMMIT_SHORT = sh(script: "git rev-parse --short ${GIT_COMMIT}", returnStdout: true).trim()
-                    }
-                }
-            }
-        }
-        
-        stage('Compare list') {
-            steps {
-                script {
-                    url = sh(script: "echo ${UAT_GIT_REPO_URL} | sed 's,https://,,'", returnStdout: true).trim()
-                    group_id = sh(script: "echo ${url} | grep / | cut -d/ -f2", returnStdout: true).trim()
-                    project_id = sh(script: "echo ${url} | grep / | cut -d/ -f3 | sed 's,.git,,'", returnStdout: true).trim()
-                    gitlab_url =  sh(script: "echo ${url} | grep / | cut -d/ -f1", returnStdout: true).trim()
-                    // response = httpRequest acceptType: 'APPLICATION_JSON', contentType: 'APPLICATION_JSON',
-                    //     httpMode: 'GET',
-                    //     url: "${CICDAPISERVICE_URL}/api/v1/packages/deployment/version?group=${group_id}&project=${project_id}",
-                    //     validResponseCodes: '200:500'
-                    // println('Status: '+response.status)
-                    // println('Response: '+response.content)
-                    // if (response.status == 200) {
-                    //     jsonObj = readJSON text: response.content
-                    //     current_version = jsonObj.version
-                    // } else if (response.status == 404) {
-                    //     current_version = "0.0.0.0"
-                    // } else {
-                    //     error(response)
-                    // }
-                    
-                    previous_version = sh(script: "git describe --tags --abbrev=0 HEAD^", returnStdout: true).trim()
-                    env.PROD_VERSION = 'print previous_version' + previous_version
-                    env.COMPARE_URL = "https://${gitlab_url}/${group_id}/${project_id}/-/compare/${previous_version}...${APP_VERSION}"
-                    println('PROD_VERSION: '+env.PROD_VERSION)
-                    println('COMPARE_URL: '+env.COMPARE_URL)
-                    println('Compare list: '+env.COMPARE_URL)
-                    
-                    // 如果沒有前ㄧ版本的紀錄，顯示訊息
-                    //if (current_version == '0.0.0.0') {
-                    if (previous_version.contains("fatal: No names found, cannot describe anything.")) {
-                        env.COMPARE_FILE = "${Git_GroupID}-${Git_ProjectID}.txt"
-                        sh "echo '沒有前一版本的紀錄，若是第ㄧ次上版，請忽略此訊息。' 2>&1 | tee ${env.COMPARE_FILE}"
-                    } else {
-                        // 寫入 compare-list 檔案
-                        env.COMPARE_FILE = "${Git_GroupID}-${Git_ProjectID}.txt"
-                        withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
-                          sh "git diff ${previous_version} ${APP_VERSION} 2>&1 | tee ${env.COMPARE_FILE}"
-                        }
-                        
-                        // 寫入 diff-filename 檔案
-                        env.COMPARE_FILENAME = "${Git_GroupID}-diff_file.txt"
-                        withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
-                          sh "git diff ${previous_version} ${APP_VERSION} --name-status 2>&1 | tee ${env.COMPARE_FILENAME}"
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
+  }
 }
-
-
-+ git describe --tags --abbrev=0 'HEAD^'
-fatal: No tags can describe 'fcc2f9ec5b4dcb9dfa4ca161733e307a526df9f4'.
-Try --always, or create some tags.
