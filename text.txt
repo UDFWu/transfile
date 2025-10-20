@@ -1,41 +1,4 @@
-stage('Compare list') {
-  steps {
-    script {
-      url = sh(script: "echo ${UAT_GIT_REPO_URL} | sed 's,https://,,g'", returnStdout: true).trim()
-      group_id = sh(script: "echo ${url} | cut -d/ -f2", returnStdout: true).trim()
-      project_id = sh(script: "echo ${url} | cut -d/ -f3 | sed 's,.git,,g'", returnStdout: true).trim()
-      gitlab_url = sh(script: "echo ${url} | cut -d/ -f1", returnStdout: true).trim()
-
-      // 確保抓到所有 tags
-      sh "git fetch --tags --force >/dev/null 2>&1"
-
-      // 找出 APP_VERSION 的上一個 tag（若沒有就回傳空字串）
-      previous_version = sh(
-        script: "git describe --tags --abbrev=0 ${APP_VERSION}^ 2>/dev/null || true",
-        returnStdout: true
-      ).trim()
-
-      if (!previous_version) {
-        // 沒有前一版：第一次上版
-        env.COMPARE_FILE = "${Git_GroupID}-${Git_ProjectID}.txt"
-        sh "echo '沒有前一版本的紀錄，若是第一次上版，請忽略此訊息。' | tee ${env.COMPARE_FILE}"
-
-        // 若想從初始 commit 比對，改用下列兩行（選用）
-        // first_commit = sh(script: "git rev-list --max-parents=0 HEAD | tail -1", returnStdout: true).trim()
-        // sh "git diff ${first_commit} ${APP_VERSION} 2>&1 | tee ${env.COMPARE_FILE}"
-      } else {
-        env.PROD_VERSION = previous_version
-        env.COMPARE_URL = "https://${gitlab_url}/${group_id}/${project_id}/-/compare/${previous_version}...${APP_VERSION}"
-        echo "PROD_VERSION: ${env.PROD_VERSION}"
-        echo "COMPARE_URL: ${env.COMPARE_URL}"
-        echo "Compare list: ${env.COMPARE_URL}"
-
-        env.COMPARE_FILE = "${Git_GroupID}-${Git_ProjectID}.txt"
-        sh "git diff ${previous_version} ${APP_VERSION} 2>&1 | tee ${env.COMPARE_FILE}"
-
-        env.COMPARE_FILENAME = "${Git_GroupID}-diff_file.txt"
-        sh "git diff ${previous_version} ${APP_VERSION} --name-status 2>&1 | tee ${env.COMPARE_FILENAME}"
-      }
-    }
-  }
-}
+DEVOCP-ncbs_mid
+DEVRH-MID
+STGRH-MID
+STGRH-mid_smoking
