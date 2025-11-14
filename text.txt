@@ -1,5 +1,7 @@
-[root@DDPSJ01 itdc]# keytool -list -v -keystore /usr/lib/jvm/java-17-openjdk-17.0.13.0.11-3.el9.x86_64/lib/security/cacerts -storepass changeit | grep -i "iqserver"
+
+[root@DDPSJ01 itdc]# keytool -list -v -keystore /etc/alternatives/java_sdk_17_openjdk/lib/security/cacerts -storepass changeit | grep "iqserver"
 Warning: use -cacerts option to access cacerts keystore
+Alias name: iqserver
 
 Warning:
 <affirmtrustcommercial> uses a 2048-bit RSA key which is considered a security risk and is disabled.
