@@ -1,4 +1,47 @@
+[root@DDPSJ01 itdc]# keytool -list -v -keystore /usr/lib/jvm/java-17-openjdk-17.0.13.0.11-3.el9.x86_64/lib/security/cacerts -storepass changeit | grep -i "iqserver"
+Warning: use -cacerts option to access cacerts keystore
 
-Trust this certificate? [no]:  yes
-Certificate was added to keystore
-keytool error: java.io.FileNotFoundException: /lib/security/cacerts (No such fil                                  e or directory)
+Warning:
+<affirmtrustcommercial> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<affirmtrustnetworking> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<amazonrootca1> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<atostrustedroot2011> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<baltimorecybertrustroot> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<certigna> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<certsignrootca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<certumtrustednetworkca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<comodoaaaservicesroot> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<comodocertificationauthority> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<d-trustrootclass3ca22009> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<d-trustrootclass3ca2ev2009> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<digicertassuredidrootca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<digicertassuredidrootg2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<digicertglobalrootca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<digicertglobalrootg2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<digicerthighassuranceevrootca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<emsignrootca-c1> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<emsignrootca-g1> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<entrust.netpremium2048secureserverca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<entrustrootcertificationauthority> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<entrustrootcertificationauthority-g2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<globalsignrootca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<globalsignrootca-r3> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<godaddyclass2ca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<godaddyrootcertificateauthority-g2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<microsece-szignorootca2009> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<netlockarany(classgold)ftanstvny> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<oistewisekeyglobalrootgbca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<secureglobalca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<securesignrootca11> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<securetrustca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<securitycommunicationrootca2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<sonatype> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<starfieldclass2ca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<starfieldrootcertificateauthority-g2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<starfieldservicesrootcertificateauthority-g2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<szafirrootca2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<t-telesecglobalrootclass2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<t-telesecglobalrootclass3> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<tubitakkamusmsslkoksertifikasi-surum1> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<twcarootcertificationauthority> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+<xrampglobalcaroot> uses a 2048-bit RSA key which is considered a security risk and is disabled.
