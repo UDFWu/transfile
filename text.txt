@@ -1,4 +1,95 @@
-DEVOCP-ncbs_mid
-DEVRH-MID
-STGRH-MID
-STGRH-mid_smoking
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/FilterRegistration.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/SessionCookieConfig.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/SessionTrackingMode.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletConfig.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletSecurityElement.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/HttpConstraintElement.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/MultipartConfigElement.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/HttpMethodConstraintElement.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ReadListener.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletContextListener.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletContextEvent.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletRequestEvent.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletResponseWrapper.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/GenericServlet.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletRequestWrapper.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletContainerInitializer.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/GenericFilter.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/UnavailableException.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletRequestAttributeEvent.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletRequestAttributeListener.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletContextAttributeListener.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletContextAttributeEvent.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/jakarta/servlet/ServletRequestListener.class
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/module-info.class
+[DEBUG] Closing directory /datam/jenkins/workspace/Pipeline_Sample/nexus_evaluate/unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/classpath.idx
+[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/layers.idx
+[DEBUG] Closing directory /datam/jenkins/workspace/Pipeline_Sample/nexus_evaluate/unlts/target/unlts.war
+[DEBUG] 2025-11-14T14:29:04.043+08:00 Finished scanning target: /datam/jenkins/workspace/Pipeline_Sample/nexus_evaluate/unlts/target/unlts.war
+[INFO] 2025-11-14T14:29:04.043+08:00 Scanned 49871 total files
+[DEBUG] Writing scan summary
+[DEBUG] Closing scan tag
+[DEBUG] Closing writer
+[INFO] 2025-11-14T14:29:04.044+08:00 Finished scanning application unlts.
+[DEBUG] Unable to find repository URL via environment variable GIT_URL
+[DEBUG] Unable to find repository URL via jGit
+[INFO] Could not discover git repository url via automation
+[DEBUG] Repository URL for application with id: unlts could not be found using automation
+[DEBUG] Running policy evaluation.
+[DEBUG] Assigned status ID fe24656ad05a48a5bd4dfa3d38fb1db8 for evaluation
+[INFO] Waiting for policy evaluation to complete...
+[DEBUG] Checking evaluation status at Fri Nov 14 14:29:04 CST 2025
+[DEBUG] Checking evaluation status at Fri Nov 14 14:29:13 CST 2025
+Post stage
+[Pipeline] echo
+偵測到違規中高風險檔案，中斷 pipeline 執行，請至 Build# Log 中查看掃描報告。
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+java.io.IOException: Policy evaluation could not be completed: The SSL/TLS connection to Sonatype Data Services could not be established, contact your network or system administrator for help. (ID 2eff6342998e4f00)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.pollEvaluationResult(PolicyClient.java:441)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.evaluate(PolicyClient.java:227)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.evaluate(PolicyClient.java:193)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.evaluateCI(PolicyClient.java:106)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.RestClientFactory$RestCIClient.evaluatePolicy(RestClientFactory.java:115)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.client.iq.impl.DefaultIqClient.evaluatePolicy(DefaultIqClient.java:473)
+Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: b9254f15-910e-4565-ae32-f7abcc666d74
+Caused: org.sonatype.nexus.ci.client.exception.IqClientException: Could not evaluate policy for application with id unlts
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.client.iq.impl.DefaultIqClient.evaluatePolicy(DefaultIqClient.java:476)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.SingleStepEvaluationRunner.runPolicyEvaluation(SingleStepEvaluationRunner.java:37)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.runtime.callsite.PojoMetaMethodSite$PojoCachedMethodSiteNoUnwrapNoCoerce.invoke(PojoMetaMethodSite.java:233)
+	at org.codehaus.groovy.runtime.callsite.PojoMetaMethodSite.call(PojoMetaMethodSite.java:56)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:120)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.runSingleStepEvaluation(IqPolicyEvaluatorCallable.groovy:409)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite$PogoCachedMethodSiteNoUnwrapNoCoerce.invoke(PogoMetaMethodSite.java:210)
+	at org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite.callCurrent(PogoMetaMethodSite.java:59)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent(AbstractCallSite.java:169)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy:234)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy)
+	at java_util_concurrent_Callable$call$311.call(Unknown Source)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy:54)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy)
+	at PluginClassLoader for workflow-step-api//org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution.lambda$start$0(SynchronousNonBlockingStepExecution.java:47)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Finished: FAILURE
