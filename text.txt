@@ -1,49 +1,45 @@
-
-[root@DDPSJ01 itdc]# keytool -list -v -keystore /etc/alternatives/java_sdk_17_openjdk/lib/security/cacerts -storepass changeit | grep "iqserver"
-Warning: use -cacerts option to access cacerts keystore
-Alias name: iqserver
-
-Warning:
-<affirmtrustcommercial> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<affirmtrustnetworking> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<amazonrootca1> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<atostrustedroot2011> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<baltimorecybertrustroot> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<certigna> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<certsignrootca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<certumtrustednetworkca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<comodoaaaservicesroot> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<comodocertificationauthority> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<d-trustrootclass3ca22009> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<d-trustrootclass3ca2ev2009> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<digicertassuredidrootca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<digicertassuredidrootg2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<digicertglobalrootca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<digicertglobalrootg2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<digicerthighassuranceevrootca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<emsignrootca-c1> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<emsignrootca-g1> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<entrust.netpremium2048secureserverca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<entrustrootcertificationauthority> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<entrustrootcertificationauthority-g2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<globalsignrootca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<globalsignrootca-r3> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<godaddyclass2ca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<godaddyrootcertificateauthority-g2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<microsece-szignorootca2009> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<netlockarany(classgold)ftanstvny> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<oistewisekeyglobalrootgbca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<secureglobalca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<securesignrootca11> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<securetrustca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<securitycommunicationrootca2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<sonatype> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<starfieldclass2ca> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<starfieldrootcertificateauthority-g2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<starfieldservicesrootcertificateauthority-g2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<szafirrootca2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<t-telesecglobalrootclass2> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<t-telesecglobalrootclass3> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<tubitakkamusmsslkoksertifikasi-surum1> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<twcarootcertificationauthority> uses a 2048-bit RSA key which is considered a security risk and is disabled.
-<xrampglobalcaroot> uses a 2048-bit RSA key which is considered a security risk and is disabled.
+java.io.IOException: Policy evaluation could not be completed: The SSL/TLS connection to Sonatype Data Services could not be established, contact your network or system administrator for help. (ID e5897a9fbafd4cb4)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.pollEvaluationResult(PolicyClient.java:441)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.evaluate(PolicyClient.java:227)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.evaluate(PolicyClient.java:193)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.evaluateCI(PolicyClient.java:106)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.RestClientFactory$RestCIClient.evaluatePolicy(RestClientFactory.java:115)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.client.iq.impl.DefaultIqClient.evaluatePolicy(DefaultIqClient.java:473)
+Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: b747661c-e3db-4c79-a283-e60ffee146e1
+Caused: org.sonatype.nexus.ci.client.exception.IqClientException: Could not evaluate policy for application with id unlts
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.client.iq.impl.DefaultIqClient.evaluatePolicy(DefaultIqClient.java:476)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.SingleStepEvaluationRunner.runPolicyEvaluation(SingleStepEvaluationRunner.java:37)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.runtime.callsite.PojoMetaMethodSite$PojoCachedMethodSiteNoUnwrapNoCoerce.invoke(PojoMetaMethodSite.java:233)
+	at org.codehaus.groovy.runtime.callsite.PojoMetaMethodSite.call(PojoMetaMethodSite.java:56)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:116)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:120)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.runSingleStepEvaluation(IqPolicyEvaluatorCallable.groovy:409)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite$PogoCachedMethodSiteNoUnwrapNoCoerce.invoke(PogoMetaMethodSite.java:210)
+	at org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite.callCurrent(PogoMetaMethodSite.java:59)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallCurrent(CallSiteArray.java:51)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent(AbstractCallSite.java:157)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent(AbstractCallSite.java:169)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy:234)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy)
+	at java_util_concurrent_Callable$call$3.call(Unknown Source)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:116)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:120)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy:54)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy)
+	at PluginClassLoader for workflow-step-api//org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution.lambda$start$0(SynchronousNonBlockingStepExecution.java:47)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Finished: FAILURE
