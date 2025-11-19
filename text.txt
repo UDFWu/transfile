@@ -1,44 +1,71 @@
-[DEBUG] Visiting unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar/module-info.class
 [DEBUG] Closing directory /datam/jenkins/workspace/Pipeline_Sample/nexus_evaluate/unlts/target/unlts.war/WEB-INF/lib-provided/jakarta.servlet-api-6.0.0.jar
 [DEBUG] Visiting unlts/target/unlts.war/WEB-INF/classpath.idx
 [DEBUG] Visiting unlts/target/unlts.war/WEB-INF/layers.idx
 [DEBUG] Closing directory /datam/jenkins/workspace/Pipeline_Sample/nexus_evaluate/unlts/target/unlts.war
-[DEBUG] 2025-11-19T14:32:07.887+08:00 Finished scanning target: /datam/jenkins/workspace/Pipeline_Sample/nexus_evaluate/unlts/target/unlts.war
-[INFO] 2025-11-19T14:32:07.887+08:00 Scanned 49871 total files
+[DEBUG] 2025-11-19T15:02:35.536+08:00 Finished scanning target: /datam/jenkins/workspace/Pipeline_Sample/nexus_evaluate/unlts/target/unlts.war
+[INFO] 2025-11-19T15:02:35.536+08:00 Scanned 49871 total files
 [DEBUG] Writing scan summary
 [DEBUG] Closing scan tag
 [DEBUG] Closing writer
-[INFO] 2025-11-19T14:32:07.888+08:00 Finished scanning application unlts.
+[INFO] 2025-11-19T15:02:35.537+08:00 Finished scanning application unlts.
 [DEBUG] Unable to find repository URL via environment variable GIT_URL
 [DEBUG] Unable to find repository URL via jGit
 [INFO] Could not discover git repository url via automation
 [DEBUG] Repository URL for application with id: unlts could not be found using automation
 [DEBUG] Running policy evaluation.
-[DEBUG] Assigned status ID 4dcd769ab6dd401ab65b1506ca83170d for evaluation
+[DEBUG] Assigned status ID 74e3e132646541cab274487b40c18af9 for evaluation
 [INFO] Waiting for policy evaluation to complete...
-[DEBUG] Checking evaluation status at Wed Nov 19 14:32:08 CST 2025
-[DEBUG] Checking evaluation status at Wed Nov 19 14:38:57 CST 2025
-
-
- stage('Nexus Evaluate') { 
-            steps {
-                nexusPolicyEvaluation (
-                    advancedProperties: '', //預設空白
-                    enableDebugLogging: true, //是否開啟Debug log
-                    failBuildOnNetworkError: true, //如果連不上IQ Server 是否中斷 build
-                    iqApplication: 'unlts', //指定哪一個 IQ Server application 做掃描 (Gitlab Project Name)
-                    iqInstanceId: 'sonatype-dev', //Jenkins server 的 IQ server 使用者
-                    iqScanPatterns: [[scanPattern: '**/target/*.jar'], [scanPattern: '**/target/*.war']], //要掃描的檔案路徑(這裡指掃描所有Target下面的 Jar file)
-                    iqStage: 'build',
-                    jobCredentialsId: 'sonatype-lifecycle-scan' 
-                )
-            }
-            post {
-                failure {
-                    echo '偵測到違規中高風險檔案，中斷 pipeline 執行，請至 Build# Log 中查看掃描報告。'
-                }
-                success {
-                    echo '掃描成功，沒有偵測到違規風險檔案。'
-                }
-            }
-        } 
+[DEBUG] Checking evaluation status at Wed Nov 19 15:02:35 CST 2025
+[DEBUG] Checking evaluation status at Wed Nov 19 15:09:24 CST 2025
+Post stage
+[Pipeline] echo
+偵測到違規中高風險檔案，中斷 pipeline 執行，請至 Build# Log 中查看掃描報告。
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+java.io.IOException: Policy evaluation could not be completed: The request to Sonatype Data Services failed, please retry in a bit. (ID 2ff696ccde8547ca)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.pollEvaluationResult(PolicyClient.java:441)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.evaluate(PolicyClient.java:227)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.evaluate(PolicyClient.java:193)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.PolicyClient.evaluateCI(PolicyClient.java:106)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.RestClientFactory$RestCIClient.evaluatePolicy(RestClientFactory.java:115)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.client.iq.impl.DefaultIqClient.evaluatePolicy(DefaultIqClient.java:473)
+Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 87fb47e6-9bf7-4ba1-85c2-0cd9139c94ce
+Caused: org.sonatype.nexus.ci.client.exception.IqClientException: Could not evaluate policy for application with id unlts
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.client.iq.impl.DefaultIqClient.evaluatePolicy(DefaultIqClient.java:476)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.SingleStepEvaluationRunner.runPolicyEvaluation(SingleStepEvaluationRunner.java:37)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.runtime.callsite.PojoMetaMethodSite$PojoCachedMethodSiteNoUnwrapNoCoerce.invoke(PojoMetaMethodSite.java:233)
+	at org.codehaus.groovy.runtime.callsite.PojoMetaMethodSite.call(PojoMetaMethodSite.java:56)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:120)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.runSingleStepEvaluation(IqPolicyEvaluatorCallable.groovy:409)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite$PogoCachedMethodSiteNoUnwrapNoCoerce.invoke(PogoMetaMethodSite.java:210)
+	at org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite.callCurrent(PogoMetaMethodSite.java:59)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent(AbstractCallSite.java:169)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy:234)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy)
+	at java_util_concurrent_Callable$call$9.call(Unknown Source)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy:54)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy)
+	at PluginClassLoader for workflow-step-api//org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution.lambda$start$0(SynchronousNonBlockingStepExecution.java:47)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Finished: FAILURE
