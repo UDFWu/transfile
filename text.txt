@@ -1,2 +1,295 @@
-Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 45b247d6-c896-491e-9307-15540f08cd89
-java.io.IOException: Failed to deploy artifacts: Could not transfer artifact com.scsb:CFMS:war:0.0.1-20251121.054856-1 from/to maven-releases (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases): transfer failed for https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/com/scsb/CFMS/0.0.1-SNAPSHOT/CFMS-0.0.1-20251121.054856-1.war, status: 400 Repository version policy: RELEASE does not allow version: 0.0.1-20251121.054856-1
+pipeline {
+	//表示這個 Pipeline 可以在任何可用的 Jenkins 代理節點上執行。
+    agent any 
+
+    tools{
+        jdk 'Java 17'
+        maven 'Maven 3.9.7'
+    }
+    environment {
+		// Git Lab的 SSH URL。
+        GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:open_cfms/cfms.git'
+        
+        // 舊 Nexus
+        NEXUS_URL = 'ddpsn01.cbsd.scsb.com.tw'
+        NEXUS_PROTOCOL = 'https'
+        NEXUS_REPO = 'maven-releases'
+    
+        // 新 Nexus
+        NEXUS_URL_NEW = '10.21.114.106:443'
+        NEXUS_PROTOCOL_NEW = 'http'
+        NEXUS_REPO_NEW = 'maven-releases'
+        
+		PROJECT_NAME='cfms'
+        AP_SERVER = '10.10.32.11'
+		TOMCAT_PATH = 'C:\\Users\\Administrator\\Desktop\\cfms'
+		// 這裡要看專案設定檔是用properties還是yaml
+		APPLICATION_PROPERTIES = '.\\cfms\\src\\main\\resources\\application-itdc.properties'
+    }
+	// Pipeline 中所有依序執行的獨立階段
+    stages {
+		stage('check env') {
+			steps {
+				echo 'check env'
+				echo '------------------------------'
+				sh 'pwd'
+				echo '------------------------------'
+				// 列出當前目錄下所有檔案和子目錄的詳細資訊
+				sh 'ls -al'
+				echo '------------------------------'
+				// 執行 Shell 命令 env|sort，列出所有環境變數並按字母順序排序，然後將其輸出到 Jenkins 日誌。
+				echo sh(script: 'env|sort', returnStdout: true)
+				echo '------------------------------'
+
+				// 版本資訊
+				sh 'java -version'
+				echo '------------------------------'
+				sh 'mvn -version'
+				echo '------------------------------'
+				sh 'git --version'
+				echo '------------------------------'
+				// 顯示當前系統的磁碟空間使用情況 Show Disk space
+				sh 'df -h' 
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'check env 失敗'
+				}
+				success {
+					echo 'check env 成功'            	
+				}
+			}
+		}
+
+
+		stage('WORKSPACE init') {
+			steps {
+				echo 'WORKSPACE init'
+				echo '------------------------------'
+				sh 'rm -rf *'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'WORKSPACE init 失敗'
+				}
+				success {
+					echo 'WORKSPACE init 成功'            	
+				}
+			}
+		}
+        stage('git clone') {
+		    steps{
+				echo 'git clone'
+				echo '------------------------------'
+				withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
+					sh '''
+						git clone --branch dev ${GIT_REPO_SSH_URL}
+						ls -al
+						pwd
+					'''
+				}
+            }
+            post{
+				failure {
+					echo 'git clone 失敗'
+				}
+				success {
+					echo 'git clone 成功'            	
+				} 
+            }
+		}
+		
+		
+		stage('Update YAML with GitLab Tag') {
+            steps {
+                script {
+                    def yamlContent = readFile("${APPLICATION_PROPERTIES}")
+                    yamlContent = yamlContent.replaceAll("GITLAB_TAG_PLACEHOLDER", "${params.GITLAB_TAG}")
+                    writeFile file: "${APPLICATION_PROPERTIES}", text: yamlContent
+                }
+            }
+        }
+		stage('maven package'){
+            steps{
+                echo 'maven package'
+                echo '------------------------------'
+                sh '''
+                    export PATH=/usr/lib/apache-maven-3.9.7/bin:$PATH
+                    mvn --version
+                    cd ${PROJECT_NAME}
+                    pwd
+                    mvn clean
+                    mvn package -DskipTests
+                '''
+                echo '------------------------------'
+            }
+            post{
+                failure {
+                    echo 'maven package 失敗'
+                }
+                success {
+					echo 'maven package 成功'
+				} 
+		    }
+		}
+        
+		stage('Publish to Nexus') { 
+			steps {
+				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'pending'
+				dir("cfms"){
+					script {
+						pom = readMavenPom file: "pom.xml";
+						filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+						echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+						artifactPath = filesByGlob[0].path;
+						artifactExists = fileExists artifactPath;
+						if(artifactExists) {
+							echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+							env.WAR_NAME = "${pom.artifactId}-${pom.version}.${pom.packaging}"
+							env.WAR_VERSION = "${pom.version}"
+							echo "WAR_NAME: ${WAR_NAME}"
+							echo "WAR_VERSION: ${WAR_VERSION}"
+
+							nexusArtifactUploader(
+								credentialsId: 'nexus-user',
+								nexusUrl: "${NEXUS_URL}",
+                                nexusVersion: 'nexus3',
+                                protocol: "${NEXUS_PROTOCOL}",
+                                repository: "${NEXUS_REPO}",
+								groupId: pom.groupId,
+								version: pom.version,
+								artifacts: [
+                                    [artifactId: pom.artifactId, classifier: '', file: artifactPath, type: pom.packaging],
+                                    [artifactId: pom.artifactId, classifier: '', file: "pom.xml", type: "pom"]
+                                ]
+							);
+						} else {
+							error "*** File: ${artifactPath}, could not be found";
+						}
+					}
+				}
+				updateGitlabCommitStatus name: 'Publish to nexus(spring)', state: 'success'
+			}
+		}
+		
+		
+		stage('Download WAR from Nexus on Target Server') {
+            steps {
+                echo 'Starting download on target server cfms_1'
+                echo '------------------------------'
+                script {
+                     sh """
+                        # 檢查主機密鑰是否已存在
+                        if ssh-keygen -F "10.10.32.11" > /dev/null 2>&1; then
+                            echo "Host key for 10.10.32.11 already exists."
+                        else
+                            echo "Host key for 10.10.32.11 not found."
+                            ssh-keyscan -p 22 -H 10.10.32.11 >>  /var/lib/jenkins/.ssh/known_hosts
+                            echo "Host key added."
+                        fi
+                    """
+                    // 使用 Jenkins 憑證來隱藏 Nexus 認證資訊
+                    withCredentials([usernamePassword(credentialsId: 'nexus-user-106', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+						sh '''
+                            ssh -t -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa administrator@10.10.32.11  <<EOF
+                                :: "ssh connection successful"
+								chcp 65001
+                                
+                                cd ${TOMCAT_PATH}
+                                curl -k -O  ${NEXUS_URL_NEW}/repository/maven-releases/com/scsb/cfms/${WAR_VERSION}/${WAR_NAME}
+                            EOF
+                        '''
+                    }  
+                }
+                echo '------------------------------'
+            }
+            post {
+                failure {
+                    echo 'Download failed on target server'
+                }
+                success {
+                    echo 'Download succeeded on target server'
+                }
+            }
+        }
+		
+        stage('deploy and restart application'){
+			steps{
+				echo 'stop cfms'
+					sh '''
+					ssh -t -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa administrator@10.10.32.11 <<EOF
+						:: "ssh connection successful"
+						chcp 65001
+						
+						:: Stop the application
+						echo "Stopping application..."
+						echo "Stop OK!"
+						// net stop TOMCAT10_CFMS
+
+
+						:: echo "backup cfms.war to backup"
+						:: copy /Y webapps\\cfms.war webapps\\backup\\cfms.war
+
+						:: 部署新的 WAR 檔案
+						echo "copy new WAR file..."
+						// copy /Y ${WAR_NAME} webapps\\cfms.war
+
+						echo "restarting..."
+						// net start TOMCAT10_CFMS
+						
+						// del ${WAR_NAME}
+						
+						echo "webapp start successfully"
+					EOF
+				'''
+			}
+			post{
+				failure {
+					echo '換版 失敗'
+				}
+				success {
+					echo '換版 成功'                
+				} 
+			}
+		}
+    }
+}
+
+
+Stage "Download WAR from Nexus on Target Server" skipped due to earlier failure(s)
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (deploy and restart application)
+Stage "deploy and restart application" skipped due to earlier failure(s)
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 65f59512-ea86-4d1e-84af-2cffb2c8ad3c
+java.io.IOException: Failed to deploy artifacts: Could not transfer artifact com.scsb:CFMS:war:0.0.1-20251121.060253-1 from/to maven-releases (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases): transfer failed for https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/com/scsb/CFMS/0.0.1-SNAPSHOT/CFMS-0.0.1-20251121.060253-1.war, status: 400 Repository version policy: RELEASE does not allow version: 0.0.1-20251121.060253-1
+	at PluginClassLoader for nexus-artifact-uploader//sp.sd.nexusartifactuploader.Utils.uploadArtifacts(Utils.java:60)
+	at PluginClassLoader for nexus-artifact-uploader//sp.sd.nexusartifactuploader.steps.NexusArtifactUploaderStep$Execution$1.call(NexusArtifactUploaderStep.java:271)
+	at PluginClassLoader for nexus-artifact-uploader//sp.sd.nexusartifactuploader.steps.NexusArtifactUploaderStep$Execution$1.call(NexusArtifactUploaderStep.java:255)
+	at hudson.FilePath.act(FilePath.java:1323)
+	at PluginClassLoader for nexus-artifact-uploader//sp.sd.nexusartifactuploader.steps.NexusArtifactUploaderStep$Execution.run(NexusArtifactUploaderStep.java:255)
+	at PluginClassLoader for nexus-artifact-uploader//sp.sd.nexusartifactuploader.steps.NexusArtifactUploaderStep$Execution.run(NexusArtifactUploaderStep.java:216)
+	at PluginClassLoader for workflow-step-api//org.jenkinsci.plugins.workflow.steps.AbstractSynchronousNonBlockingStepExecution$1$1.call(AbstractSynchronousNonBlockingStepExecution.java:47)
+	at hudson.security.ACL.impersonate2(ACL.java:451)
+	at hudson.security.ACL.impersonate(ACL.java:463)
+	at PluginClassLoader for workflow-step-api//org.jenkinsci.plugins.workflow.steps.AbstractSynchronousNonBlockingStepExecution$1.run(AbstractSynchronousNonBlockingStepExecution.java:44)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Finished: FAILURE
