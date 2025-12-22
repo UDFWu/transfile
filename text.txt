@@ -1,41 +1,51 @@
-org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'DEP_EWB_BAT8' defined in class path resource [com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.batch.core.Job]: Factory method 'job' threw exception; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'DEP_EWB_BAT8.step' defined in class path resource [com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.batch.core.Step]: Factory method 'step' threw exception; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'newEwbBat8Tasklet': Unsatisfied dependency expressed through field 'repository'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'depEwbEBHBrokerRepository' defined in com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository defined in @EnableMidRepositories declared on DepJpaConfiguration: Invocation of init method failed; nested exception is org.springframework.data.repository.query.QueryCreationException: Could not create query for public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList(); Reason: Validation failed for query for method public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList()!; nested exception is java.lang.IllegalArgumentException: Validation failed for query for method public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList()!
+private void run(StepContribution contribution, LocalDate runDate) {
 
+        // 取得整批代收來源檔
+        MidLogUtils.addInfoLog("開始取得 券商主檔來源檔");
+        List<DepEwHBrokerEntity> brokerList = repository.findBrokerList();
 
-/**
- */
-@Data
-@Entity
-@EntityListeners(AuditingEntityListener.class)
-@Table(name = "EB_SCSB_H_BROKER")
-public class DepEwHBrokerEntity extends BaseEntity {
+        //颱風天處理
+        //boolean isTyphon = isTyphon(runDate);
 
-  @Id
-  @Column(name = "ID")
-  private String id;
+        Map<String, EwbBat8OutputDto> outputMap = new HashMap<>();
+        for (DepEwHBrokerEntity scu : brokerList) {
+            EwbBat8OutputDto output = new EwbBat8OutputDto();
+            output.setFutCod(scu.getId());
+            output.setTlrId(scu.getLInputter());
+            output.setName(scu.getDescription());
+            output.setBranch(scu.getStockBrokerLegalId());
+            output.setMainComp(scu.getParentStockCompany());
+        }
 
-  @Column(name = "L_INPUTTER")
-  private String lInputter;
+        StringBuilder outputContent = new StringBuilder();
+        //組成回饋檔
+        FixedFormatLineAggregator<EwbBat8OutputDto> fixedFormatLineAggregator = new FixedFormatLineAggregator<>();
+        for (Map.Entry<String, EwbBat8OutputDto> entry : outputMap.entrySet()) {
+            EwbBat8OutputDto output = entry.getValue();
+            validate(output);
+            outputContent.append(fixedFormatLineAggregator.aggregate(output)).append("\n");
+        }
+        writeToFile("FNMSC0_SCU", outputContent.toString());
+    }
 
-  @Column(name = "DESCRIPTION")
-  private String description;
+    private void validate(EwbBat8OutputDto output) {
 
-  @Column(name = "STOCK_BROKER_LEGAL_ID")
-  private String stockBrokerLegalId;
+        try {
+            return;
+        } catch (TxnException e) {
+            //IF  Not Found  -> MOVE 'E001'   to  "處理訊息"欄位
+            //output.setPrsCod("E001");
+            return;
+        }
+    }
 
-  @Column(name = "PARENT_STOCK_COMPANY")
-  private String parentStockCompany;
-
-  @Column(name = "EWB_APPLY")
-  private String ewbApply;
- 
-}
-
-
-@Repository
-public interface DepEwbEBHBrokerRepository extends MidJpaRepository<DepEwHBrokerEntity, String> {
-
-    @Query(value = "SELECT e FROM DepEwHBrokerEntity e "
-            + "WHERE e.EWB_APPLY = 'Y' ")
-    List<DepEwHBrokerEntity> findBrokerList();
-
-}
+    private void writeToFile(String fileName, String content) {
+        try {
+            Path path = Paths.get("D:/{}.txt", fileName);
+            Files.writeString(path, content); // 自動處理流的開關
+            //sftpClient.send(eftExportFilepath, fileName, content.getBytes());
+        } catch (Exception e) {
+            MidLogUtils.addWarnLog("上傳 {} 檔案至 {} 失敗, error: {}", fileName, eftExportFilepath, e);
+            MidMessageUtils.raiseTxError(CodeEnum.DEPDS010, fileName);
+        }
+    }
