@@ -1,61 +1,32 @@
-org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'midBatchConfiguration': Unsatisfied dependency expressed through field 'transactionManager'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'fabricTransactionManager' defined in class path resource [com/scsb/ncbs/core/data/jpa/MidJpaAutoConfiguration.class]: Unsatisfied dependency expressed through method 'midTransactionManager' parameter 0; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'fabricEntityManager' defined in class path resource [com/scsb/ncbs/core/data/jpa/MidJpaAutoConfiguration.class]: Invocation of init method failed; nested exception is org.hibernate.AnnotationException: No identifier specified for entity: com.scsb.ncbs.dep.persistence.entity.ewb.DepEwHBrokerEntity
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'DEP_EWB_BAT8' defined in class path resource [com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.batch.core.Job]: Factory method 'job' threw exception; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'DEP_EWB_BAT8.step' defined in class path resource [com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.batch.core.Step]: Factory method 'step' threw exception; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'newEwbBat8Tasklet': Unsatisfied dependency expressed through field 'repository'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'depEwbEBHBrokerRepository' defined in com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository defined in @EnableMidRepositories declared on DepJpaConfiguration: Invocation of init method failed; nested exception is org.springframework.data.repository.query.QueryCreationException: Could not create query for public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList(); Reason: Failed to create query for method public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList()! No property 'findBrokerList' found for type 'DepEwHBrokerEntity'; nested exception is java.lang.IllegalArgumentException: Failed to create query for method public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList()! No property 'findBrokerList' found for type 'DepEwHBrokerEntity'
 
-package com.scsb.ncbs.dep.batch.job.ewb;
+@Data
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "EB_SCSB_H_BROKER")
+public class DepEwHBrokerEntity extends BaseEntity {
 
-import com.ibm.cbmp.fabric.foundation.exception.TxnException;
-import com.ibm.cbmp.fabric.foundation.facade.bean.ApiRequest;
-import com.ibm.cbmp.fabric.foundation.facade.bean.ApiRequestHeader;
-import com.ibm.cbmp.fabric.foundation.facade.bean.ServiceRq;
-import com.scsb.ncbs.batch.core.MidBatchContext;
-import com.scsb.ncbs.batch.core.MidJobParameter;
-import com.scsb.ncbs.batch.core.item.FixedFormatLineAggregator;
-import com.scsb.ncbs.batch.core.item.FixedFormatLineMapper;
-import com.scsb.ncbs.batch.core.item.RemoteFileItemReader;
-import com.scsb.ncbs.core.mcs.MidRequestContext;
-import com.scsb.ncbs.core.sftp.SftpClient;
-import com.scsb.ncbs.core.utils.MidLogUtils;
-import com.scsb.ncbs.core.utils.MidMessageUtils;
-import com.scsb.ncbs.core.utils.MidObjectUtils;
-import com.scsb.ncbs.core.utils.MidStringUtils;
-import com.scsb.ncbs.dep.batch.bean.ewb.EwbBat5InputDto;
-import com.scsb.ncbs.dep.batch.bean.ewb.EwbBat8OutputDto;
-import com.scsb.ncbs.dep.persistence.entity.t24view.MvMidFundsTransferEwbBat8Entity;
-import com.scsb.ncbs.dep.persistence.entity.ewb.DepEwHBrokerEntity;
-import com.scsb.ncbs.dep.persistence.repository.t24view.MvMidFundsTransferEwbBat8Repository;
-import com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository;
-import com.scsb.ncbs.dep.service.cmn.AccountApiHelper;
-import com.scsb.ncbs.dep.service.cmn.BdayHelper;
-import com.scsb.ncbs.dep.service.cmn.CustomerApiHelper;
-import com.scsb.ncbs.dep.service.cmn.bean.account.AccountBean;
-import com.scsb.ncbs.dep.service.mid.cmn.BdayNearApi;
-import com.scsb.ncbs.dep.service.mid.cmn.bean.BdayNearReadRq;
-import com.scsb.ncbs.dep.service.t24.co0025.bean.SCSBCustomerResponseBody;
-import com.scsb.ncbs.dep.utils.enums.common.CodeEnum;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+  @Id
+  @Column(name = "ID")
+  private String Id;
 
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.nio.file.Paths;
+  @Column(name = "L_INPUTTER")
+  private String lInputter;
 
+  @Column(name = "DESCRIPTION")
+  private String description;
 
-/**
- * 全球一路通 - 券商主檔 -- 批次程式
- *
- * @author: SCSB:67164_吳宗樺
- * @date: 2025/12/11 上午 11:00
- */
+  @Column(name = "STOCK_BROKER_LEGAL_ID")
+  private String stockBrokerLegalId;
+
+  @Column(name = "PARENT_STOCK_COMPANY")
+  private String parentStockCompany;
+
+  @Column(name = "EWB_APPLY")
+  private String ewbApply;
+ 
+}
+
 public class EwbBat8Tasklet implements Tasklet {
 
     /**
@@ -105,12 +76,6 @@ public class EwbBat8Tasklet implements Tasklet {
     @Autowired
     @Qualifier("eftSftpClient")
     private SftpClient sftpClient;
-
-//    @Autowired
-//    private BdayHelper bdayHelper;
-//
-//    @Autowired
-//    private BdayNearApi bdayNearApi;
 
     /**
      * 批次執行入口
@@ -188,19 +153,6 @@ public class EwbBat8Tasklet implements Tasklet {
         }
     }
 
-//    private boolean isTyphon(LocalDate queryDate) {
-//        BdayNearReadRq rq = new BdayNearReadRq();
-//        rq.setBusCurrency("TWD");
-//        rq.setBusCountry("TW");
-//        rq.setQueryDate(queryDate);
-//
-//        LocalDate busDate = bdayNearApi.read(buildApiRequest(rq)).getServiceRs().getContent().getNearBusDate();
-//        if (!queryDate.isEqual(busDate))
-//            return true;
-//
-//        return false;
-//    }
-
     protected <T> ApiRequest<ServiceRq<T>> buildApiRequest(T content) {
         ServiceRq<T> serviceRq = new ServiceRq<>();
         serviceRq.setServiceInfo(MidRequestContext.getInstance().getServiceInfo());
@@ -230,20 +182,8 @@ public class EwbBat8Tasklet implements Tasklet {
     }
 }
 
-package com.scsb.ncbs.dep.persistence.repository.ewb;
-
-import com.scsb.ncbs.core.repository.MidJpaRepository;
-import com.scsb.ncbs.dep.persistence.entity.ewb.DepEwHBrokerEntity;
-import com.scsb.ncbs.dep.persistence.entity.ewb.DepEwbCertItemEntity;
-import org.springframework.stereotype.Repository;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 @Repository
-public interface DepEwbEBHBrokerRepository extends MidJpaRepository<DepEwHBrokerEntity, Long> {
+public interface DepEwbEBHBrokerRepository extends MidJpaRepository<DepEwHBrokerEntity, String> {
 
     List<DepEwHBrokerEntity> findBrokerList();
 
