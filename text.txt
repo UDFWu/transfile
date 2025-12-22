@@ -1,1 +1,250 @@
-org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'DEP_EWB_BAT8' defined in class path resource [com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.batch.core.Job]: Factory method 'job' threw exception; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'DEP_EWB_BAT8.step' defined in class path resource [com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.batch.core.Step]: Factory method 'step' threw exception; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'newEwbBat8Tasklet': Unsatisfied dependency expressed through field 'repository'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'mvMidFundsTransferEwbBat8Repository' defined in com.scsb.ncbs.dep.persistence.repository.t24view.MvMidFundsTransferEwbBat8Repository defined in @EnableMidRepositories declared on DepJpaConfiguration: Invocation of init method failed; nested exception is org.springframework.data.repository.query.QueryCreationException: Could not create query for public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.t24view.MvMidFundsTransferEwbBat8Repository.findBrokerList(); Reason: Validation failed for query for method public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.t24view.MvMidFundsTransferEwbBat8Repository.findBrokerList()!; nested exception is java.lang.IllegalArgumentException: Validation failed for query for method public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.t24view.MvMidFundsTransferEwbBat8Repository.findBrokerList()!
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'midBatchConfiguration': Unsatisfied dependency expressed through field 'transactionManager'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'fabricTransactionManager' defined in class path resource [com/scsb/ncbs/core/data/jpa/MidJpaAutoConfiguration.class]: Unsatisfied dependency expressed through method 'midTransactionManager' parameter 0; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'fabricEntityManager' defined in class path resource [com/scsb/ncbs/core/data/jpa/MidJpaAutoConfiguration.class]: Invocation of init method failed; nested exception is org.hibernate.AnnotationException: No identifier specified for entity: com.scsb.ncbs.dep.persistence.entity.ewb.DepEwHBrokerEntity
+
+package com.scsb.ncbs.dep.batch.job.ewb;
+
+import com.ibm.cbmp.fabric.foundation.exception.TxnException;
+import com.ibm.cbmp.fabric.foundation.facade.bean.ApiRequest;
+import com.ibm.cbmp.fabric.foundation.facade.bean.ApiRequestHeader;
+import com.ibm.cbmp.fabric.foundation.facade.bean.ServiceRq;
+import com.scsb.ncbs.batch.core.MidBatchContext;
+import com.scsb.ncbs.batch.core.MidJobParameter;
+import com.scsb.ncbs.batch.core.item.FixedFormatLineAggregator;
+import com.scsb.ncbs.batch.core.item.FixedFormatLineMapper;
+import com.scsb.ncbs.batch.core.item.RemoteFileItemReader;
+import com.scsb.ncbs.core.mcs.MidRequestContext;
+import com.scsb.ncbs.core.sftp.SftpClient;
+import com.scsb.ncbs.core.utils.MidLogUtils;
+import com.scsb.ncbs.core.utils.MidMessageUtils;
+import com.scsb.ncbs.core.utils.MidObjectUtils;
+import com.scsb.ncbs.core.utils.MidStringUtils;
+import com.scsb.ncbs.dep.batch.bean.ewb.EwbBat5InputDto;
+import com.scsb.ncbs.dep.batch.bean.ewb.EwbBat8OutputDto;
+import com.scsb.ncbs.dep.persistence.entity.t24view.MvMidFundsTransferEwbBat8Entity;
+import com.scsb.ncbs.dep.persistence.entity.ewb.DepEwHBrokerEntity;
+import com.scsb.ncbs.dep.persistence.repository.t24view.MvMidFundsTransferEwbBat8Repository;
+import com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository;
+import com.scsb.ncbs.dep.service.cmn.AccountApiHelper;
+import com.scsb.ncbs.dep.service.cmn.BdayHelper;
+import com.scsb.ncbs.dep.service.cmn.CustomerApiHelper;
+import com.scsb.ncbs.dep.service.cmn.bean.account.AccountBean;
+import com.scsb.ncbs.dep.service.mid.cmn.BdayNearApi;
+import com.scsb.ncbs.dep.service.mid.cmn.bean.BdayNearReadRq;
+import com.scsb.ncbs.dep.service.t24.co0025.bean.SCSBCustomerResponseBody;
+import com.scsb.ncbs.dep.utils.enums.common.CodeEnum;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.nio.file.Paths;
+
+
+/**
+ * 全球一路通 - 券商主檔 -- 批次程式
+ *
+ * @author: SCSB:67164_吳宗樺
+ * @date: 2025/12/11 上午 11:00
+ */
+public class EwbBat8Tasklet implements Tasklet {
+
+    /**
+     * 中台批次Context
+     */
+    @Autowired
+    private MidBatchContext midBatchContext;
+
+    /**
+     * 中台批次參數
+     */
+    @Autowired
+    private MidJobParameter jobParameter;
+
+    @Autowired
+    protected AccountApiHelper accountHelper;
+
+    @Autowired
+    protected CustomerApiHelper customerHelper;
+
+    /**
+     * 證照主檔 repository
+     */
+    @Autowired
+    private DepEwbEBHBrokerRepository repository;
+
+    /**
+     * file name
+     */
+    private static final String INPUT_FILE_NAME = "EWBBAT8";
+
+    /**
+     * eft file path
+     */
+    @Value("${batch.dep-import-ewb-bat8.filepath}")
+    private String eftImportFilepath;
+
+    /**
+     * eft file path
+     */
+    @Value("${batch.dep-export-ewb-bat8.filepath}")
+    private String eftExportFilepath;
+
+    /**
+     * sftp client
+     */
+    @Autowired
+    @Qualifier("eftSftpClient")
+    private SftpClient sftpClient;
+
+//    @Autowired
+//    private BdayHelper bdayHelper;
+//
+//    @Autowired
+//    private BdayNearApi bdayNearApi;
+
+    /**
+     * 批次執行入口
+     */
+    @Override
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+        MidLogUtils.addDebugLog("batchControl : {}", midBatchContext.getBatchControl());
+        MidLogUtils.addDebugLog("jobParameter : {}", midBatchContext.getJobParameter());
+        MidLogUtils.addDebugLog("jobParameter : {}", jobParameter);
+
+        MidLogUtils.addInfoLog(midBatchContext.getBatchDefine().getJobName() + " 執行開始");
+        doProcess(contribution);
+        MidLogUtils.addInfoLog(midBatchContext.getBatchDefine().getJobName() + " 執行結束");
+
+        return RepeatStatus.FINISHED;
+    }
+
+    /**
+     * 批次實際執行程式
+     */
+    private void doProcess(StepContribution contribution) {
+        LocalDate runDate = jobParameter.getRunDate();
+        run(contribution, runDate);
+    }
+
+    private void run(StepContribution contribution, LocalDate runDate) {
+
+        // 取得整批代收來源檔
+        MidLogUtils.addInfoLog("開始取得 券商主檔來源檔");
+        List<DepEwHBrokerEntity> brokerList = repository.findBrokerList();
+
+        //颱風天處理
+        //boolean isTyphon = isTyphon(runDate);
+
+        Map<String, EwbBat8OutputDto> outputMap = new HashMap<>();
+        for (DepEwHBrokerEntity scu : brokerList) {
+            EwbBat8OutputDto output = new EwbBat8OutputDto();
+            output.setFutCod(scu.getId());
+            output.setTlrId(scu.getLInputter());
+            output.setName(scu.getDescription());
+            output.setBranch(scu.getStockBrokerLegalId());
+            output.setMainComp(scu.getParentStockCompany());
+        }
+
+        StringBuilder outputContent = new StringBuilder();
+        //組成回饋檔
+        FixedFormatLineAggregator<EwbBat8OutputDto> fixedFormatLineAggregator = new FixedFormatLineAggregator<>();
+        for (Map.Entry<String, EwbBat8OutputDto> entry : outputMap.entrySet()) {
+            EwbBat8OutputDto output = entry.getValue();
+            validate(output);
+            outputContent.append(fixedFormatLineAggregator.aggregate(output)).append("\n");
+        }
+        writeToFile("FNMSC0_SCU", outputContent.toString());
+    }
+
+    private void validate(EwbBat8OutputDto output) {
+
+        try {
+            return;
+        } catch (TxnException e) {
+            //IF  Not Found  -> MOVE 'E001'   to  "處理訊息"欄位
+            //output.setPrsCod("E001");
+            return;
+        }
+    }
+
+    private void writeToFile(String fileName, String content) {
+        try {
+            Path path = Paths.get("D:/{}.txt", fileName);
+            Files.writeString(path, content); // 自動處理流的開關
+            //sftpClient.send(eftExportFilepath, fileName, content.getBytes());
+        } catch (Exception e) {
+            MidLogUtils.addWarnLog("上傳 {} 檔案至 {} 失敗, error: {}", fileName, eftExportFilepath, e);
+            MidMessageUtils.raiseTxError(CodeEnum.DEPDS010, fileName);
+        }
+    }
+
+//    private boolean isTyphon(LocalDate queryDate) {
+//        BdayNearReadRq rq = new BdayNearReadRq();
+//        rq.setBusCurrency("TWD");
+//        rq.setBusCountry("TW");
+//        rq.setQueryDate(queryDate);
+//
+//        LocalDate busDate = bdayNearApi.read(buildApiRequest(rq)).getServiceRs().getContent().getNearBusDate();
+//        if (!queryDate.isEqual(busDate))
+//            return true;
+//
+//        return false;
+//    }
+
+    protected <T> ApiRequest<ServiceRq<T>> buildApiRequest(T content) {
+        ServiceRq<T> serviceRq = new ServiceRq<>();
+        serviceRq.setServiceInfo(MidRequestContext.getInstance().getServiceInfo());
+        serviceRq.setContent(content);
+
+        ApiRequest<ServiceRq<T>> apiRequest = new ApiRequest<>();
+        apiRequest.setHeader(buildDefaultHeader(MidRequestContext.getInstance().getRequestHeader()));
+        apiRequest.setServiceRq(serviceRq);
+
+        return apiRequest;
+    }
+
+    private ApiRequestHeader buildDefaultHeader(ApiRequestHeader header) {
+        if (MidStringUtils.isEmpty(header.getClientSystemId())) {
+            header.setClientSystemId("MID");
+        }
+
+        if (MidObjectUtils.isEmpty(header.getClientTimestamp())) {
+            header.setClientTimestamp(LocalDateTime.now());
+        }
+
+        if (MidStringUtils.isEmpty(header.getClientSeqNo())) {
+            header.setClientSeqNo(UUID.randomUUID().toString());
+        }
+
+        return header;
+    }
+}
+
+package com.scsb.ncbs.dep.persistence.repository.ewb;
+
+import com.scsb.ncbs.core.repository.MidJpaRepository;
+import com.scsb.ncbs.dep.persistence.entity.ewb.DepEwHBrokerEntity;
+import com.scsb.ncbs.dep.persistence.entity.ewb.DepEwbCertItemEntity;
+import org.springframework.stereotype.Repository;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+@Repository
+public interface DepEwbEBHBrokerRepository extends MidJpaRepository<DepEwHBrokerEntity, Long> {
+
+    List<DepEwHBrokerEntity> findBrokerList();
+
+}
