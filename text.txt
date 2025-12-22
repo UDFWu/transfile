@@ -1,5 +1,8 @@
-org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'DEP_EWB_BAT8' defined in class path resource [com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.batch.core.Job]: Factory method 'job' threw exception; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'DEP_EWB_BAT8.step' defined in class path resource [com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.batch.core.Step]: Factory method 'step' threw exception; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'newEwbBat8Tasklet': Unsatisfied dependency expressed through field 'repository'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'depEwbEBHBrokerRepository' defined in com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository defined in @EnableMidRepositories declared on DepJpaConfiguration: Invocation of init method failed; nested exception is org.springframework.data.repository.query.QueryCreationException: Could not create query for public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList(); Reason: Failed to create query for method public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList()! No property 'findBrokerList' found for type 'DepEwHBrokerEntity'; nested exception is java.lang.IllegalArgumentException: Failed to create query for method public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList()! No property 'findBrokerList' found for type 'DepEwHBrokerEntity'
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'DEP_EWB_BAT8' defined in class path resource [com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.batch.core.Job]: Factory method 'job' threw exception; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'DEP_EWB_BAT8.step' defined in class path resource [com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.batch.core.Step]: Factory method 'step' threw exception; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'newEwbBat8Tasklet': Unsatisfied dependency expressed through field 'repository'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'depEwbEBHBrokerRepository' defined in com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository defined in @EnableMidRepositories declared on DepJpaConfiguration: Invocation of init method failed; nested exception is org.springframework.data.repository.query.QueryCreationException: Could not create query for public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList(); Reason: Validation failed for query for method public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList()!; nested exception is java.lang.IllegalArgumentException: Validation failed for query for method public abstract java.util.List com.scsb.ncbs.dep.persistence.repository.ewb.DepEwbEBHBrokerRepository.findBrokerList()!
 
+
+/**
+ */
 @Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -8,7 +11,7 @@ public class DepEwHBrokerEntity extends BaseEntity {
 
   @Id
   @Column(name = "ID")
-  private String Id;
+  private String id;
 
   @Column(name = "L_INPUTTER")
   private String lInputter;
@@ -27,164 +30,12 @@ public class DepEwHBrokerEntity extends BaseEntity {
  
 }
 
-public class EwbBat8Tasklet implements Tasklet {
-
-    /**
-     * 中台批次Context
-     */
-    @Autowired
-    private MidBatchContext midBatchContext;
-
-    /**
-     * 中台批次參數
-     */
-    @Autowired
-    private MidJobParameter jobParameter;
-
-    @Autowired
-    protected AccountApiHelper accountHelper;
-
-    @Autowired
-    protected CustomerApiHelper customerHelper;
-
-    /**
-     * 證照主檔 repository
-     */
-    @Autowired
-    private DepEwbEBHBrokerRepository repository;
-
-    /**
-     * file name
-     */
-    private static final String INPUT_FILE_NAME = "EWBBAT8";
-
-    /**
-     * eft file path
-     */
-    @Value("${batch.dep-import-ewb-bat8.filepath}")
-    private String eftImportFilepath;
-
-    /**
-     * eft file path
-     */
-    @Value("${batch.dep-export-ewb-bat8.filepath}")
-    private String eftExportFilepath;
-
-    /**
-     * sftp client
-     */
-    @Autowired
-    @Qualifier("eftSftpClient")
-    private SftpClient sftpClient;
-
-    /**
-     * 批次執行入口
-     */
-    @Override
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        MidLogUtils.addDebugLog("batchControl : {}", midBatchContext.getBatchControl());
-        MidLogUtils.addDebugLog("jobParameter : {}", midBatchContext.getJobParameter());
-        MidLogUtils.addDebugLog("jobParameter : {}", jobParameter);
-
-        MidLogUtils.addInfoLog(midBatchContext.getBatchDefine().getJobName() + " 執行開始");
-        doProcess(contribution);
-        MidLogUtils.addInfoLog(midBatchContext.getBatchDefine().getJobName() + " 執行結束");
-
-        return RepeatStatus.FINISHED;
-    }
-
-    /**
-     * 批次實際執行程式
-     */
-    private void doProcess(StepContribution contribution) {
-        LocalDate runDate = jobParameter.getRunDate();
-        run(contribution, runDate);
-    }
-
-    private void run(StepContribution contribution, LocalDate runDate) {
-
-        // 取得整批代收來源檔
-        MidLogUtils.addInfoLog("開始取得 券商主檔來源檔");
-        List<DepEwHBrokerEntity> brokerList = repository.findBrokerList();
-
-        //颱風天處理
-        //boolean isTyphon = isTyphon(runDate);
-
-        Map<String, EwbBat8OutputDto> outputMap = new HashMap<>();
-        for (DepEwHBrokerEntity scu : brokerList) {
-            EwbBat8OutputDto output = new EwbBat8OutputDto();
-            output.setFutCod(scu.getId());
-            output.setTlrId(scu.getLInputter());
-            output.setName(scu.getDescription());
-            output.setBranch(scu.getStockBrokerLegalId());
-            output.setMainComp(scu.getParentStockCompany());
-        }
-
-        StringBuilder outputContent = new StringBuilder();
-        //組成回饋檔
-        FixedFormatLineAggregator<EwbBat8OutputDto> fixedFormatLineAggregator = new FixedFormatLineAggregator<>();
-        for (Map.Entry<String, EwbBat8OutputDto> entry : outputMap.entrySet()) {
-            EwbBat8OutputDto output = entry.getValue();
-            validate(output);
-            outputContent.append(fixedFormatLineAggregator.aggregate(output)).append("\n");
-        }
-        writeToFile("FNMSC0_SCU", outputContent.toString());
-    }
-
-    private void validate(EwbBat8OutputDto output) {
-
-        try {
-            return;
-        } catch (TxnException e) {
-            //IF  Not Found  -> MOVE 'E001'   to  "處理訊息"欄位
-            //output.setPrsCod("E001");
-            return;
-        }
-    }
-
-    private void writeToFile(String fileName, String content) {
-        try {
-            Path path = Paths.get("D:/{}.txt", fileName);
-            Files.writeString(path, content); // 自動處理流的開關
-            //sftpClient.send(eftExportFilepath, fileName, content.getBytes());
-        } catch (Exception e) {
-            MidLogUtils.addWarnLog("上傳 {} 檔案至 {} 失敗, error: {}", fileName, eftExportFilepath, e);
-            MidMessageUtils.raiseTxError(CodeEnum.DEPDS010, fileName);
-        }
-    }
-
-    protected <T> ApiRequest<ServiceRq<T>> buildApiRequest(T content) {
-        ServiceRq<T> serviceRq = new ServiceRq<>();
-        serviceRq.setServiceInfo(MidRequestContext.getInstance().getServiceInfo());
-        serviceRq.setContent(content);
-
-        ApiRequest<ServiceRq<T>> apiRequest = new ApiRequest<>();
-        apiRequest.setHeader(buildDefaultHeader(MidRequestContext.getInstance().getRequestHeader()));
-        apiRequest.setServiceRq(serviceRq);
-
-        return apiRequest;
-    }
-
-    private ApiRequestHeader buildDefaultHeader(ApiRequestHeader header) {
-        if (MidStringUtils.isEmpty(header.getClientSystemId())) {
-            header.setClientSystemId("MID");
-        }
-
-        if (MidObjectUtils.isEmpty(header.getClientTimestamp())) {
-            header.setClientTimestamp(LocalDateTime.now());
-        }
-
-        if (MidStringUtils.isEmpty(header.getClientSeqNo())) {
-            header.setClientSeqNo(UUID.randomUUID().toString());
-        }
-
-        return header;
-    }
-}
 
 @Repository
 public interface DepEwbEBHBrokerRepository extends MidJpaRepository<DepEwHBrokerEntity, String> {
 
+    @Query(value = "SELECT e FROM DepEwHBrokerEntity e "
+            + "WHERE e.EWB_APPLY = 'Y' ")
     List<DepEwHBrokerEntity> findBrokerList();
 
 }
