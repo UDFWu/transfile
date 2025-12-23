@@ -1,1 +1,55 @@
-org.springframework.dao.InvalidDataAccessResourceUsageException: could not extract ResultSet; SQL [n/a]; nested exception is org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+
+  CREATE TABLE "MIDAPP"."EB_SCSB_H_BROKER" 
+   (	"ID" VARCHAR2(9 BYTE), 
+	"L_INPUTTER" VARCHAR2(6 BYTE), 
+	"DESCRIPTION" VARCHAR2(30 BYTE), 
+	"STOCK_BROKER_LEGAL_ID" VARCHAR2(8 BYTE), 
+	"PARENT_STOCK_COMPANY" VARCHAR2(8 BYTE), 
+	"EWB_APPLY" VARCHAR2(1 BYTE)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "MIDAPP_TS" ;
+
+
+package com.scsb.ncbs.dep.persistence.entity.ewb;
+
+import com.scsb.ncbs.core.entity.BaseEntity;
+import lombok.Data;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+/**
+ */
+@Data
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "EB_SCSB_H_BROKER")
+public class DepEwHBrokerEntity extends BaseEntity {
+
+  @Id
+  @Column(name = "ID")
+  private String id;
+
+  @Column(name = "L_INPUTTER")
+  private String lInputter;
+
+  @Column(name = "DESCRIPTION")
+  private String description;
+
+  @Column(name = "STOCK_BROKER_LEGAL_ID")
+  private String stockBrokerLegalId;
+
+  @Column(name = "PARENT_STOCK_COMPANY")
+  private String parentStockCompany;
+
+  @Column(name = "EWB_APPLY")
+  private String ewbApply;
+ 
+}
