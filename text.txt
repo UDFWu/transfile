@@ -15,15 +15,6 @@
   TABLESPACE "MIDAPP_TS" ;
 
 
-package com.scsb.ncbs.dep.persistence.entity.ewb;
-
-import com.scsb.ncbs.core.entity.BaseEntity;
-import lombok.Data;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 /**
  */
@@ -52,4 +43,164 @@ public class DepEwHBrokerEntity extends BaseEntity {
   @Column(name = "EWB_APPLY")
   private String ewbApply;
  
+}
+
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+
+@MappedSuperclass
+public class BaseEntity implements Serializable {
+    @CreatedDate
+    @Column(
+        name = "CREATED_TIMESTAMP"
+    )
+    private LocalDateTime createdTimestamp;
+    @CreatedBy
+    @Column(
+        name = "CREATED_USER_ID"
+    )
+    private String createdUserId;
+    @LastModifiedDate
+    @Column(
+        name = "UPDATED_TIMESTAMP"
+    )
+    private LocalDateTime updatedTimestamp;
+    @LastModifiedBy
+    @Column(
+        name = "UPDATED_USER_ID"
+    )
+    private String updatedUserId;
+
+    @Generated
+    public BaseEntity() {
+    }
+
+    @Generated
+    public LocalDateTime getCreatedTimestamp() {
+        return this.createdTimestamp;
+    }
+
+    @Generated
+    public String getCreatedUserId() {
+        return this.createdUserId;
+    }
+
+    @Generated
+    public LocalDateTime getUpdatedTimestamp() {
+        return this.updatedTimestamp;
+    }
+
+    @Generated
+    public String getUpdatedUserId() {
+        return this.updatedUserId;
+    }
+
+    @Generated
+    public void setCreatedTimestamp(LocalDateTime createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
+    }
+
+    @Generated
+    public void setCreatedUserId(String createdUserId) {
+        this.createdUserId = createdUserId;
+    }
+
+    @Generated
+    public void setUpdatedTimestamp(LocalDateTime updatedTimestamp) {
+        this.updatedTimestamp = updatedTimestamp;
+    }
+
+    @Generated
+    public void setUpdatedUserId(String updatedUserId) {
+        this.updatedUserId = updatedUserId;
+    }
+
+    @Generated
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (!(o instanceof BaseEntity)) {
+            return false;
+        } else {
+            BaseEntity other = (BaseEntity)o;
+            if (!other.canEqual(this)) {
+                return false;
+            } else {
+                label59: {
+                    Object this$createdTimestamp = this.getCreatedTimestamp();
+                    Object other$createdTimestamp = other.getCreatedTimestamp();
+                    if (this$createdTimestamp == null) {
+                        if (other$createdTimestamp == null) {
+                            break label59;
+                        }
+                    } else if (this$createdTimestamp.equals(other$createdTimestamp)) {
+                        break label59;
+                    }
+
+                    return false;
+                }
+
+                Object this$createdUserId = this.getCreatedUserId();
+                Object other$createdUserId = other.getCreatedUserId();
+                if (this$createdUserId == null) {
+                    if (other$createdUserId != null) {
+                        return false;
+                    }
+                } else if (!this$createdUserId.equals(other$createdUserId)) {
+                    return false;
+                }
+
+                Object this$updatedTimestamp = this.getUpdatedTimestamp();
+                Object other$updatedTimestamp = other.getUpdatedTimestamp();
+                if (this$updatedTimestamp == null) {
+                    if (other$updatedTimestamp != null) {
+                        return false;
+                    }
+                } else if (!this$updatedTimestamp.equals(other$updatedTimestamp)) {
+                    return false;
+                }
+
+                Object this$updatedUserId = this.getUpdatedUserId();
+                Object other$updatedUserId = other.getUpdatedUserId();
+                if (this$updatedUserId == null) {
+                    if (other$updatedUserId != null) {
+                        return false;
+                    }
+                } else if (!this$updatedUserId.equals(other$updatedUserId)) {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+    }
+
+    @Generated
+    protected boolean canEqual(Object other) {
+        return other instanceof BaseEntity;
+    }
+
+    @Generated
+    public int hashCode() {
+        int PRIME = true;
+        int result = 1;
+        Object $createdTimestamp = this.getCreatedTimestamp();
+        result = result * 59 + ($createdTimestamp == null ? 43 : $createdTimestamp.hashCode());
+        Object $createdUserId = this.getCreatedUserId();
+        result = result * 59 + ($createdUserId == null ? 43 : $createdUserId.hashCode());
+        Object $updatedTimestamp = this.getUpdatedTimestamp();
+        result = result * 59 + ($updatedTimestamp == null ? 43 : $updatedTimestamp.hashCode());
+        Object $updatedUserId = this.getUpdatedUserId();
+        result = result * 59 + ($updatedUserId == null ? 43 : $updatedUserId.hashCode());
+        return result;
+    }
+
+    @Generated
+    public String toString() {
+        LocalDateTime var10000 = this.getCreatedTimestamp();
+        return "BaseEntity(createdTimestamp=" + var10000 + ", createdUserId=" + this.getCreatedUserId() + ", updatedTimestamp=" + this.getUpdatedTimestamp() + ", updatedUserId=" + this.getUpdatedUserId() + ")";
+    }
 }
