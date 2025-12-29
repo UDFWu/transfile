@@ -1,14 +1,1 @@
-14:32:06.645: [ncbs-mid-repo-p2] git -c credential.helper= -c core.quotepath=false -c log.showSignature=false merge sit
-14:35:50.750: [ncbs-mid-repo-p2] git -c credential.helper= -c core.quotepath=false -c log.showSignature=false push --progress --porcelain origin refs/heads/feature_dep_#29304:feature_dep_#29304
-Picked up JAVA_TOOL_OPTIONS: -agentlib:jvmhook
-Picked up _JAVA_OPTIONS: -Xrunjvmhook -Xbootclasspath/a:"C:\Program Files (x86)\Micro Focus\UFT One\bin\java_shared\classes\jasmine.jar"
-Picked up JAVA_TOOL_OPTIONS: -agentlib:jvmhook
-Picked up _JAVA_OPTIONS: -Xrunjvmhook -Xbootclasspath/a:"C:\Program Files (x86)\Micro Focus\UFT One\bin\java_shared\classes\jasmine.jar"
-error: failed to push some refs to 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git'
-To https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git
-hint: Updates were rejected because the tip of your current branch is behind
-!	refs/heads/feature_dep_#29304:refs/heads/feature_dep_#29304	[rejected] (non-fast-forward)
-hint: its remote counterpart. If you want to integrate the remote changes,
-hint: use 'git pull' before pushing again.
-Done
-hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+Picked up JAVA_TOOL_OPTIONS: -agentlib:jvmhook Picked up _JAVA_OPTIONS: -Xrunjvmhook -Xbootclasspath/a:"C:\Program Files (x86)\Micro Focus\UFT One\bin\java_shared\classes\jasmine.jar" Picked up JAVA_TOOL_OPTIONS: -agentlib:jvmhook Picked up _JAVA_OPTIONS: -Xrunjvmhook -Xbootclasspath/a:"C:\Program Files (x86)\Micro Focus\UFT One\bin\java_shared\classes\jasmine.jar" remote: Total 160 (delta 68), reused 159 (delta 67), pack-reused 0 From https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2 ! [rejected] sit -> sit (non-fast-forward) 5edea90cb..eef6ce386 sit -> origin/sit
