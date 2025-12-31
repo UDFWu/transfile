@@ -1,19 +1,15 @@
-@Repository
-public interface DepEwbEBHBrokerRepository extends MidJpaRepository<DepEwHBrokerEntity, String> {
-
-}  
-
-CREATE TABLE "MIDAPP"."EB_SCSB_H_BROKER" 
-   (	"SCU_ID" VARCHAR2(9 BYTE), 
-	"L_INPUTTER" VARCHAR2(6 BYTE), 
-	"DESCRIPTION" VARCHAR2(30 BYTE), 
-	"STOCK_BROKER_LEGAL_ID" VARCHAR2(8 BYTE), 
-	"PARENT_STOCK_COMPANY" VARCHAR2(8 BYTE), 
-	"EWB_APPLY" VARCHAR2(1 BYTE)
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
-  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
-  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
-  TABLESPACE "MIDAPP_TS" ;
+org.springframework.beans.factory.BeanCreationException: 
+Error creating bean with name 'DEP_EWB_BAT8' defined in class path resource [com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: 
+Bean instantiation via factory method failed; 
+nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate 
+[org.springframework.batch.core.Job]: Factory method 'job' threw exception; 
+nested exception is org.springframework.beans.factory.BeanCreationException: 
+Error creating bean with name 'DEP_EWB_BAT8.step' defined in class path resource 
+[com/scsb/ncbs/dep/batch/job/ewb/EwbBat8JobConfig.class]: Bean instantiation via factory method failed; 
+nested exception is org.springframework.beans.BeanInstantiationException: 
+Failed to instantiate [org.springframework.batch.core.Step]: Factory method 'step' threw exception; 
+nested exception is org.springframework.beans.factory.BeanCreationException: 
+Error creating bean with name 'newEwbBat8Tasklet': Injection of autowired dependencies failed; 
+nested exception is java.lang.IllegalArgumentException: 
+Could not resolve placeholder 'batch.dep-export-ewb-bat8.filepath' in value "${batch.dep-export-ewb-bat8.filepath}"
+	
