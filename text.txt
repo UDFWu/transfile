@@ -1,85 +1,60 @@
-如果該使用者已經被加入群組，但仍然無法登入（Login Failure）或登入後看不到資源，通常可以從以下三個維度進行排查：
+既然不是使用 LDAP，且錯誤訊息是 "Invalid username or password"，那問題通常集中在 HTPasswd（手動建立的帳號密碼檔）或 Keystone / Custom IDP 的設定上。
 
-1. 身份驗證（Authentication）階段：根本無法登入
-如果使用者在登入畫面就失敗，這通常與群組設定無關，而是 Identity Provider (IdP) 的問題：
+在沒有 LDAP 自動同步的情況下，最常見的原因是 「手動建立帳號時的名稱」與「群組中加入的名稱」不一致。
 
-帳號 ID 格式不符： 這是最常見的原因。您的 IdP（如 LDAP/AD）定義的登入帳號可能是 jason.wu（UID），但您在 OCP 群組中加的是 jason.wu@ibm.com.tw。
+請依照以下步驟排查：
 
-檢查方式： 請該人員登入後（如果能登入），執行 oc whoami 查看他在 OCP 系統內真正的「名字」。
+1. 檢查 HTPasswd 檔案（如果使用的是 HTPasswd）
+大多數不接 LDAP 的 OCP 環境會使用 HTPasswd 類型來管理使用者。
 
-帳號鎖定或密碼過期： 請確認該人員在公司的 AD/LDAP 帳號是否正常運作。
+名稱必須完全匹配： 帳號是在一個 Secret 中定義的。如果您在 Secret 裡建立的是 jason.wu，但登入時輸入 jason.wu@ibm.com.tw，就會失敗。
 
-IdP 設定限制： OCP 的 OAuth 設定中可能有限制只有特定組織單位（OU）或特定過濾條件（Filter）的人員才能登入。
+如何檢查：
+找出 OAuth 使用的是哪個 Secret：
 
-2. 授權（Authorization）階段：可以登入但「什麼都看不到」
-如果使用者可以進入 Web Console，但畫面顯示 403 Forbidden 或找不到 Project，這代表權限綁定失敗：
+oc get oauth cluster -o yaml | grep htpasswdFieldName -A 5
+導出該 Secret 並查看內容（需要 Base64 解碼）：
 
-缺少 RoleBinding： 您雖然創建了 ncbs-mid-dev-group 並加入了使用者，但您是否已經將這個 Group 綁定到某個角色（Role）？
+oc get secret <htpasswd-secret-name> -n openshift-config -o jsonpath='{.data.htpasswd}' | base64 -d
+核對清單： 查看輸出的內容中，是否有 jason.wu@ibm.com.tw 這個字串？如果只有 jason.wu，那該人員就不能帶 Email 後綴登入。
 
-修正指令： ```bash oc create rolebinding dev-permissions --clusterrole=edit --group=ncbs-mid-dev-group -n <您的專案名稱>
+2. 確認使用者輸入的「帳號」與 OCP 認定的「名稱」
+在非 LDAP 環境下，OpenShift 對於帳號名稱非常敏感。請確認該使用者在登入框輸入的是：
 
-使用者名稱「重複」或「衝突」： 如果 OCP 中同時存在多個 Identity Provider，系統可能會為同一個 Email 建立不同的 User Identity。例如 IDP_A:jason.wu 與 IDP_B:jason.wu。
+jason.wu
 
-3. OCP 內部的使用者對應問題
-有時候 OCP 內部的 User 物件與 Identity 物件對應出錯：
+jason.wu@ibm.com.tw
 
-檢查指令：
-oc get users | grep jason.wu
-oc get identities | grep jason.wu
-確認 Identities 顯示的名稱與您在 Group 裡面填寫的字串完全一致（包括大小寫）。
+如果他在登入框輸入 A，但您在 oc adm groups add-users 加的是 B，就算密碼對了能登入，他也拿不到群組權限。但現在連登入都失敗，表示 IDP (HTPasswd) 裡根本沒有這個帳號。
 
-疑難排查流程圖
-建議檢查步驟
-確認真正的 Username： 請該人員嘗試登入一次，然後管理員執行：
-oc get users
+3. 使用者是否根本還沒被「建立」？
+在 OpenShift 中，「加入群組」不代表「建立帳號」。
 
-找找看有沒有長得像 jason.wu 的使用者。如果有，請確認該名稱是否與您在 Group 中輸入的一模一樣。
+oc adm groups add-users 只是在一個清單上記錄這個名字。
 
-確認群組綁定： 確認您的 RoleBinding 是指向 kind: Group 而不是 kind: User：
-oc get rolebinding <binding-name> -o yaml
+如果使用的是 HTPasswd，管理員必須先執行建立帳號的動作：
 
-檢查日誌： 如果登入失敗，可以檢查 openshift-authentication namespace 下 pod 的 log：
-oc logs -n openshift-authentication <authentication-operator-pod>
-**您可以分享一下該使用者登入時看到的錯誤訊息（例如：Invalid username or password，或是 Permissions denied）嗎？
-這能幫我更精確定位問題。**順帶一提，如果要取得所有應用程式的完整功能，請開啟 Gemini 系列應用程式活動記錄。
+# 這是在本機產生密碼檔，並非直接在 OCP 建立
+htpasswd -b users.htpasswd jason.wu@ibm.com.tw <password>
 
------------------------------------------------
+# 接著還要更新 OCP 的 Secret
+oc create secret generic htpasswd-secret --from-file=htpasswd=users.htpasswd --dry-run=client -o yaml | oc replace -f -
+請問管理員是否有執行過「建立帳號並更新 Secret」的動作？ 如果只是執行了 oc adm groups add-users，該使用者是無法登入的。
 
-既然錯誤訊息是 "Invalid username or password"，這代表問題發生在 「身份驗證 (Authentication)」 階段。
+4. 檢查 OAuth Pod 的即時錯誤紀錄
+這是找出真相最快的方法。請在使用者嘗試登入失敗時，同時觀察 log：
 
-這意味著 OpenShift 的 OAuth 伺服器向後端的身份驗證提供者（Identity Provider, IdP，例如：LDAP, AD, 或 HTPasswd）進行校驗時，對方回傳了「帳號不存在」或「密碼錯誤」。
+oc logs -n openshift-authentication -l app=oauth-openshift --tail=50
+Log 中常見的提示：
 
-這通常與您在 OCP 建立的 Group 無關，因為 Group 是權限控管，而 Login 是身份核對。以下是可能的原因與排查方向：
+Login failed: password mismatch: 帳號對了，但密碼錯了。
 
-1. 帳號格式不符合 IdP 定義 (最常見)
-雖然您在 Group 裡加了 jason.wu@ibm.com.tw，但該人員登入時，IdP 預期的 Username 格式可能不同。
+Login failed: user not found: 帳號名稱輸入錯誤，或 Secret 裡根本沒這個人。
 
-情況 A： 您的 LDAP/AD 設定只接受 UID（例如 jason.wu），不接受 Email 格式。
+建議下一步操作
+您可以先確認：目前 OCP 是使用哪種方式管理帳號？（例如：HTPasswd, GitHub, 或 OpenID Connect）。
 
-情況 B： 您的 IdP 設定要求使用 網域\帳號（例如 IBM\jason.wu）。
+如果是 HTPasswd，請執行下述指令確認該使用者是否存在於系統認可的檔案中：
 
-解決建議： 詢問該人員平常登入其他公司內部系統（或當初第一次登入 OCP）時使用的精確字串。
-
-2. Identity Provider (IdP) 的對應設定 (Mapping)
-請管理員檢查 OCP 的 OAuth 設定：
-oc get oauth cluster -o yaml
-
-檢查 spec.identityProviders 部分，看 preferredUsernameAttributes 是設定哪一個欄位（例如 uid, sAMAccountName, 或 mail）。
-
-如果系統設定抓取 uid，但使用者輸入 jason.wu@ibm.com.tw，就會導致驗證失敗。
-
-3. 帳號本身的問題
-這點與 OCP 無關，但經常發生：
-
-密碼過期： 使用者的公司密碼是否剛好過期需要修改？
-
-帳號鎖定： 是否因為嘗試錯誤太多次，導致在 AD/LDAP 端被鎖定？
-
-輸入錯誤： 請確認使用者是否有開啟大寫鎖定（Caps Lock）或輸入了多餘的空白。
-
-4. 暫時性的 User Identity 衝突
-如果該使用者以前用 A 名稱登入過，後來改用 B 名稱，有時會造成 OCP 內部的 identity 物件衝突。
-
-檢查指令：
-oc get identity | grep -i jason
-如果發現有多個重複但格式略有不同的 Identity，可能需要清理舊的 Identity。
+oc get secret -n openshift-config $(oc get oauth cluster -o jsonpath='{.spec.identityProviders[0].htpasswd.fileData.name}') -o jsonpath='{.data.htpasswd}' | base64 -d | grep jason.wu
+如果查不到結果，表示帳號還沒在密碼檔裡建立。需要我提供建立 HTPasswd 帳號的完整流程嗎？
