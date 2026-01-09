@@ -1,14 +1,85 @@
-  CREATE TABLE "MIDAPP"."EB_SCSB_H_BROKER" 
-   (	"SCU_ID" VARCHAR2(9 BYTE), 
-	"L_INPUTTER" VARCHAR2(8 BYTE), 
-	"DESCRIPTION" VARCHAR2(30 BYTE), 
-	"STOCK_BROKER_LEGAL_ID" VARCHAR2(8 BYTE), 
-	"PARENT_STOCK_COMPANY" VARCHAR2(8 BYTE), 
-	"EWB_APPLY" VARCHAR2(1 BYTE)
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
-  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
-  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
-  TABLESPACE "MIDAPP_TS" ;
+如果該使用者已經被加入群組，但仍然無法登入（Login Failure）或登入後看不到資源，通常可以從以下三個維度進行排查：
+
+1. 身份驗證（Authentication）階段：根本無法登入
+如果使用者在登入畫面就失敗，這通常與群組設定無關，而是 Identity Provider (IdP) 的問題：
+
+帳號 ID 格式不符： 這是最常見的原因。您的 IdP（如 LDAP/AD）定義的登入帳號可能是 jason.wu（UID），但您在 OCP 群組中加的是 jason.wu@ibm.com.tw。
+
+檢查方式： 請該人員登入後（如果能登入），執行 oc whoami 查看他在 OCP 系統內真正的「名字」。
+
+帳號鎖定或密碼過期： 請確認該人員在公司的 AD/LDAP 帳號是否正常運作。
+
+IdP 設定限制： OCP 的 OAuth 設定中可能有限制只有特定組織單位（OU）或特定過濾條件（Filter）的人員才能登入。
+
+2. 授權（Authorization）階段：可以登入但「什麼都看不到」
+如果使用者可以進入 Web Console，但畫面顯示 403 Forbidden 或找不到 Project，這代表權限綁定失敗：
+
+缺少 RoleBinding： 您雖然創建了 ncbs-mid-dev-group 並加入了使用者，但您是否已經將這個 Group 綁定到某個角色（Role）？
+
+修正指令： ```bash oc create rolebinding dev-permissions --clusterrole=edit --group=ncbs-mid-dev-group -n <您的專案名稱>
+
+使用者名稱「重複」或「衝突」： 如果 OCP 中同時存在多個 Identity Provider，系統可能會為同一個 Email 建立不同的 User Identity。例如 IDP_A:jason.wu 與 IDP_B:jason.wu。
+
+3. OCP 內部的使用者對應問題
+有時候 OCP 內部的 User 物件與 Identity 物件對應出錯：
+
+檢查指令：
+oc get users | grep jason.wu
+oc get identities | grep jason.wu
+確認 Identities 顯示的名稱與您在 Group 裡面填寫的字串完全一致（包括大小寫）。
+
+疑難排查流程圖
+建議檢查步驟
+確認真正的 Username： 請該人員嘗試登入一次，然後管理員執行：
+oc get users
+
+找找看有沒有長得像 jason.wu 的使用者。如果有，請確認該名稱是否與您在 Group 中輸入的一模一樣。
+
+確認群組綁定： 確認您的 RoleBinding 是指向 kind: Group 而不是 kind: User：
+oc get rolebinding <binding-name> -o yaml
+
+檢查日誌： 如果登入失敗，可以檢查 openshift-authentication namespace 下 pod 的 log：
+oc logs -n openshift-authentication <authentication-operator-pod>
+**您可以分享一下該使用者登入時看到的錯誤訊息（例如：Invalid username or password，或是 Permissions denied）嗎？
+這能幫我更精確定位問題。**順帶一提，如果要取得所有應用程式的完整功能，請開啟 Gemini 系列應用程式活動記錄。
+
+-----------------------------------------------
+
+既然錯誤訊息是 "Invalid username or password"，這代表問題發生在 「身份驗證 (Authentication)」 階段。
+
+這意味著 OpenShift 的 OAuth 伺服器向後端的身份驗證提供者（Identity Provider, IdP，例如：LDAP, AD, 或 HTPasswd）進行校驗時，對方回傳了「帳號不存在」或「密碼錯誤」。
+
+這通常與您在 OCP 建立的 Group 無關，因為 Group 是權限控管，而 Login 是身份核對。以下是可能的原因與排查方向：
+
+1. 帳號格式不符合 IdP 定義 (最常見)
+雖然您在 Group 裡加了 jason.wu@ibm.com.tw，但該人員登入時，IdP 預期的 Username 格式可能不同。
+
+情況 A： 您的 LDAP/AD 設定只接受 UID（例如 jason.wu），不接受 Email 格式。
+
+情況 B： 您的 IdP 設定要求使用 網域\帳號（例如 IBM\jason.wu）。
+
+解決建議： 詢問該人員平常登入其他公司內部系統（或當初第一次登入 OCP）時使用的精確字串。
+
+2. Identity Provider (IdP) 的對應設定 (Mapping)
+請管理員檢查 OCP 的 OAuth 設定：
+oc get oauth cluster -o yaml
+
+檢查 spec.identityProviders 部分，看 preferredUsernameAttributes 是設定哪一個欄位（例如 uid, sAMAccountName, 或 mail）。
+
+如果系統設定抓取 uid，但使用者輸入 jason.wu@ibm.com.tw，就會導致驗證失敗。
+
+3. 帳號本身的問題
+這點與 OCP 無關，但經常發生：
+
+密碼過期： 使用者的公司密碼是否剛好過期需要修改？
+
+帳號鎖定： 是否因為嘗試錯誤太多次，導致在 AD/LDAP 端被鎖定？
+
+輸入錯誤： 請確認使用者是否有開啟大寫鎖定（Caps Lock）或輸入了多餘的空白。
+
+4. 暫時性的 User Identity 衝突
+如果該使用者以前用 A 名稱登入過，後來改用 B 名稱，有時會造成 OCP 內部的 identity 物件衝突。
+
+檢查指令：
+oc get identity | grep -i jason
+如果發現有多個重複但格式略有不同的 Identity，可能需要清理舊的 Identity。
