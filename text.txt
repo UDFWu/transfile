@@ -1,2 +1,1 @@
-#31726 由於 ODP，以及中台各子系統新增多支新批次，因此需要將新的 CTM Job 設定過版至 UAT，以便在 UAT 環境進行測試，謝謝。
-ODP 新增了 WATCH_T24_REPORTING 批次
+componentIdentifier.coordinates.groupId:org.apache.logging.log4j
