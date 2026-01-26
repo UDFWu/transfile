@@ -1,1 +1,4 @@
-componentIdentifier.coordinates.groupId:org.apache.logging.log4j
+在搜尋框輸入類似：
+componentName:*你的套件名稱*
+或用更精準的座標欄位，例如只用 artifactId：
+componentCoordinateArtifactId:你的套件名稱
