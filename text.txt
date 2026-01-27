@@ -1,5 +1,44 @@
-(maven)maven-apache - https://repo.maven.apache.org/maven2/
-(maven)maven-central - https://repo1.maven.org/maven2/
-(maven)maven-gradle-plugin - https://plugins.gradle.org/m2/
-(npm)npmjs.org-proxy - https://registry.npmjs.org
-(nuget)nuget.org-proxy - https://api.nuget.org/v3/index.json
+stage('Trivy scan APP image') {
+            when {
+                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+            }
+
+            steps {
+                script {
+                    for (project in deployProjects) {
+                        sh 'mkdir -p reports'
+                        // 使用 Trivy 進行掃描 image
+                        // --skip-db-update: 跳過更新 Trivy 的資料庫
+                        // --skip-java-db-update: 跳過更新 Java 的資料庫
+                        // --offline-scan: 離線掃描
+                        // --skip-check-update: 跳過檢查更新
+                        // --format template: 輸出格式為 template
+                        // --template '@/usr/local/share/trivy/templates/html.tpl': 使用 HTML 的格式
+                        // template 要有讀的權限
+                        // -o reports/trivy-image-report.html: 輸出檔案為 reports/trivy-image-report.html
+                        reportFile = "reports/${env.HARBOR_PROJECT}-${project}-${env.TYPE}-report.html"
+                        sh "trivy image --skip-db-update \
+                            --skip-java-db-update \
+                            --offline-scan \
+                            --skip-check-update \
+                            --format template \
+                            --template '@/usr/local/share/trivy/templates/html.tpl' \
+                            -o ${reportFile} \
+                            ${CONTAINER_REGISTRY}/${env.HARBOR_PROJECT}/${project}-${env.TYPE}:${env.TAG}"
+                        // 上傳報告到 Jenkins
+                        publishHTML([
+                                allowMissing: true,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: true,
+                                reportDir: 'reports',
+                                reportFiles: "${project}-${env.TYPE}-report.html",
+                                reportName: "${project}-${env.TYPE} Report",
+                                reportTitles: "${project}-${env.TYPE} Report",
+                                useWrapperFileDirectly: true
+                        ])
+                    }
+
+                    sh "podman logout ${CONTAINER_REGISTRY}"
+                }
+            }
+        }
