@@ -3,8 +3,8 @@
 2026-01-27T01:55:25Z	INFO	[db] Need to update DB
 2026-01-27T01:55:25Z	INFO	[db] Downloading DB...	repository="ghcr.io/aquasecurity/trivy-db:2"
 2026-01-27T02:08:31Z	FATAL	Fatal error	init error: DB error: failed to download vulnerability DB: database download error: OCI repository error: 2 errors occurred:
-	* Get "https://ghcr.io/v2/": dial tcp 20.27.177.117:443: connect: connection timed out; Get "http://ghcr.io/v2/": dial tcp 20.27.177.117:80: connect: connection timed out
-	* Get "https://ghcr.io/v2/": dial tcp 20.27.177.117:443: connect: connection timed out; Get "http://ghcr.io/v2/": dial tcp 20.27.177.117:80: connect: connection timed out
+	* Get "https://ghcr.io/v2/": dial tcp 120.127.177.117:443: connect: connection timed out; Get "http://ghcr.io/v2/": dial tcp 120.127.177.117:80: connect: connection timed out
+	* Get "https://ghcr.io/v2/": dial tcp 120.127.177.117:443: connect: connection timed out; Get "http://ghcr.io/v2/": dial tcp 120.127.177.117:80: connect: connection timed out
 
 
 : general response handler: unexpected status code: 500, expected: 200
