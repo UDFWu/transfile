@@ -8,3 +8,54 @@
 
 
 : general response handler: unexpected status code: 500, expected: 200
+
+         stage('Build APP Image') {
+             when {
+                 expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+             }
+
+             steps {
+                 script {
+                     withCredentials([usernamePassword(credentialsId: 'harbor-user', passwordVariable: 'HARBOR_PASSWORD', usernameVariable: 'HARBOR_USER')]) {
+                         // 先登入 Harbor，爲了拉取 base image
+                         sh "podman login ${CONTAINER_REGISTRY} -u '${HARBOR_USER}' -p '${HARBOR_PASSWORD}'"
+                         for (project in deployProjects) {
+                             echo "Building ${project}-${env.TYPE} image"
+
+                             sh """
+                                 podman images | grep ${project}-${env.TYPE} | awk '{print \$3}' | xargs podman rmi --force || true
+                                 cd ${env.WORKSPACE}/${project}/${project}-${env.TYPE}
+                                 podman build --build-arg CONTAINER_REGISTRY=${CONTAINER_REGISTRY} -f ./Dockerfile -t ${CONTAINER_REGISTRY}/${env.HARBOR_PROJECT}/${project}-${env.TYPE}:${env.TAG} .
+                             """
+                         }
+                     }
+                 }
+             }
+         }
+
+         stage('Release APP Image') {
+             when {
+                 expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+             }
+
+             steps {
+                 script {
+                     // 上傳 image 到 Harbor
+                     for (project in deployProjects) {
+                         echo "Releaseing ${project}-${env.TYPE} image"
+
+                         //取得 RepoDigest
+                         def repoDigest = sh(returnStdout: true, script: "podman inspect -f '{{index .RepoDigests 0}}' ${CONTAINER_REGISTRY}/${env.HARBOR_PROJECT}/${project}-${env.TYPE}:${env.TAG}").trim()
+                         // 上傳 repoDigest 到 Harbor
+                         sh "podman push ${repoDigest}"
+                         // 上傳 image 到 Harbor
+                         sh "podman push ${CONTAINER_REGISTRY}/${env.HARBOR_PROJECT}/${project}-${env.TYPE}:${env.TAG}"
+                         withCredentials([file(credentialsId: 'cosign-private-key', variable: 'COSIGN_PRIVATE_KEY'), string(credentialsId: 'cosign-password', variable: 'COSIGN_PASSWORD')]) {
+                             println(repoDigest)
+                             // 使用 cosign 簽名
+                             sh "cosign sign --key '${COSIGN_PRIVATE_KEY}' --tlog-upload=false --allow-insecure-registry=true ${repoDigest}"
+                         }
+                     }
+                 }
+             }
+         }
