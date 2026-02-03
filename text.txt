@@ -1,1 +1,5 @@
-為確保中台批次機之運行狀態，目前新增了一支監控中台各模組批次機狀態之 Job。且有些 Job 因前後依賴錯誤而無法執行，因此調整中台各模組 Job 前後依賴。
+Gitlab簡介
+2月 4日 (星期三) · 下午2:00 - 4:00
+時區：Asia/Taipei
+Google Meet 會議參加資訊
+視訊通話連結：https://meet.google.com/fqi-nemh-bkd
