@@ -1,17 +1,20 @@
-67164@ITRD-67164 MINGW64 /d/repos_north_gitlab/scsb_test/transfile (greenbranch)
-$ git checkout –b redbranch origin/greenbranch
-error: pathspec '–b' did not match any file(s) known to git
-error: pathspec 'redbranch' did not match any file(s) known to git
-error: pathspec 'origin/greenbranch' did not match any file(s) known to git
+$ git push
+fatal: The current branch redbranch has no upstream branch.
+To push the current branch and set the remote as upstream, use
 
-67164@ITRD-67164 MINGW64 /d/repos_north_gitlab/scsb_test/transfile (greenbranch)
-$ ^C
+    git push --set-upstream origin redbranch
 
-67164@ITRD-67164 MINGW64 /d/repos_north_gitlab/scsb_test/transfile (greenbranch)
-$ git branch -a
-* greenbranch
-  main
-  remotes/origin/HEAD -> origin/main
-  remotes/origin/bluebranch
-  remotes/origin/greenbranch
-  remotes/origin/main
+To have this happen automatically for branches without a tracking
+upstream, see 'push.autoSetupRemote' in 'git help config'.
+
+
+67164@ITRD-67164 MINGW64 /d/repos_north_gitlab/scsb_test/transfile (redbranch)
+$ git push origin/redbranch
+fatal: 'origin/redbranch' does not appear to be a git repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+
+67164@ITRD-67164 MINGW64 /d/repos_north_gitlab/scsb_test/transfile (redbranch)
+$
