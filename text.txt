@@ -1,24 +1,119 @@
-這個錯誤 Host key verification failed. 
-指的是 Jenkins 執行環境不信任遠端伺服器（10.21.105.114）的 SSH 指紋（Host Key）。
++ ssh-keygen -F 10.21.105.114
++ echo 'Host key for 10.21.105.114 not found.'
+Host key for 10.21.105.114 not found.
++ // ssh-keyscan -p 22 -H 10.21.105.114
+/datam/jenkins/workspace/ncbs_apc/api-resource/DEV/07-02-apic_logging_resource_download@tmp/durable-8956a2bd/script.sh: line 7: //: Is a directory
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 126
+Finished: FAILURE
 
-在預設情況下，當你第一次透過 SSH 或 SFTP 連線到一台新機器時，
-系統會詢問你是否要將這台機器的指紋加入 known_hosts。由於 Jenkins 是自動化執行，
-無法進行人工輸入 "yes"，因此連線會直接被拒絕。
+def workItemName
+pipeline {
+  agent any
 
-以下是三種常見的解決方案，按推薦程度排序：
+  environment {
+    
+	GIT_REPO_URL     = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_apc/apic-logging-extracter-server.git'	    
+	GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw/ncbs_apc/apic-logging-extracter-server.git'	
 
-方案一：關閉主機金鑰檢查（最快、最常用於內網）
-在 sftp 指令中加入參數 -o StrictHostKeyChecking=no。這樣 SFTP 就會自動接受該主機金鑰，不會彈出確認提示。
+    //SOURCE_FILE_NAME = 'api-resource.tar.gz'
+    REMOTE_HOST      = '10.21.105.114'   
+    REMOTE_FOLDER    = '/CICD/api-resource'
+    //UNZIP_FOLDER     = '/home/jboss/CICD/api-resource'
 
-修改程式碼如下：
-sh "echo 'put ${JAR_FILE_NAME} /iso' | sftp -o StrictHostKeyChecking=no -i ${SFTP_K} version@${REMOTE_HOST}"
+    GROUP_ID            = 'com.ibm'       
+    ARTIFACT_ID         = 'logging-server'
+    //dev
+    SFTP_K              = '/var/lib/jenkins/.ssh/jenkinsAgent_rsa'
+    NEXUS_URL           = 'ddpsn01.cbsd.scsb.com.tw'
+    NEXUS_VERSION       = 'nexus3'
+    NEXUS_CREDENTIAL_ID = 'f106b445-8b4e-4a21-94b3-9a361cdf124b' 
+    API_SERVER_URL      = 'ddpsg01.cbsd.scsb.com.tw:5001'       
+    EXTENSION_NAME      = 'jar'
+    JAR_FILE_NAME       = "${ARTIFACT_ID}.${EXTENSION_NAME}"        
+    GROUP_ID_PATH       = "${GROUP_ID}".replace('.', '/')
+    PROJECT_ID          = "${ARTIFACT_ID}"
+    APP_VERSION         = "${env.Tag}"
+    APP_NAME            = "${PROJECT_ID}-${APP_VERSION}.${EXTENSION_NAME}"
+    APP_PATH            = "repository/maven-releases/${GROUP_ID_PATH}/${PROJECT_ID}/${APP_VERSION}/${APP_NAME}"
+       
+  }
+ 
+  stages {
+    stage('Get project info') {
+      steps {     
+        updateGitlabCommitStatus name: 'Get project info', state: 'pending'
+        script {
+          response = httpRequest httpMode: 'GET', contentType: 'APPLICATION_JSON',
+            url: "http://${API_SERVER_URL}/api/v1/packages/projects?group=${GROUP_ID}&project=${PROJECT_ID}&version=${APP_VERSION}",
+            validResponseCodes: '200:500'
+          println('Status: '+response.status)
+          println('Response: '+response.content)
+          if (response.status != 200) {
+            error(response)
+          }
+                    
+          jsonObj = readJSON text: response.content
+                    
+          if (!jsonObj.items) {
+            error("*** Can't find version.")
+          }
+          projectInfo = jsonObj.items[0]
+        }
+        updateGitlabCommitStatus name: 'Get project info', state: 'success'
+      }
+    }
+        
+    stage('download source') {
+      steps {
+        updateGitlabCommitStatus name: 'download source', state: 'pending'
+          script {
+            projectInfo.packages.each { item ->
+              println(item)
+              workItemName = item.name
+              res = sh(script: "curl -s -w 200 ${item.url} -o ${item.name}", returnStdout: true).trim()
+              if (res != "200"){
+                error('Failed to download source.')
+              }
+              res = sh(script: "ls -al", returnStdout: true).trim()
+              println(res)
+            }
+          }                
+        updateGitlabCommitStatus name: 'download source', state: 'success'
+      }
+    }
 
-方案二：預先手動掃描並加入信任清單（最安全）
-如果你希望保持安全性（避免中間人攻擊），你可以先在 Jenkins Agent 伺服器 上，以 Jenkins 執行的使用者身分（通常是 jenkins）將遠端主機加入 known_hosts。
+    stage('copy source from Nexus to Deploy server') {
+        steps {
+            updateGitlabCommitStatus name: 'copy source from Nexus to Deploy server', state: 'pending'
+            script {
+                sh "mv ./${workItemName} ./${JAR_FILE_NAME}"
+                println("${workItemName}")
+                println("${JAR_FILE_NAME}")
+                sh """
+                        # 檢查主機密鑰是否已存在
+                        if ssh-keygen -F "10.21.105.114" > /dev/null 2>&1; then
+                            echo "Host key for 10.21.105.114 already exists."
+                        else
+                            echo "Host key for 10.21.105.114 not found."
+                       //     ssh-keyscan -p 22 -H 10.21.105.114 >>  /var/lib/jenkins/.ssh/known_hosts
+                            echo "Host key added."
+                        fi
+                    """
+                //sh "sftp -i ${SFTP_K} version@${REMOTE_HOST} <<< 'put ${JAR_FILE_NAME} /iso'"
+                sh "echo 'put ${JAR_FILE_NAME} /iso' | sftp -i ${SFTP_K} version@${REMOTE_HOST}"
+            }
+            updateGitlabCommitStatus name: 'copy source from Nexus to Deploy server', state: 'success'
+        }
+    }
 
-在 Jenkins 伺服器的終端機執行：
-# 切換到 jenkins 使用者 (如果需要)
-sudo su - jenkins
-
-# 掃描並加入遠端主機金鑰
-ssh-keyscan -H 10.21.105.114 >> ~/.ssh/known_hosts
+  }
+}
