@@ -1,20 +1,72 @@
-$ git push
-fatal: The current branch redbranch has no upstream branch.
-To push the current branch and set the remote as upstream, use
 
-    git push --set-upstream origin redbranch
+    stage('Get project info') {
+      steps {     
+        updateGitlabCommitStatus name: 'Get project info', state: 'pending'
+        script {
+          response = httpRequest httpMode: 'GET', contentType: 'APPLICATION_JSON',
+            url: "http://${API_SERVER_URL}/api/v1/packages/projects?group=${GROUP_ID}&project=${PROJECT_ID}&version=${APP_VERSION}",
+            validResponseCodes: '200:500'
+          println('Status: '+response.status)
+          println('Response: '+response.content)
+          if (response.status != 200) {
+            error(response)
+          }
+                    
+          jsonObj = readJSON text: response.content
+                    
+          if (!jsonObj.items) {
+            error("*** Can't find version.")
+          }
+          projectInfo = jsonObj.items[0]
+        }
+        updateGitlabCommitStatus name: 'Get project info', state: 'success'
+      }
+    }
+        
+    stage('download source') {
+      steps {
+        updateGitlabCommitStatus name: 'download source', state: 'pending'
+          script {
+            projectInfo.packages.each { item ->
+              println(item)
+              workItemName = item.name
+              res = sh(script: "curl -s -w 200 ${item.url} -o ${item.name}", returnStdout: true).trim()
+              if (res != "200"){
+                error('Failed to download source.')
+              }
+              res = sh(script: "ls -al", returnStdout: true).trim()
+              println(res)
+            }
+          }                
+        updateGitlabCommitStatus name: 'download source', state: 'success'
+      }
+    }
 
-To have this happen automatically for branches without a tracking
-upstream, see 'push.autoSetupRemote' in 'git help config'.
+    stage('copy source from Nexus to Deploy server') {
+        steps {
+            updateGitlabCommitStatus name: 'copy source from Nexus to Deploy server', state: 'pending'
+            script {
+                sh "mv ./${workItemName} ./${JAR_FILE_NAME}"
+                println("${workItemName}")
+                println("${JAR_FILE_NAME}")
+                //sh "sftp -i ${SFTP_K} version@${REMOTE_HOST} <<< 'put ${JAR_FILE_NAME} /iso'"
+                sh "echo 'put ${JAR_FILE_NAME} /iso' | sftp -i ${SFTP_K} version@${REMOTE_HOST}"
+            }
+            updateGitlabCommitStatus name: 'copy source from Nexus to Deploy server', state: 'success'
+        }
+    }
 
 
-67164@ITRD-67164 MINGW64 /d/repos_north_gitlab/scsb_test/transfile (redbranch)
-$ git push origin/redbranch
-fatal: 'origin/redbranch' does not appear to be a git repository
-fatal: Could not read from remote repository.
++ mv ./logging-server-v20260210.001-apic.jar ./logging-server.jar
+[Pipeline] echo
+logging-server-v20260210.001-apic.jar
+[Pipeline] echo
+logging-server.jar
+[Pipeline] sh
++ echo 'put logging-server.jar /iso'
++ sftp -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa version@10.21.105.114
+Host key verification failed.
+Connection closed
 
-Please make sure you have the correct access rights
-and the repository exists.
 
-67164@ITRD-67164 MINGW64 /d/repos_north_gitlab/scsb_test/transfile (redbranch)
-$
+
