@@ -1,72 +1,24 @@
+這個錯誤 Host key verification failed. 
+指的是 Jenkins 執行環境不信任遠端伺服器（10.21.105.114）的 SSH 指紋（Host Key）。
 
-    stage('Get project info') {
-      steps {     
-        updateGitlabCommitStatus name: 'Get project info', state: 'pending'
-        script {
-          response = httpRequest httpMode: 'GET', contentType: 'APPLICATION_JSON',
-            url: "http://${API_SERVER_URL}/api/v1/packages/projects?group=${GROUP_ID}&project=${PROJECT_ID}&version=${APP_VERSION}",
-            validResponseCodes: '200:500'
-          println('Status: '+response.status)
-          println('Response: '+response.content)
-          if (response.status != 200) {
-            error(response)
-          }
-                    
-          jsonObj = readJSON text: response.content
-                    
-          if (!jsonObj.items) {
-            error("*** Can't find version.")
-          }
-          projectInfo = jsonObj.items[0]
-        }
-        updateGitlabCommitStatus name: 'Get project info', state: 'success'
-      }
-    }
-        
-    stage('download source') {
-      steps {
-        updateGitlabCommitStatus name: 'download source', state: 'pending'
-          script {
-            projectInfo.packages.each { item ->
-              println(item)
-              workItemName = item.name
-              res = sh(script: "curl -s -w 200 ${item.url} -o ${item.name}", returnStdout: true).trim()
-              if (res != "200"){
-                error('Failed to download source.')
-              }
-              res = sh(script: "ls -al", returnStdout: true).trim()
-              println(res)
-            }
-          }                
-        updateGitlabCommitStatus name: 'download source', state: 'success'
-      }
-    }
+在預設情況下，當你第一次透過 SSH 或 SFTP 連線到一台新機器時，
+系統會詢問你是否要將這台機器的指紋加入 known_hosts。由於 Jenkins 是自動化執行，
+無法進行人工輸入 "yes"，因此連線會直接被拒絕。
 
-    stage('copy source from Nexus to Deploy server') {
-        steps {
-            updateGitlabCommitStatus name: 'copy source from Nexus to Deploy server', state: 'pending'
-            script {
-                sh "mv ./${workItemName} ./${JAR_FILE_NAME}"
-                println("${workItemName}")
-                println("${JAR_FILE_NAME}")
-                //sh "sftp -i ${SFTP_K} version@${REMOTE_HOST} <<< 'put ${JAR_FILE_NAME} /iso'"
-                sh "echo 'put ${JAR_FILE_NAME} /iso' | sftp -i ${SFTP_K} version@${REMOTE_HOST}"
-            }
-            updateGitlabCommitStatus name: 'copy source from Nexus to Deploy server', state: 'success'
-        }
-    }
+以下是三種常見的解決方案，按推薦程度排序：
 
+方案一：關閉主機金鑰檢查（最快、最常用於內網）
+在 sftp 指令中加入參數 -o StrictHostKeyChecking=no。這樣 SFTP 就會自動接受該主機金鑰，不會彈出確認提示。
 
-+ mv ./logging-server-v20260210.001-apic.jar ./logging-server.jar
-[Pipeline] echo
-logging-server-v20260210.001-apic.jar
-[Pipeline] echo
-logging-server.jar
-[Pipeline] sh
-+ echo 'put logging-server.jar /iso'
-+ sftp -i /var/lib/jenkins/.ssh/jenkinsAgent_rsa version@10.21.105.114
-Host key verification failed.
-Connection closed
+修改程式碼如下：
+sh "echo 'put ${JAR_FILE_NAME} /iso' | sftp -o StrictHostKeyChecking=no -i ${SFTP_K} version@${REMOTE_HOST}"
 
+方案二：預先手動掃描並加入信任清單（最安全）
+如果你希望保持安全性（避免中間人攻擊），你可以先在 Jenkins Agent 伺服器 上，以 Jenkins 執行的使用者身分（通常是 jenkins）將遠端主機加入 known_hosts。
 
+在 Jenkins 伺服器的終端機執行：
+# 切換到 jenkins 使用者 (如果需要)
+sudo su - jenkins
 
+# 掃描並加入遠端主機金鑰
+ssh-keyscan -H 10.21.105.114 >> ~/.ssh/known_hosts
