@@ -1,119 +1,20 @@
-+ ssh-keygen -F 10.21.105.114
-+ echo 'Host key for 10.21.105.114 not found.'
-Host key for 10.21.105.114 not found.
-+ // ssh-keyscan -p 22 -H 10.21.105.114
-/datam/jenkins/workspace/ncbs_apc/api-resource/DEV/07-02-apic_logging_resource_download@tmp/durable-8956a2bd/script.sh: line 7: //: Is a directory
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 126
-Finished: FAILURE
+Downloading from nexus: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/com/ibm/ncbs/mid-foundation-core/1.0.0-P2-20250226/mid-foundation-core-1.0.0-P2-20250226.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  5.117 s
+[INFO] Finished at: 2026-02-23T15:47:26+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal on project dep-service: Could not collect dependencies for project com.ibm.ncbs:dep-service:jar:0.0.1-SNAPSHOT
+[ERROR] Failed to read artifact descriptor for com.ibm.ncbs:mid-foundation-core:jar:1.0.0-P2-20250226
+[ERROR] 	Caused by: The following artifacts could not be resolved: com.ibm.ncbs:mid-foundation-core:pom:1.0.0-P2-20250226 (absent): Could not transfer artifact com.ibm.ncbs:mid-foundation-core:pom:1.0.0-P2-20250226 from/to nexus (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/): PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/DependencyResolutionException
 
-def workItemName
-pipeline {
-  agent any
-
-  environment {
-    
-	GIT_REPO_URL     = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_apc/apic-logging-extracter-server.git'	    
-	GIT_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw/ncbs_apc/apic-logging-extracter-server.git'	
-
-    //SOURCE_FILE_NAME = 'api-resource.tar.gz'
-    REMOTE_HOST      = '10.21.105.114'   
-    REMOTE_FOLDER    = '/CICD/api-resource'
-    //UNZIP_FOLDER     = '/home/jboss/CICD/api-resource'
-
-    GROUP_ID            = 'com.ibm'       
-    ARTIFACT_ID         = 'logging-server'
-    //dev
-    SFTP_K              = '/var/lib/jenkins/.ssh/jenkinsAgent_rsa'
-    NEXUS_URL           = 'ddpsn01.cbsd.scsb.com.tw'
-    NEXUS_VERSION       = 'nexus3'
-    NEXUS_CREDENTIAL_ID = 'f106b445-8b4e-4a21-94b3-9a361cdf124b' 
-    API_SERVER_URL      = 'ddpsg01.cbsd.scsb.com.tw:5001'       
-    EXTENSION_NAME      = 'jar'
-    JAR_FILE_NAME       = "${ARTIFACT_ID}.${EXTENSION_NAME}"        
-    GROUP_ID_PATH       = "${GROUP_ID}".replace('.', '/')
-    PROJECT_ID          = "${ARTIFACT_ID}"
-    APP_VERSION         = "${env.Tag}"
-    APP_NAME            = "${PROJECT_ID}-${APP_VERSION}.${EXTENSION_NAME}"
-    APP_PATH            = "repository/maven-releases/${GROUP_ID_PATH}/${PROJECT_ID}/${APP_VERSION}/${APP_NAME}"
-       
-  }
- 
-  stages {
-    stage('Get project info') {
-      steps {     
-        updateGitlabCommitStatus name: 'Get project info', state: 'pending'
-        script {
-          response = httpRequest httpMode: 'GET', contentType: 'APPLICATION_JSON',
-            url: "http://${API_SERVER_URL}/api/v1/packages/projects?group=${GROUP_ID}&project=${PROJECT_ID}&version=${APP_VERSION}",
-            validResponseCodes: '200:500'
-          println('Status: '+response.status)
-          println('Response: '+response.content)
-          if (response.status != 200) {
-            error(response)
-          }
-                    
-          jsonObj = readJSON text: response.content
-                    
-          if (!jsonObj.items) {
-            error("*** Can't find version.")
-          }
-          projectInfo = jsonObj.items[0]
-        }
-        updateGitlabCommitStatus name: 'Get project info', state: 'success'
-      }
-    }
-        
-    stage('download source') {
-      steps {
-        updateGitlabCommitStatus name: 'download source', state: 'pending'
-          script {
-            projectInfo.packages.each { item ->
-              println(item)
-              workItemName = item.name
-              res = sh(script: "curl -s -w 200 ${item.url} -o ${item.name}", returnStdout: true).trim()
-              if (res != "200"){
-                error('Failed to download source.')
-              }
-              res = sh(script: "ls -al", returnStdout: true).trim()
-              println(res)
-            }
-          }                
-        updateGitlabCommitStatus name: 'download source', state: 'success'
-      }
-    }
-
-    stage('copy source from Nexus to Deploy server') {
-        steps {
-            updateGitlabCommitStatus name: 'copy source from Nexus to Deploy server', state: 'pending'
-            script {
-                sh "mv ./${workItemName} ./${JAR_FILE_NAME}"
-                println("${workItemName}")
-                println("${JAR_FILE_NAME}")
-                sh """
-                        # 檢查主機密鑰是否已存在
-                        if ssh-keygen -F "10.21.105.114" > /dev/null 2>&1; then
-                            echo "Host key for 10.21.105.114 already exists."
-                        else
-                            echo "Host key for 10.21.105.114 not found."
-                       //     ssh-keyscan -p 22 -H 10.21.105.114 >>  /var/lib/jenkins/.ssh/known_hosts
-                            echo "Host key added."
-                        fi
-                    """
-                //sh "sftp -i ${SFTP_K} version@${REMOTE_HOST} <<< 'put ${JAR_FILE_NAME} /iso'"
-                sh "echo 'put ${JAR_FILE_NAME} /iso' | sftp -i ${SFTP_K} version@${REMOTE_HOST}"
-            }
-            updateGitlabCommitStatus name: 'copy source from Nexus to Deploy server', state: 'success'
-        }
-    }
-
-  }
-}
+Process finished with exit code 1
