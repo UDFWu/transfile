@@ -1,20 +1,7 @@
-Downloading from nexus: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/com/ibm/ncbs/mid-foundation-core/1.0.0-P2-20250226/mid-foundation-core-1.0.0-P2-20250226.pom
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD FAILURE
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  5.117 s
-[INFO] Finished at: 2026-02-23T15:47:26+08:00
-[INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal on project dep-service: Could not collect dependencies for project com.ibm.ncbs:dep-service:jar:0.0.1-SNAPSHOT
-[ERROR] Failed to read artifact descriptor for com.ibm.ncbs:mid-foundation-core:jar:1.0.0-P2-20250226
-[ERROR] 	Caused by: The following artifacts could not be resolved: com.ibm.ncbs:mid-foundation-core:pom:1.0.0-P2-20250226 (absent): Could not transfer artifact com.ibm.ncbs:mid-foundation-core:pom:1.0.0-P2-20250226 from/to nexus (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/): PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
-[ERROR] 
-[ERROR] -> [Help 1]
-[ERROR] 
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR] 
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/DependencyResolutionException
-
-Process finished with exit code 1
+PS D:\repos_north_gitlab\ncbs_mid\ncbs-mid-repo-p2> mvn -v
+mvn : 無法辨識 'mvn' 詞彙是否為 Cmdlet、函數、指令檔或可執行程式的名稱。請檢查名稱拼字是否正確，如果包含路徑的話，請確認路徑是否正確，然後再試一次。
+位於 線路:1 字元:1
++ mvn -v
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (mvn:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
