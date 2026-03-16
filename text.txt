@@ -1,13 +1,21 @@
 org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:
-WorkflowScript: 37: Arguments to "checkout" must be explicitly named. @ line 37, column 5.
-   				checkout([$class: 'GitSCM'],
+WorkflowScript: 45: expecting ']', found ')' @ line 45, column 5.
+   				)
        ^
 
 1 error
 
 	at org.codehaus.groovy.control.ErrorCollector.failIfErrors(ErrorCollector.java:309)
-	at org.codehaus.groovy.control.CompilationUnit.applyToPrimaryClassNodes(CompilationUnit.java:1107)
-	at org.codehaus.groovy.control.CompilationUnit.doPhaseOperation(CompilationUnit.java:624)
+	at org.codehaus.groovy.control.ErrorCollector.addFatalError(ErrorCollector.java:149)
+	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:119)
+	at org.codehaus.groovy.control.ErrorCollector.addError(ErrorCollector.java:131)
+	at org.codehaus.groovy.control.SourceUnit.addError(SourceUnit.java:349)
+	at org.codehaus.groovy.antlr.AntlrParserPlugin.transformCSTIntoAST(AntlrParserPlugin.java:225)
+	at org.codehaus.groovy.antlr.AntlrParserPlugin.parseCST(AntlrParserPlugin.java:191)
+	at org.codehaus.groovy.control.SourceUnit.parse(SourceUnit.java:233)
+	at org.codehaus.groovy.control.CompilationUnit$1.call(CompilationUnit.java:189)
+	at org.codehaus.groovy.control.CompilationUnit.applyToSourceUnits(CompilationUnit.java:966)
+	at org.codehaus.groovy.control.CompilationUnit.doPhaseOperation(CompilationUnit.java:626)
 	at org.codehaus.groovy.control.CompilationUnit.processPhaseOperations(CompilationUnit.java:602)
 	at org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:579)
 	at groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:323)
@@ -22,9 +30,6 @@ WorkflowScript: 37: Arguments to "checkout" must be explicitly named. @ line 37,
 	at hudson.model.Executor.run(Executor.java:446)
 Finished: FAILURE
 
-
-def deployProjects = []
-def projectVersions = [:] // 在腳本作用域中宣告變數
 
 pipeline {
     agent any
@@ -59,12 +64,14 @@ pipeline {
 		    steps{
 				echo 'git clone'
 				echo '------------------------------'
-				checkout([$class: 'GitSCM'],
-				    branches: [[name: "refs/tags/${params.GIT_TAG}"]],
-				    userRemoteConfigs: [[
-				        url: 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git',
-				        credentialsId: 'gitlab-user'
-				    ]]
+				checkout(
+				    scm: [
+				        $class: 'GitSCM',
+				        branches: [[name: "refs/tags/${params.GIT_TAG}"]],
+				        userRemoteConfigs: [[
+    				        url: 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git',
+    				        credentialsId: 'gitlab-user'
+				        ]]
 				)
             }
             post{
