@@ -1,45 +1,120 @@
-[DEBUG] Writing scan summary
-[DEBUG] Closing scan tag
-[DEBUG] Closing writer
-[INFO] 2026-03-16T16:27:21.222+08:00 Finished scanning application ncbs-mid-repo-p2.
-[DEBUG] Unable to find repository URL via environment variable GIT_URL
-[INFO] Discovered repository url 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2' via jGit
-[INFO] Repository URL https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2 was found using automation
-[INFO] Amending source control record for application with id: ncbs-mid-repo-p2 with discovered Repository URL: https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2
-[DEBUG] Running policy evaluation.
-[DEBUG] Assigned status ID 3f5b377fcf01486b9e0aa76ae5ece8ac for evaluation
-[INFO] Waiting for policy evaluation to complete...
-[DEBUG] Checking evaluation status at Mon Mar 16 16:27:21 CST 2026
-[DEBUG] Checking evaluation status at Mon Mar 16 16:27:26 CST 2026
-[INFO] Assigned scan ID dcba5cbc13c94f17aee9c15f0933cc8b for evaluation
-[DEBUG] Checking evaluation status at Mon Mar 16 16:27:31 CST 2026
-[INFO] Policy evaluation completed in 10 seconds.
-[DEBUG] Reachability analysis is either not configured or is not enabled.
-[DEBUG] Evaluation has notifications: false
-[DEBUG] Evaluation has warnings: true
-[DEBUG] Evaluation has failures: false
-[DEBUG] Message formatter has warnings: true
-[DEBUG] Message formatter has failures: false
-[DEBUG] Scan summary error count: 0
-IQ reports policy warning due to 
-Policy(Architecture-Quality) [
- Component(displayName=org.jeasy : easy-random-core : 5.0.0, hash=2cb40d3bddaa900cfa35) [
-  Constraint(Version is old) [Age older than 1825 days because: Found component older than 5 years] ]]
-The detailed report can be viewed online at https://10.21.114.100:443/ui/links/application/ncbs-mid-repo-p2/report/dcba5cbc13c94f17aee9c15f0933cc8b
-The application priorities can be viewed online at https://10.21.114.100:443/ui/links/developer/integrations/ncbs-mid-repo-p2/dcba5cbc13c94f17aee9c15f0933cc8b/jenkins
-Summary of policy violations: 0 critical, 0 severe, 0 moderate
-IQ Server evaluation of application ncbs-mid-repo-p2 detected warnings
-[DEBUG] Result: UNSTABLE
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Checkmarx scan)
-Stage "Checkmarx scan" skipped due to when conditional
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] End of Pipeline
-Finished: UNSTABLE
+pipeline {
+    agent any
+
+    environment {
+        APP_GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git'
+        PROFILE = 'sit'
+    }
+
+    stages {
+        
+        stage('WORKSPACE init') {
+			steps {
+				echo 'WORKSPACE init'
+				echo '------------------------------'
+				sh 'rm -rf *'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'WORKSPACE init 失敗'
+				}
+				success {
+					echo 'WORKSPACE init 成功'            	
+				}
+			}
+		}
+		
+        stage('git clone') {
+		    steps{
+				echo 'git clone'
+				echo '------------------------------'
+				checkout(
+				    scm: [
+				        $class: 'GitSCM',
+				        branches: [[name: "refs/tags/${params.GIT_TAG}"]],
+				        userRemoteConfigs: [[
+    				        url: 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git',
+    				        credentialsId: 'gitlab-user'
+				        ]]
+				    ]
+				)
+            }
+            post{
+				failure {
+					echo 'git clone 失敗'
+				}
+				success {
+					echo 'git clone 成功'            	
+				} 
+            }
+		}
+         
+         //此步驟為 Sonatype 套件風險掃描, 不影響原流程, 如有問題可以先註解掉
+         stage('Nexus Evaluate') { 
+            steps {
+                nexusPolicyEvaluation (
+                    advancedProperties: '', //預設空白
+                    enableDebugLogging: true, //是否開啟Debug log
+                    failBuildOnNetworkError: true, //如果連不上IQ Server 是否中斷 build
+                    iqApplication: 'ncbs-mid-repo-p2', //指定哪一個 IQ Server application 做掃描 (請對應 Gitlab project) 
+                    iqInstanceId: 'sonatype-dev',
+                    iqScanPatterns: [[scanPattern: '**/*']], //要掃描的檔案路徑(這裡指掃描所有Target下面的 Jar file)
+                    iqStage: 'build',
+                    jobCredentialsId: 'sonatype-lifecycle-scan' 
+                )
+            }
+            post {
+                failure {
+                    echo '偵測到違規中高風險檔案，請至 Build# Log 中查看掃描報告。'
+                }
+                success {
+                    echo '掃描成功，沒有偵測到違規風險檔案。'
+                }
+            }
+         }
+
+        stage('Checkmarx scan') {
+            steps {
+                script {
+                    try {
+                        step([$class: 'CxScanBuilder',
+                        comment: 'NCBS-MID', //NCBS-MID:新核心_業務中台
+                        credentialsId: 'checkmarx-server',
+                        sourceEncoding: '1',
+                        excludeFolders: '',
+                        excludeOpenSourceFolders: '',
+                        exclusionsSetting: 'global',
+                        highThreshold: 0, //高風險限制
+                        mediumThreshold: 0, //中風險限制
+                        lowThreshold: 0, //低風險限制
+                        vulnerabilityThresholdResult: 'FAILURE', //設定pipeline偵測到超過閥值時失敗
+                        waitForResultsEnabled: true, //等待掃描結果回傳
+                        vulnerabilityThresholdEnabled: true, //設定風險閥值開啟
+                        fullScanCycle: 0, //每間隔多少次執行一次完整掃描
+                        groupId: '6',
+                        projectName: 'CICD',
+                        preset: '36', sastEnabled: true, serverUrl: 'http://10.10.2.164/',
+                        generatePdfReport: true, generateXmlReport: false,
+                        osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz', osaInstallBeforeScan: false,
+                        filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*, !**/.hg/**/*, !**/.git/**/*, !**/.bzr/**/*, !**/bin/**/*,!**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr, !**/*.iws, !**/*.bak, !**/*.tmp, !**/*.aac, !**/*.aif, !**/*.iff, !**/*.m3u, !**/*.mid, !**/*.mp3,!**/*.mpa, !**/*.ra, !**/*.wav, !**/*.wma, !**/*.3g2, !**/*.3gp, !**/*.asf, !**/*.asx, !**/*.avi, !**/*.flv, !**/*.mov, !**/*.mp4, !**/*.mpg, !**/*.rm, !**/*.swf, !**/*.vob, !**/*.wmv,!**/*.bmp, !**/*.gif, !**/*.jpg, !**/*.png, !**/*.psd, !**/*.tif, !**/*.swf, !**/*.jar, !**/*.zip, !**/*.rar, !**/*.exe, !**/*.dll, !**/*.pdb, !**/*.7z,  !**/*.gz, !**/*.tar.gz,!**/*.tar, !**/*.gz, !**/*.ahtm, !**/*.ahtml, !**/*.fhtml, !**/*.hdm, !**/*.hdml, !**/*.hsql, !**/*.ht, !**/*.hta, !**/*.htc, !**/*.htd, !**/*.war, !**/*.ear,!**/*.htmls,!**/*.ihtml, !**/*.mht, !**/*.mhtm, !**/*.mhtml, !**/*.ssi, !**/*.stm, !**/*.stml, !**/*.ttml, !**/*.txn, !**/*.xhtm, !**/*.xhtml, !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*'''
+                        ])
+
+                        // 取得掃描結果並進行判斷
+                        if (scanResults.hasHighVulnerability || scanResults.hasMediumVulnerability) {
+                            currentBuild.result = 'FAILURE'
+                        } else if (scanResults.lowVulnerabilityCount > 0) {
+                            currentBuild.result = 'FAILURE'
+                        }
+
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Checkmarx scan failed: ${e.message}")
+                    }
+                }
+            }
+        }
+    }
+}
