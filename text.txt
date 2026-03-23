@@ -182,3 +182,26 @@ pipeline {
 
     
 }
+
+
+stage('Publish to Nexus') {
+    steps {
+        script {
+            for (project in deployProjects) {
+                // 取得剛才存好的版本號
+                def v = projectVersions[project] 
+                sh """
+                    mvn deploy:deploy-file -DgroupId=mid.ai \
+                        -DartifactId=${project}-${env.TYPE} \
+                        -Dversion=${v} \
+                        -Dpackaging=jar \
+                        -Dfile=./${project}-${env.TYPE}/target/${project}-${env.TYPE}-${v}.jar \
+                        -Durl=${NEXUS_URL}/repository/maven-releases/ \
+                        -DrepositoryId=serverid \
+                        -DgeneratePom=true \
+                        -Dmaven.wagon.http.ssl.insecure=true
+                """
+            }
+        }
+    }
+}
