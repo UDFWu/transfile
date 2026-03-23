@@ -1,3 +1,70 @@
+pipeline a:
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'TAG', defaultValue: '9.0.0', description: '部屬的 tag')
+        choice(name: 'TYPE', choices: ['app', 'rpt'], description: '部屬的環境')
+        booleanParam(defaultValue: false, description: '部屬 demo', name: 'demo')
+        booleanParam(defaultValue: false, description: '部屬 cbr', name: 'cbr')
+        booleanParam(defaultValue: false, description: '部屬 cmn', name: 'cmn')
+        booleanParam(defaultValue: false, description: '部屬 dep', name: 'dep')
+        booleanParam(defaultValue: false, description: '部屬 gla', name: 'gla')
+        booleanParam(defaultValue: false, description: '部屬 len', name: 'len')
+        booleanParam(defaultValue: false, description: '部屬 mds', name: 'mds')
+        booleanParam(defaultValue: false, description: '部屬 rem', name: 'rem')
+        booleanParam(defaultValue: false, description: '部屬 remb', name: 'remb')
+        booleanParam(defaultValue: false, description: '部屬 remm', name: 'remm')
+        booleanParam(defaultValue: false, description: '部屬 rems', name: 'rems')
+        booleanParam(defaultValue: false, description: '部屬 try', name: 'try')
+        booleanParam(defaultValue: false, description: '部屬 xau', name: 'xau')
+    }
+
+    stages {
+        stage('Get Selection') {
+            steps {
+                script {
+                    def deployProjects = []
+                    deployProjects.add('demo')
+                    deployProjects.add('cbr')
+                    deployProjects.add('cmn')
+                    deployProjects.add('dep')
+                    deployProjects.add('gla')
+                    deployProjects.add('len')
+                    deployProjects.add('mds')
+                    deployProjects.add('rem')
+                    deployProjects.add('remb')
+                    deployProjects.add('remm')
+                    deployProjects.add('rems')
+                    deployProjects.add('try')
+                    deployProjects.add('xau')
+                    
+                    
+                    if (deployProjects.isEmpty()) {
+                        error "請至少選擇一個專案部屬"
+                    }
+
+                    env.DEPLOY_PROJECTS = deployProjects.join(',')
+                    echo "DEPLOY_PROJECTS: ${env.DEPLOY_PROJECTS}"
+                    echo "TAG: ${env.TAG}"
+                    echo "TYPE: ${env.TYPE}"
+
+                    // 定義要傳送的參數
+                    def parameters = [
+                        string(name: 'DEPLOY_PROJECTS', value: env.DEPLOY_PROJECTS),
+                        string(name: 'TAG', value: env.TAG),
+                        string(name: 'TYPE', value: env.TYPE),
+                    ]
+                    // 觸發 B pipeline
+                    build job: 'midi-ai-b', parameters: parameters
+                }
+            }
+        }
+    }
+}
+
+pipeline b:
+
 def deployProjects = []
 def projectVersions = [:] // 在腳本作用域中宣告變數
 
@@ -9,15 +76,8 @@ pipeline {
     }
 
     environment {
-        GIT_SWAGGER_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-swagger-repo.git'
-        GIT_SWAGGER_REPO_SSH_URL = 'git@ddpsg01.cbsd.scsb.com.tw:ncbs_mid/ncbs-swagger-repo.git'
         APP_GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git'
-        OCP_GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-ocp-repo.git'
-        CONTAINER_REGISTRY = 'docph01.cbsd.scsb.com.tw'
         NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
-        CICDAPISERVICE_URL = 'http://ddpsg01.cbsd.scsb.com.tw:5001'
-        // OPENSHIFT_SERVER = 'ocp-rh'
-        OPENSHIFT_SERVER = 'ocp.cbsd-ncbs-mid-mid-token'
         PROFILE = 'sit'
     }
 
@@ -32,20 +92,14 @@ pipeline {
                     // 將收到的參數設置爲環境變數
                     deployProjects = params.DEPLOY_PROJECTS.split(',') // 將結果存入全局變數
                     
-                    if (env.OPENSHIFT_SERVER == 'ocp.cbsd-ncbs-mid-mid-token') {
-                        env.NAMESPACE = 'ncbs-mid'
-                    }else {
-                        env.NAMESPACE = params.NAMESPACE
-                    }
+                    
                     env.TAG = params.TAG
                     env.TYPE = params.TYPE
-                    env.HARBOR_PROJECT = params.HARBOR_PROJECT
-                    env.NOTES = params.NOTES
 
                     //檢查訊息
+                    echo "Deploy Projects: ${deployProjects}"
                     echo "TYPE: ${env.TYPE}"
                     echo "TAG: ${env.TAG}"
-                    echo "NOTES: ${env.NOTES}"
                 }
             }
         }
@@ -60,30 +114,13 @@ pipeline {
                     sh "rm -rf ./*"
                 }
                 checkout scmGit(
-                        branches: [[name: "*/sit"]],
+                        branches: [[name: "refs/tags/${env.TAG}"]],
                         browser: github("${APP_GIT_REPO_URL}"),
                         extensions: [],
                         userRemoteConfigs: [[credentialsId: 'gitlab-user', url: "${APP_GIT_REPO_URL}"]]
                 )
             }
         }
-
-         stage('Delete APP mid-core and fabric dependencies') {
-             when {
-                 expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
-             }
-
-             steps {
-                 script {
-                     sh """
-                         rm -rf ~/.m2/repository/com/ibm/cbmp/*
-                         rm -rf ~/.m2/repository/com/ibm/ncbs/mid-foundation-core/*
-                         rm -rf ~/.m2/repository/com/ibm/ncbs/ncbs-mid-foundation/*
-                         rm -rf ~/.m2/repository/com/ibm/ncbs/ncbs-mid-jasypt/*
-                     """
-                 }
-             }
-         }
 
          stage('Build APP Code') {
              when {
@@ -102,7 +139,7 @@ pipeline {
                          projectVersions[project] = projectVersion
 
                          sh """
-                             mvn -B -q -U clean install \\
+                             mvn -B -q -U clean verify \\
                              -pl :${project}-${env.TYPE} \\
                              -am -Dnexus-url=${NEXUS_URL} \\
                              -Dmaven.test.skip=true \\
@@ -116,55 +153,18 @@ pipeline {
                  }
              }
          }
-         
-        stage('Dependency Check') {
-            when {
-                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
-            }
-
-            steps {
-                // 執行 Dependency Check
-                dependencyCheck additionalArguments: '--data /opt/dependency-check/data -f HTML JSON --noupdate --disableNodeAudit --disableCentral --disableOssIndex', nvdCredentialsId: 'NVD-API-KEY', odcInstallation: 'owasp_check'
-            }
-        }
-
-         stage('Build APP Image') {
-             when {
-                 expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
-             }
-
-             steps {
-                 script {
-                     withCredentials([usernamePassword(credentialsId: 'harbor-user', passwordVariable: 'HARBOR_PASSWORD', usernameVariable: 'HARBOR_USER')]) {
-                         // 先登入 Harbor，爲了拉取 base image
-                         sh "podman login ${CONTAINER_REGISTRY} -u '${HARBOR_USER}' -p '${HARBOR_PASSWORD}'"
-                         for (project in deployProjects) {
-                             echo "Building ${project}-${env.TYPE} image"
-
-                             sh """
-                                 podman images | grep ${project}-${env.TYPE} | awk '{print \$3}' | xargs podman rmi --force || true
-                                 cd ${env.WORKSPACE}/${project}/${project}-${env.TYPE}
-                                 podman build --build-arg CONTAINER_REGISTRY=${CONTAINER_REGISTRY} -f ./Dockerfile -t ${CONTAINER_REGISTRY}/${env.HARBOR_PROJECT}/${project}-${env.TYPE}:${env.TAG} .
-                             """
-                         }
-                     }
-                 }
-             }
-         }
 
         stage('Publish to Nexus') {
             steps {
                 script {
                     for (project in deployProjects) {
                         sh """
-                            cp base/${PROFILE}/configmap.yaml ${project}/${project}-${TYPE}/${PROFILE}/base-configmap.yaml
-                            cp base/${PROFILE}/secret.yaml ${project}/${project}-${TYPE}/${PROFILE}/base-secret.yaml
-                            zip -r -9 ${project}-${TYPE}.zip ${project}/${project}-${TYPE}/${PROFILE}/
-                            mvn deploy:deploy-file "-DgroupId=com.ibm.ncbs" \
+
+                            mvn deploy:deploy-file "-DgroupId=mid.ai" \
                                 "-DartifactId=${project}-${TYPE}" \
                                 "-Dversion=${env.TAG}" \
-                                "-Dpackaging=zip" \
-                                "-Dfile=./${project}-${TYPE}.zip" \
+                                "-Dpackaging=jar" \
+                                "-Dfile=./${project}-${TYPE}.jar" \
                                 "-Durl=${NEXUS_URL}/repository/maven-releases/" \
                                 "-Dmaven.wagon.http.ssl.insecure=true" \
                                 "-Dmaven.wagon.http.ssl.allowall=true" \
@@ -176,4 +176,9 @@ pipeline {
             }
         }
 
+
+
+    }
+
+    
 }
