@@ -1,128 +1,6 @@
-+ mvn deploy:deploy-file -DgroupId=mid.ai -DartifactId=cbr-app -Dversion=0.0.1-SNAPSHOT -Dpackaging=jar -Dfile=./cbr-app/target/cbr-app-0.0.1-SNAPSHOT.jar -Durl=https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/ -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -DrepositoryId=serverid -DgeneratePom=true
-[INFO] Scanning for projects...
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:cbr-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:cbr-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/cbr/cbr-app/pom.xml, line 243, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:cbr-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/cbr/cbr-app/pom.xml, line 177, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:dep-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:dep-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/dep/dep-app/pom.xml, line 258, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:dep-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/dep/dep-app/pom.xml, line 193, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:len-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:len-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/len/len-app/pom.xml, line 268, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:len-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/len/len-app/pom.xml, line 202, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:rem-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:rem-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/rem/rem-app/pom.xml, line 247, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:rem-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/rem/rem-app/pom.xml, line 181, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:cmn-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:cmn-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/cmn/cmn-app/pom.xml, line 240, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:cmn-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/cmn/cmn-app/pom.xml, line 174, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:remm-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:remm-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/remm/remm-app/pom.xml, line 236, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:remm-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/remm/remm-app/pom.xml, line 171, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:remb-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:remb-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/remb/remb-app/pom.xml, line 236, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:remb-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/remb/remb-app/pom.xml, line 171, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:rems-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:rems-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/rems/rems-app/pom.xml, line 236, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:rems-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/rems/rems-app/pom.xml, line 171, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:gla-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:gla-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/gla/gla-app/pom.xml, line 147, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:gla-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/gla/gla-app/pom.xml, line 82, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:gla-rpt:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:gla-rpt:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/gla/gla-rpt/pom.xml, line 147, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:gla-rpt:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/gla/gla-rpt/pom.xml, line 82, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:try-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:try-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/try/try-app/pom.xml, line 102, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:try-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/try/try-app/pom.xml, line 47, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:mds-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:mds-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/mds/mds-app/pom.xml, line 102, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:mds-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/mds/mds-app/pom.xml, line 47, column 21
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.ibm.ncbs:sgw-app:jar:0.0.1-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.springdoc:springdoc-openapi-maven-plugin is missing. @ com.ibm.ncbs:sgw-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-app/pom.xml, line 248, column 21
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ com.ibm.ncbs:sgw-app:[unknown-version], /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-app/pom.xml, line 181, column 21
-[WARNING] 
-[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
-[WARNING] 
-[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
-[WARNING] 
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Build Order:
-[INFO] 
-[INFO] ncbs-mid-parent                                                    [pom]
-[INFO] cbr                                                                [pom]
-[INFO] cbr-service                                                        [jar]
-[INFO] cbr-app                                                            [jar]
-[INFO] cbr-bat                                                            [war]
-[INFO] dep                                                                [pom]
-[INFO] dep-service                                                        [jar]
-[INFO] dep-app                                                            [jar]
-[INFO] dep-rpt                                                            [jar]
-[INFO] gla                                                                [pom]
-[INFO] gla-api                                                            [jar]
-[INFO] dep-bat                                                            [war]
-[INFO] xau                                                                [pom]
-[INFO] xau-service                                                        [jar]
-[INFO] xau-app                                                            [jar]
-[INFO] xau-bat                                                            [war]
-[INFO] xau-rpt                                                            [jar]
-[INFO] len                                                                [pom]
-[INFO] len-service                                                        [jar]
-[INFO] len-rpt                                                            [jar]
-[INFO] len-bat                                                            [war]
-[INFO] len-app                                                            [jar]
-[INFO] rem                                                                [pom]
-[INFO] rem-service                                                        [jar]
-[INFO] rem-app                                                            [jar]
-[INFO] rem-bat                                                            [war]
-[INFO] cmn                                                                [pom]
-[INFO] cmn-service                                                        [jar]
-[INFO] cmn-app                                                            [jar]
-[INFO] cmn-bat                                                            [war]
-[INFO] remm                                                               [pom]
-[INFO] remm-service                                                       [jar]
-[INFO] remm-app                                                           [jar]
-[INFO] remb                                                               [pom]
-[INFO] remb-service                                                       [jar]
-[INFO] remb-app                                                           [jar]
-[INFO] rems                                                               [pom]
-[INFO] rems-service                                                       [jar]
-[INFO] rems-app                                                           [jar]
-[INFO] gla-service                                                        [jar]
-[INFO] gla-app                                                            [jar]
-[INFO] gla-bat                                                            [war]
-[INFO] gla-rpt                                                            [jar]
-[INFO] try                                                                [pom]
-[INFO] try-service                                                        [jar]
-[INFO] try-app                                                            [jar]
-[INFO] try-bat                                                            [war]
-[INFO] mds                                                                [pom]
-[INFO] mds-service                                                        [jar]
-[INFO] mds-app                                                            [jar]
-[INFO] sgw                                                                [pom]
-[INFO] sgw-service                                                        [jar]
-[INFO] sgw-app                                                            [jar]
-[INFO] 
-[INFO] --------------------< com.ibm.ncbs:ncbs-mid-parent >--------------------
-[INFO] Building ncbs-mid-parent 0.0.1-SNAPSHOT                           [1/53]
-[INFO] --------------------------------[ pom ]---------------------------------
-[INFO] 
-[INFO] --- maven-deploy-plugin:2.8.2:deploy-file (default-cli) @ ncbs-mid-parent ---
-[INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] ncbs-mid-parent 0.0.1-SNAPSHOT ..................... FAILURE [  0.087 s]
+[INFO] ncbs-mid-parent 0.0.1-SNAPSHOT ..................... FAILURE [  5.604 s]
 [INFO] cbr ................................................ SKIPPED
 [INFO] cbr-service ........................................ SKIPPED
 [INFO] cbr-app ............................................ SKIPPED
@@ -178,45 +56,28 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 1.560 s
-[INFO] Finished at: 2026-03-24T11:37:54+08:00
+[INFO] Total time: 7.098 s
+[INFO] Finished at: 2026-03-24T13:44:53+08:00
 [INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy-file (default-cli) on project ncbs-mid-parent: /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/cbr-app/target/cbr-app-0.0.1-SNAPSHOT.jar not found. -> [Help 1]
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy-file (default-cli) on project ncbs-mid-parent: Failed to deploy artifacts: Could not transfer artifact mid.ai:cbr-app:jar:0.0.1-20260324.054448-1 from/to serverid (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/): Failed to transfer file: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/mid/ai/cbr-app/0.0.1-SNAPSHOT/cbr-app-0.0.1-20260324.054448-1.jar. Return code is: 400, ReasonPhrase: Repository version policy: RELEASE does not allow version: 0.0.1-20260324.054448-1. -> [Help 1]
 [ERROR] 
 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
 [ERROR] Re-run Maven using the -X switch to enable full debug logging.
 [ERROR] 
 [ERROR] For more information about the errors and possible solutions, please read the following articles:
-
-
-stage('Build APP Code') {
-             when {
-                 expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
-             }
-
-             steps {
-                 script {
-                     for (project in deployProjects) {
-                         echo "Building ${project}-${env.TYPE} code"
-
-                         def projectVersion = sh(
-                                 script: "mvn -q -DforceStdout help:evaluate -Dexpression=project.version -pl :${project}-${env.TYPE}",
-                                 returnStdout: true
-                         ).trim()
-                         projectVersions[project] = projectVersion
-
-                         sh """
-                             mvn -B -q -U clean verify \\
-                             -pl :${project}-${env.TYPE} \\
-                             -am -Dnexus-url=${NEXUS_URL} \\
-                             -Dmaven.test.skip=true \\
-                             -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \\
-                             -Dmaven.wagon.http.ssl.insecure=true \\
-                             -DreleaseTag=${env.TAG} \\
-                             -DreleaseNotes=${env.NOTES}
-                         """
-                     }
-                     echo "${projectVersions}"
-                 }
-             }
-         }
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+Finished: FAILURE
