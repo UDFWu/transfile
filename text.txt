@@ -1,43 +1,214 @@
-stage('Publish All Artifacts to Nexus') {
-    steps {
-        script {
-            // 遍歷所有專案目錄
-            for (project in deployProjects) {
-                // 自動判定倉庫
-                // 註：這裡假設所有模組版本一致，若不一致，可改用 mvn help:evaluate 抓取
-                def targetRepo = env.TAG.contains("SNAPSHOT") ? "maven-snapshots" : "maven-releases"
+INFO] mds-app ............................................ SUCCESS [ 14.922 s]
+[INFO] sgw ................................................ SUCCESS [  0.001 s]
+[INFO] sgw-service ........................................ FAILURE [  7.888 s]
+[INFO] sgw-app 0.0.1-SNAPSHOT ............................. SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 12:27 min
+[INFO] Finished at: 2026-03-24T16:18:04+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:compile (default-compile) on project sgw-service: Compilation failure: Compilation failure: 
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/configuration/SwallowAgentProperties.java:[4,29] error: package com.scsb.ncbs.core.ssl does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/configuration/SwallowAgentProperties.java:[46,16] error: cannot find symbol
+[ERROR]   symbol:   class SslContextProperties
+[ERROR]   location: class IbmMqProperties
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/configuration/SwallowAgentProperties.java:[46,37] error: cannot find symbol
+[ERROR]   symbol:   class SslContextProperties
+[ERROR]   location: class IbmMqProperties
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/configuration/SwallowAgentProperties.java:[40,4] error: cannot find symbol
+[ERROR]   symbol:   class SslContextProperties
+[ERROR]   location: class IbmMqProperties
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/common/SwiftMqLogService.java:[3,34] error: package com.scsb.ncbs.core.data.jpa does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/common/SwiftMqLogService.java:[4,31] error: package com.scsb.ncbs.core.utils does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/common/SwiftMqLogService.java:[19,1] error: cannot find symbol
+[ERROR]   symbol: class MidTransactional
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/persistence/repository/bedt/RemBedtSwiftMqLogRepository.java:[3,36] error: package com.scsb.ncbs.core.repository does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/persistence/repository/bedt/RemBedtSwiftMqLogRepository.java:[12,53] error: cannot find symbol
+[ERROR]   symbol: class MidJpaRepository
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/persistence/entity/bedt/RemBedtSwiftMqLogEntity.java:[3,32] error: package com.scsb.ncbs.core.entity does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/persistence/entity/bedt/RemBedtSwiftMqLogEntity.java:[24,45] error: cannot find symbol
+[ERROR]   symbol: class BaseEntity
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/common/mapper/SwiftMqLogMapper.java:[3,45] error: package com.scsb.ncbs.core.service.bean.mapper does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/ChannelEnum.java:[3,31] error: package com.scsb.ncbs.core.enums does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/ChannelEnum.java:[4,31] error: package com.scsb.ncbs.core.utils does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/ChannelEnum.java:[14,35] error: cannot find symbol
+[ERROR]   symbol: class CommonEnum
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/SgwErrorEnum.java:[3,43] error: package com.ibm.cbmp.fabric.foundation.enums does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/SgwErrorEnum.java:[4,47] error: package com.ibm.cbmp.fabric.foundation.enums.api does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/SgwErrorEnum.java:[12,36] error: cannot find symbol
+[ERROR]   symbol: class IReturnCodeDescEnum
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/SgwErrorEnum.java:[28,12] error: cannot find symbol
+[ERROR]   symbol:   class SeverityEnum
+[ERROR]   location: class SgwErrorEnum
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/SgwErrorEnum.java:[38,30] error: cannot find symbol
+[ERROR]   symbol:   class SeverityEnum
+[ERROR]   location: class SgwErrorEnum
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/SgwErrorEnum.java:[45,11] error: cannot find symbol
+[ERROR]   symbol:   class SeverityEnum
+[ERROR]   location: class SgwErrorEnum
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/bean/SwiftQueueDataBean.java:[3,30] error: package com.scsb.ncbs.core.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/bean/SwiftQueueDataBean.java:[13,40] error: cannot find symbol
+[ERROR]   symbol: class BaseBean
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/bean/SwiftHeader.java:[3,30] error: package com.scsb.ncbs.core.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/bean/SwiftHeader.java:[11,33] error: cannot find symbol
+[ERROR]   symbol: class BaseBean
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/bean/SwiftContent.java:[4,30] error: package com.scsb.ncbs.core.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/bean/SwiftContent.java:[10,34] error: cannot find symbol
+[ERROR]   symbol: class BaseBean
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/YesNoEnum.java:[3,31] error: package com.scsb.ncbs.core.enums does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/YesNoEnum.java:[13,33] error: cannot find symbol
+[ERROR]   symbol: class CommonEnum
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/bean/BedtQuerySwiftIdRs.java:[3,30] error: package com.scsb.ncbs.core.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/bean/BedtQuerySwiftIdRs.java:[15,40] error: cannot find symbol
+[ERROR]   symbol: class BaseRs
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/SgwJpaConfiguration.java:[3,46] error: package com.ibm.cbmp.fabric.foundation.data.jpa does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/SgwJpaConfiguration.java:[4,34] error: package com.scsb.ncbs.core.data.jpa does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/SgwJpaConfiguration.java:[5,34] error: package com.scsb.ncbs.core.data.jpa does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/SgwJpaConfiguration.java:[6,34] error: package com.scsb.ncbs.core.data.jpa does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/SgwJpaConfiguration.java:[20,44] error: cannot find symbol
+[ERROR]   symbol: class FabricJpaConfigurator
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/SgwJpaConfiguration.java:[10,1] error: cannot find symbol
+[ERROR]   symbol: class EnableMidJpa
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/SgwJpaConfiguration.java:[11,1] error: cannot find symbol
+[ERROR]   symbol: class EnableMidEntities
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/SgwJpaConfiguration.java:[16,1] error: cannot find symbol
+[ERROR]   symbol: class EnableMidRepositories
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/SwiftListener.java:[3,49] error: package com.ibm.cbmp.fabric.foundation.facade.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/SwiftListener.java:[4,49] error: package com.ibm.cbmp.fabric.foundation.facade.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/SwiftListener.java:[5,49] error: package com.ibm.cbmp.fabric.foundation.facade.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/SwiftListener.java:[6,49] error: package com.ibm.cbmp.fabric.foundation.facade.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/SwiftListener.java:[7,31] error: package com.scsb.ncbs.core.utils does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/SwiftListener.java:[8,31] error: package com.scsb.ncbs.core.utils does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/SwiftListener.java:[9,31] error: package com.scsb.ncbs.core.utils does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/SwiftListener.java:[10,31] error: package com.scsb.ncbs.core.utils does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/BawSwiftApiClient.java:[3,49] error: package com.ibm.cbmp.fabric.foundation.facade.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/BawSwiftApiClient.java:[5,49] error: package com.ibm.cbmp.fabric.foundation.facade.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/persistence/repository/bedt/RemBedtSwiftInfoRepository.java:[3,36] error: package com.scsb.ncbs.core.repository does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/persistence/repository/bedt/RemBedtSwiftInfoRepository.java:[14,52] error: cannot find symbol
+[ERROR]   symbol: class MidJpaRepository
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/persistence/entity/bedt/RemBedtSwiftInfoEntity.java:[3,32] error: package com.scsb.ncbs.core.entity does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/persistence/entity/bedt/RemBedtSwiftInfoEntity.java:[24,44] error: cannot find symbol
+[ERROR]   symbol: class BaseEntity
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/common/MessageEncryptor.java:[3,47] error: package com.ibm.cbmp.fabric.foundation.exception does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/bean/BawSwiftIncomingRq.java:[3,30] error: package com.scsb.ncbs.core.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/bean/BawSwiftIncomingRq.java:[16,40] error: cannot find symbol
+[ERROR]   symbol: class BaseRq
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/bean/BawSwiftIncomingRs.java:[3,30] error: package com.scsb.ncbs.core.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/bean/BawSwiftIncomingRs.java:[14,40] error: cannot find symbol
+[ERROR]   symbol: class BaseRs
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/bean/BawSwiftOutgoingRq.java:[3,30] error: package com.scsb.ncbs.core.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/bean/BawSwiftOutgoingRq.java:[16,40] error: cannot find symbol
+[ERROR]   symbol: class BaseRq
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/bean/BawSwiftOutgoingRs.java:[3,30] error: package com.scsb.ncbs.core.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/bean/BawSwiftOutgoingRs.java:[14,40] error: cannot find symbol
+[ERROR]   symbol: class BaseRs
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/bean/BawSwiftOutgoingRqFormInfo.java:[3,30] error: package com.scsb.ncbs.core.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/bean/BawSwiftOutgoingRqFormInfo.java:[16,48] error: cannot find symbol
+[ERROR]   symbol: class BaseRq
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/BawSwiftApiClient.java:[28,81] error: cannot find symbol
+[ERROR]   symbol:   class ApiRequest
+[ERROR]   location: interface BawSwiftApiClient
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/BawSwiftApiClient.java:[28,11] error: cannot find symbol
+[ERROR]   symbol:   class ApiResponse
+[ERROR]   location: interface BawSwiftApiClient
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/BawSwiftApiClient.java:[28,23] error: cannot find symbol
+[ERROR]   symbol:   class ServiceRs
+[ERROR]   location: interface BawSwiftApiClient
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/BawSwiftApiClient.java:[32,80] error: cannot find symbol
+[ERROR]   symbol:   class ApiRequest
+[ERROR]   location: interface BawSwiftApiClient
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/BawSwiftApiClient.java:[32,11] error: cannot find symbol
+[ERROR]   symbol:   class ApiResponse
+[ERROR]   location: interface BawSwiftApiClient
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/api/BawSwiftApiClient.java:[32,23] error: cannot find symbol
+[ERROR]   symbol:   class ServiceRs
+[ERROR]   location: interface BawSwiftApiClient
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/ServiceConfig.java:[3,52] error: package com.ibm.cbmp.fabric.foundation.mcs.annotation does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/ServiceConfig.java:[10,1] error: cannot find symbol
+[ERROR]   symbol: class EnableMcs
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/BaseBedtService.java:[3,33] error: package com.scsb.ncbs.core.service does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/BaseBedtService.java:[10,46] error: cannot find symbol
+[ERROR]   symbol: class BaseService
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/BedtService.java:[3,49] error: package com.ibm.cbmp.fabric.foundation.facade.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/BedtService.java:[4,34] error: package com.scsb.ncbs.core.data.jpa does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/BedtService.java:[5,38] error: package com.scsb.ncbs.core.service.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/BedtService.java:[20,1] error: cannot find symbol
+[ERROR]   symbol: class MidTransactional
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/bean/BedtQuerySwiftIdArg.java:[3,30] error: package com.scsb.ncbs.core.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/bean/BedtQuerySwiftIdArg.java:[15,41] error: cannot find symbol
+[ERROR]   symbol: class BaseArg
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/BedtService.java:[30,11] error: cannot find symbol
+[ERROR]   symbol:   class ServiceRs
+[ERROR]   location: class BedtService
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/bedt/ServiceTypeEnum.java:[3,31] error: package com.scsb.ncbs.core.enums does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/bedt/ServiceTypeEnum.java:[16,39] error: cannot find symbol
+[ERROR]   symbol: class CommonEnum
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/configuration/JMSConnectionFactoryRegistrar.java:[7,29] error: package com.scsb.ncbs.core.ssl does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/configuration/JMSConnectionFactoryRegistrar.java:[8,29] error: package com.scsb.ncbs.core.ssl does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/configuration/JMSConnectionFactoryRegistrar.java:[211,79] error: cannot find symbol
+[ERROR]   symbol:   class SslContextProperties
+[ERROR]   location: class JMSConnectionFactoryRegistrar
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/configuration/BawApiClientResponseHandler.java:[4,49] error: package com.ibm.cbmp.fabric.foundation.facade.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/configuration/BawApiClientResponseHandler.java:[12,74] error: cannot find symbol
+[ERROR]   symbol: class ApiResponse
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/configuration/BawApiClientResponseHandler.java:[15,31] error: cannot find symbol
+[ERROR]   symbol:   class ApiResponse
+[ERROR]   location: class BawApiClientResponseHandler
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/bean/TradetxnInfoDataBean.java:[5,30] error: package com.scsb.ncbs.core.bean does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/listener/bean/TradetxnInfoDataBean.java:[21,42] error: cannot find symbol
+[ERROR]   symbol: class BaseBean
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/CurrencyCodeEnum.java:[3,31] error: package com.scsb.ncbs.core.enums does not exist
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/utils/enums/CurrencyCodeEnum.java:[13,40] error: cannot find symbol
+[ERROR]   symbol: class CommonEnum
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/common/mapper/SwiftMqLogMapper.java:[14,72] error: cannot find symbol
+[ERROR]   symbol: class EnumMappingConfig
+[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/sgw/sgw-service/src/main/java/com/scsb/ncbs/sgw/service/bedt/common/mapper/SwiftMqLogMapper.java:[15,7] error: No implementation was created for SwiftMqLogMapper due to having a problem in the erroneous element null. Hint: this often means that some other annotation processor was supposed to process the erroneous element. You can also enable MapStruct verbose mode by setting -Amapstruct.verbose=true as a compilation argument.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <goals> -rf :sgw-service
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Publish to Nexus)
+Stage "Publish to Nexus" skipped due to earlier failure(s)
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+Finished: FAILURE
 
-                echo "正在搜尋並上傳 ${project} 模組的產出物..."
+stage('Build APP Code') {
 
-                // 使用 find 尋找該專案目錄下所有 target 裡的 jar/war
-                // 排除掉不必要的 sources 或 javadoc
-                def files = sh(
-                    script: "find ./${project} -name 'target' -type d -exec find {} -maxdepth 1 -type f \\( -name '*.jar' -o -name '*.war' \\) ! -name '*-sources.jar' ! -name '*-javadoc.jar' \\; ",
-                    returnStdout: true
-                ).trim().split('\n')
-
-                for (filePath in files) {
-                    if (!filePath) continue
-                    
-                    def fileName = filePath.split('/').last()
-                    // 從檔名推斷 artifactId (例如 cbr-app-0.0.1.jar -> artifactId 就是 cbr-app)
-                    // 或者你也可以統一用 ${project}
-                    def artifactId = fileName.replaceAll("-${env.TAG}.*", "")
-                    def ext = fileName.endsWith('.war') ? 'war' : 'jar'
-
+             steps {
+                 script {
+                    // 在 Parent 執行一次編譯 (包含所有依賴模組)
                     sh """
-                        mvn deploy:deploy-file -DgroupId=mid.ai \
-                            -DartifactId=${artifactId} \
-                            -Dversion=${env.TAG} \
-                            -Dpackaging=${ext} \
-                            -Dfile=${filePath} \
-                            -Durl=${NEXUS_URL}/repository/${targetRepo}/ \
-                            -DrepositoryId=serverid \
-                            -DgeneratePom=true \
-                            -Dmaven.wagon.http.ssl.insecure=true
+                        mvn -B -U clean verify \
+                        -Dnexus-url=${NEXUS_URL} \
+                        -Dmaven.test.skip=true \
+                        -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \
+                        -Dmaven.wagon.http.ssl.insecure=true \
+                        -DreleaseTag=${env.TAG} \
+                        -DreleaseNotes=${env.NOTES}
                     """
-                }
-            }
-        }
-    }
-}
+                 }
+             }
+         }
