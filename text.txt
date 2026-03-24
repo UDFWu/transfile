@@ -1,132 +1,40 @@
-
-
-         stage('Build APP Code') {
-             when {
-                 expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
-             }
-
-             steps {
-                 script {
-                     for (project in deployProjects) {
-                         echo "Building ${project}-${env.TYPE} code"
-
-                         def projectVersion = sh(
-                                 script: "mvn -q -DforceStdout help:evaluate -Dexpression=project.version -pl :${project}",
-                                 returnStdout: true
-                         ).trim()
-                         projectVersions[project] = projectVersion
-
-                         sh """
-                             mvn -B -q -U clean verify \\
-                             -pl :${project} \\
-                             -am -Dnexus-url=${NEXUS_URL} \\
-                             -Dmaven.test.skip=true \\
-                             -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \\
-                             -Dmaven.wagon.http.ssl.insecure=true \\
-                             -DreleaseTag=${env.TAG} \\
-                             -DreleaseNotes=${env.NOTES}
-                         """
-                     }
-                     echo "${projectVersions}"
-                 }
-             }
-         }
-
-        stage('Publish to Nexus') {
-            steps {
-                script {
-                    for (project in deployProjects) {
-                        def v = projectVersions[project] 
-                        sh """
-
-                            mvn deploy:deploy-file "-DgroupId=mid.ai" \
-                                "-DartifactId=${project}" \
-                                "-Dversion=${v}" \
-                                "-Dpackaging=jar" \
-                                "-Dfile=./${project}/target/${project}-${env.TYPE}-${v}.jar" \
-                                "-Durl=${NEXUS_URL}/repository/maven-snapshots/" \
-                                "-Dmaven.wagon.http.ssl.insecure=true" \
-                                "-Dmaven.wagon.http.ssl.allowall=true" \
-                                "-DrepositoryId=serverid" \
-                                "-DgeneratePom=true"
-                        """
-                    }
-                }
-            }
-        }
-
-stage('Build All Modules') {
-    when {
-        expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
-    }
+stage('Publish All Artifacts to Nexus') {
     steps {
         script {
-            // 1. 準備模組清單，例如 :cbr-app,:cmn-app...
-            // 這裡假設 deployProjects 存放的是專案前綴（如 cbr, cmn）
-            def projectList = deployProjects.collect { ":${it}-${env.TYPE}" }.join(',')
-            
-            echo "正在 Parent 層級批次編譯模組: ${projectList}"
-
-            // 2. 在 Parent 執行一次編譯 (包含所有依賴模組)
-            sh """
-                mvn -B -U clean verify \
-                -pl ${projectList} \
-                -am \
-                -Dnexus-url=${NEXUS_URL} \
-                -Dmaven.test.skip=true \
-                -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \
-                -Dmaven.wagon.http.ssl.insecure=true \
-                -DreleaseTag=${env.TAG} \
-                -DreleaseNotes=${env.NOTES}
-            """
-
-            // 3. 收集各模組版本號（供後續上傳使用）
+            // 遍歷所有專案目錄
             for (project in deployProjects) {
-                def fullProjectName = "${project}-${env.TYPE}"
-                def v = sh(
-                    script: "mvn -q -DforceStdout help:evaluate -Dexpression=project.version -pl :${fullProjectName}",
-                    returnStdout: true
-                ).trim()
-                projectVersions[project] = v
-            }
-        }
-    }
-}
+                // 自動判定倉庫
+                // 註：這裡假設所有模組版本一致，若不一致，可改用 mvn help:evaluate 抓取
+                def targetRepo = env.TAG.contains("SNAPSHOT") ? "maven-snapshots" : "maven-releases"
 
-stage('Publish to Nexus') {
-    steps {
-        script {
-            for (project in deployProjects) {
-                def v = projectVersions[project]
-                def fullProjectName = "${project}-${env.TYPE}"
-                def targetRepo = v.contains("SNAPSHOT") ? "maven-snapshots" : "maven-releases"
-                
-                // 4. 自動尋找 target 底下的 jar 或 war 檔
-                // 我們搜尋該模組目錄下的 target 夾，排除掉 -sources.jar 或 -javadoc.jar
-                def filesToDeploy = sh(
-                    script: "find ./${project}/${fullProjectName}/target -maxdepth 1 -type f \\( -name '*.jar' -o -name '*.war' \\) ! -name '*-sources.jar' ! -name '*-javadoc.jar'",
+                echo "正在搜尋並上傳 ${project} 模組的產出物..."
+
+                // 使用 find 尋找該專案目錄下所有 target 裡的 jar/war
+                // 排除掉不必要的 sources 或 javadoc
+                def files = sh(
+                    script: "find ./${project} -name 'target' -type d -exec find {} -maxdepth 1 -type f \\( -name '*.jar' -o -name '*.war' \\) ! -name '*-sources.jar' ! -name '*-javadoc.jar' \\; ",
                     returnStdout: true
                 ).trim().split('\n')
 
-                for (filePath in filesToDeploy) {
-                    if (filePath == "") continue
+                for (filePath in files) {
+                    if (!filePath) continue
                     
                     def fileName = filePath.split('/').last()
-                    def extension = fileName.endsWith('.war') ? 'war' : 'jar'
-                    
-                    echo "正在上傳檔案: ${fileName} 至 ${targetRepo}"
+                    // 從檔名推斷 artifactId (例如 cbr-app-0.0.1.jar -> artifactId 就是 cbr-app)
+                    // 或者你也可以統一用 ${project}
+                    def artifactId = fileName.replaceAll("-${env.TAG}.*", "")
+                    def ext = fileName.endsWith('.war') ? 'war' : 'jar'
 
                     sh """
                         mvn deploy:deploy-file -DgroupId=mid.ai \
-                            -DartifactId=${fullProjectName} \
-                            -Dversion=${v} \
-                            -Dpackaging=${extension} \
+                            -DartifactId=${artifactId} \
+                            -Dversion=${env.TAG} \
+                            -Dpackaging=${ext} \
                             -Dfile=${filePath} \
                             -Durl=${NEXUS_URL}/repository/${targetRepo}/ \
                             -DrepositoryId=serverid \
                             -DgeneratePom=true \
-                            -Dmaven.wagon.http.ssl.insecure=true \
-                            -Dmaven.wagon.http.ssl.allowall=true
+                            -Dmaven.wagon.http.ssl.insecure=true
                     """
                 }
             }
