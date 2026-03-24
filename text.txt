@@ -1,83 +1,119 @@
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] ncbs-mid-parent 0.0.1-SNAPSHOT ..................... FAILURE [  5.604 s]
-[INFO] cbr ................................................ SKIPPED
-[INFO] cbr-service ........................................ SKIPPED
-[INFO] cbr-app ............................................ SKIPPED
-[INFO] cbr-bat ............................................ SKIPPED
-[INFO] dep ................................................ SKIPPED
-[INFO] dep-service ........................................ SKIPPED
-[INFO] dep-app ............................................ SKIPPED
-[INFO] dep-rpt ............................................ SKIPPED
-[INFO] gla ................................................ SKIPPED
-[INFO] gla-api ............................................ SKIPPED
-[INFO] dep-bat ............................................ SKIPPED
-[INFO] xau ................................................ SKIPPED
-[INFO] xau-service ........................................ SKIPPED
-[INFO] xau-app ............................................ SKIPPED
-[INFO] xau-bat ............................................ SKIPPED
-[INFO] xau-rpt ............................................ SKIPPED
-[INFO] len ................................................ SKIPPED
-[INFO] len-service ........................................ SKIPPED
-[INFO] len-rpt ............................................ SKIPPED
-[INFO] len-bat ............................................ SKIPPED
-[INFO] len-app ............................................ SKIPPED
-[INFO] rem ................................................ SKIPPED
-[INFO] rem-service ........................................ SKIPPED
-[INFO] rem-app ............................................ SKIPPED
-[INFO] rem-bat ............................................ SKIPPED
-[INFO] cmn ................................................ SKIPPED
-[INFO] cmn-service ........................................ SKIPPED
-[INFO] cmn-app ............................................ SKIPPED
-[INFO] cmn-bat ............................................ SKIPPED
-[INFO] remm ............................................... SKIPPED
-[INFO] remm-service ....................................... SKIPPED
-[INFO] remm-app ........................................... SKIPPED
-[INFO] remb ............................................... SKIPPED
-[INFO] remb-service ....................................... SKIPPED
-[INFO] remb-app ........................................... SKIPPED
-[INFO] rems ............................................... SKIPPED
-[INFO] rems-service ....................................... SKIPPED
-[INFO] rems-app ........................................... SKIPPED
-[INFO] gla-service ........................................ SKIPPED
-[INFO] gla-app ............................................ SKIPPED
-[INFO] gla-bat ............................................ SKIPPED
-[INFO] gla-rpt ............................................ SKIPPED
-[INFO] try ................................................ SKIPPED
-[INFO] try-service ........................................ SKIPPED
-[INFO] try-app ............................................ SKIPPED
-[INFO] try-bat ............................................ SKIPPED
-[INFO] mds ................................................ SKIPPED
-[INFO] mds-service ........................................ SKIPPED
-[INFO] mds-app ............................................ SKIPPED
-[INFO] sgw ................................................ SKIPPED
-[INFO] sgw-service ........................................ SKIPPED
-[INFO] sgw-app 0.0.1-SNAPSHOT ............................. SKIPPED
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD FAILURE
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 7.098 s
-[INFO] Finished at: 2026-03-24T13:44:53+08:00
-[INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy-file (default-cli) on project ncbs-mid-parent: Failed to deploy artifacts: Could not transfer artifact mid.ai:cbr-app:jar:0.0.1-20260324.054448-1 from/to serverid (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/): Failed to transfer file: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-releases/mid/ai/cbr-app/0.0.1-SNAPSHOT/cbr-app-0.0.1-20260324.054448-1.jar. Return code is: 400, ReasonPhrase: Repository version policy: RELEASE does not allow version: 0.0.1-20260324.054448-1. -> [Help 1]
-[ERROR] 
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR] 
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 1
-Finished: FAILURE
+def deployProjects = []
+def projectVersions = [:] // 在腳本作用域中宣告變數
+
+pipeline {
+    agent any
+
+    tools {
+        oc 'OpenShift CLI'
+    }
+
+    environment {
+        APP_GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git'
+        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
+        PROFILE = 'sit'
+    }
+
+    stages {
+        stage('Get Selection') {
+            steps {
+                script {
+                    if (!params.DEPLOY_PROJECTS ||params.DEPLOY_PROJECTS.trim().isEmpty()) {
+                        error "請至少選擇一個專案部屬"
+                    }
+
+                    // 將收到的參數設置爲環境變數
+                    deployProjects = params.DEPLOY_PROJECTS.split(',') // 將結果存入全局變數
+                    
+                    
+                    env.TAG = params.TAG
+                    env.TYPE = params.TYPE
+
+                    //檢查訊息
+                    echo "Deploy Projects: ${deployProjects}"
+                    echo "TYPE: ${env.TYPE}"
+                    echo "TAG: ${env.TAG}"
+                }
+            }
+        }
+
+        stage('Clone App Repository') {
+            when {
+                expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+            }
+
+            steps {
+                script {
+                    sh "rm -rf ./*"
+                }
+                checkout scmGit(
+                        //branches: [[name: "refs/tags/${env.TAG}"]],
+                        branches: [[name: "*/sit"]],
+                        browser: github("${APP_GIT_REPO_URL}"),
+                        extensions: [],
+                        userRemoteConfigs: [[credentialsId: 'gitlab-user', url: "${APP_GIT_REPO_URL}"]]
+                )
+            }
+        }
+
+         stage('Build APP Code') {
+             when {
+                 expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+             }
+
+             steps {
+                 script {
+                     for (project in deployProjects) {
+                         echo "Building ${project}-${env.TYPE} code"
+
+                         def projectVersion = sh(
+                                 script: "mvn -q -DforceStdout help:evaluate -Dexpression=project.version -pl :${project}",
+                                 returnStdout: true
+                         ).trim()
+                         projectVersions[project] = projectVersion
+
+                         sh """
+                             mvn -B -q -U clean verify \\
+                             -pl :${project} \\
+                             -am -Dnexus-url=${NEXUS_URL} \\
+                             -Dmaven.test.skip=true \\
+                             -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \\
+                             -Dmaven.wagon.http.ssl.insecure=true \\
+                             -DreleaseTag=${env.TAG} \\
+                             -DreleaseNotes=${env.NOTES}
+                         """
+                     }
+                     echo "${projectVersions}"
+                 }
+             }
+         }
+
+        stage('Publish to Nexus') {
+            steps {
+                script {
+                    for (project in deployProjects) {
+                        def v = projectVersions[project] 
+                        sh """
+
+                            mvn deploy:deploy-file "-DgroupId=mid.ai" \
+                                "-DartifactId=${project}" \
+                                "-Dversion=${v}" \
+                                "-Dpackaging=jar" \
+                                "-Dfile=./${project}/target/${project}-${env.TYPE}-${v}.jar" \
+                                "-Durl=${NEXUS_URL}/repository/maven-snapshots/" \
+                                "-Dmaven.wagon.http.ssl.insecure=true" \
+                                "-Dmaven.wagon.http.ssl.allowall=true" \
+                                "-DrepositoryId=serverid" \
+                                "-DgeneratePom=true"
+                        """
+                    }
+                }
+            }
+        }
+
+
+
+    }
+
+    
+}
