@@ -1,94 +1,6 @@
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy-file (default-cli) on project ncbs-mid-parent: Failed to deploy artifacts: Could not transfer artifact mid.ai:cbr-app-0.0.1-SNAPSHOT.jar:jar:9.0.0 from/to serverid (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-snapshots/): Failed to transfer file: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-snapshots/mid/ai/cbr-app-0.0.1-SNAPSHOT.jar/9.0.0/cbr-app-0.0.1-SNAPSHOT.jar-9.0.0.jar. Return code is: 400, ReasonPhrase: Repository version policy: SNAPSHOT does not allow version: 9.0.0. -> [Help 1]
-[ERROR] 
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR] 
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 1
-Finished: FAILURE
-
-def deployProjects = []
-def projectVersions = [:] // 在腳本作用域中宣告變數
-
-pipeline {
-    agent any
-
-    environment {
-        APP_GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git'
-        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
-        PROFILE = 'sit'
-    }
-
-    stages {
-        stage('Get Selection') {
-            steps {
-                script {
-                    if (!params.DEPLOY_PROJECTS ||params.DEPLOY_PROJECTS.trim().isEmpty()) {
-                        error "請至少選擇一個專案部屬"
-                    }
-
-                    // 將收到的參數設置爲環境變數
-                    deployProjects = params.DEPLOY_PROJECTS.split(',') // 將結果存入全局變數
-                    
-                    
-                    env.TAG = params.TAG
-                    env.NOTES = params.NOTES
-
-                    //檢查訊息
-                    echo "Deploy Projects: ${deployProjects}"
-                    echo "TYPE: ${env.TYPE}"
-                    echo "TAG: ${env.TAG}"
-                    echo "NOTES: ${env.NOTES}"
-                }
-            }
-        }
-
-        stage('Clone App Repository') {
-            steps {
-                script {
-                    sh "rm -rf ./*"
-                }
-                checkout scmGit(
-                        //branches: [[name: "refs/tags/${env.TAG}"]],
-                        branches: [[name: "*/sit"]],
-                        browser: github("${APP_GIT_REPO_URL}"),
-                        extensions: [],
-                        userRemoteConfigs: [[credentialsId: 'gitlab-user', url: "${APP_GIT_REPO_URL}"]]
-                )
-            }
-        }
-
-         stage('Build APP Code') {
-
-             steps {
-                 script {
-                    // 在 Parent 執行一次編譯 (包含所有依賴模組)
-                    sh """
-                        mvn -B -U clean verify \
-                        -pl '!:sgw,!:sgw-service,!:sgw-app' \
-                        -am \
-                        -Dnexus-url=${NEXUS_URL} \
-                        -Dmaven.test.skip=true \
-                        -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \
-                        -Dmaven.wagon.http.ssl.insecure=true \
-                        -DreleaseTag=${env.TAG} \
-                        -DreleaseNotes=${env.NOTES}
-                    """
-                 }
-             }
-         }
-
-        stage('Publish to Nexus') {
+	mid/ai/cbr-app-0.0.1-SNAPSHOT.jar/9.0.0-SNAPSHOT/cbr-app-0.0.1-SNAPSHOT.jar-9.0.0-20260325.034307-1.jar
+	
+	stage('Publish to Nexus') {
             steps {
                 script {
                     for (project in deployProjects) {
@@ -114,7 +26,7 @@ pipeline {
                             sh """
                                 mvn deploy:deploy-file -DgroupId=mid.ai \
                                     -DartifactId=${artifactId} \
-                                    -Dversion=${env.TAG} \
+                                    -Dversion="${env.TAG}-SNAPSHOT" \
                                     -Dpackaging=${ext} \
                                     -Dfile=${filePath} \
                                     -Durl=${NEXUS_URL}/repository/maven-snapshots/ \
@@ -127,10 +39,3 @@ pipeline {
                 }
             }
         }
-
-
-
-    }
-
-    
-}
