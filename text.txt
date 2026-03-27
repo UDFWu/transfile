@@ -115,7 +115,17 @@ pipeline {
 
     
 }
-
+[INFO] try-app ............................................ SUCCESS [ 13.863 s]
+[INFO] try-bat ............................................ FAILURE [  4.031 s]
+[INFO] mds ................................................ SKIPPED
+[INFO] mds-service ........................................ SKIPPED
+[INFO] mds-app 0.0.1-SNAPSHOT ............................. SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 09:25 min
+[INFO] Finished at: 2026-03-27T14:09:28+08:00
+[INFO] ------------------------------------------------------------------------
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:compile (default-compile) on project try-bat: Compilation failure
 [ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/try/try-bat/src/main/java/com/scsb/ncbs/treasury/batch/configuration/TreasurySftpConfiguration.java:[11,96] error: EFT_CONFIG_PREFIX has private access in TreasurySftpConfiguration
 [ERROR] -> [Help 1]
