@@ -14,3 +14,8 @@ https://scsbtw.webex.com/scsbtw/j.php?MTID=m30175ee2e7f3fd7c0a4faadf9e93aeed
 
 登入密碼 (請妥適保管勿外流)
 Pukii#03036306
+
+	mid/ai/cbr-app-0.0.1-SNAPSHOT.jar/9.0.0-SNAPSHOT/cbr-app-0.0.1-SNAPSHOT.jar-9.0.0-20260330.041130-1.jar
+	
+	
+	131231
