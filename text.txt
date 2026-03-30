@@ -1,156 +1,16 @@
-def deployProjects = []
-def projectVersions = [:] // 在腳本作用域中宣告變數
+宗樺好：
+	會議資訊如下，屆時請使用zoomforscsb.conf@gmail.com登入Webex主持會議，密碼後寄，謝謝。
+		Sincerely, 御宸
 
-pipeline {
-    agent any
+===請將以下資訊通知與會人員===
+南區資訊中心四月月會
+由 SCSB conf 主持
 
-    environment {
-        APP_GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git'
-        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
-        PROFILE = 'sit'
-    }
-
-    stages {
-        stage('Get Selection') {
-            steps {
-                script {
-                    if (!params.DEPLOY_PROJECTS ||params.DEPLOY_PROJECTS.trim().isEmpty()) {
-                        error "請至少選擇一個專案部屬"
-                    }
-
-                    // 將收到的參數設置爲環境變數
-                    deployProjects = params.DEPLOY_PROJECTS.split(',') // 將結果存入全局變數
-                    
-                    
-                    env.TAG = params.TAG
-                    env.NOTES = params.NOTES
-
-                    //檢查訊息
-                    echo "Deploy Projects: ${deployProjects}"
-                    echo "TYPE: ${env.TYPE}"
-                    echo "TAG: ${env.TAG}"
-                    echo "NOTES: ${env.NOTES}"
-                }
-            }
-        }
-
-        stage('Clone App Repository') {
-            steps {
-                script {
-                    sh "rm -rf ./*"
-                }
-                checkout scmGit(
-                        //branches: [[name: "refs/tags/${env.TAG}"]],
-                        branches: [[name: "*/sit"]],
-                        browser: github("${APP_GIT_REPO_URL}"),
-                        extensions: [],
-                        userRemoteConfigs: [[credentialsId: 'gitlab-user', url: "${APP_GIT_REPO_URL}"]]
-                )
-            }
-        }
-
-         stage('Build APP Code') {
-
-             steps {
-                 script {
-                    // 在 Parent 執行一次編譯 (包含所有依賴模組)
-                    sh """
-                        mvn -B -U clean verify \
-                        -pl '!:sgw,!:sgw-service,!:sgw-app' \
-                        -am \
-                        -Dnexus-url=${NEXUS_URL} \
-                        -Dmaven.test.skip=true \
-                        -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \
-                        -Dmaven.wagon.http.ssl.insecure=true \
-                        -DreleaseTag=${env.TAG} \
-                        -DreleaseNotes=${env.NOTES}
-                    """
-                 }
-             }
-         }
-
-        stage('Publish to Nexus') {
-            steps {
-                script {
-                    for (project in deployProjects) {
-                        def v = projectVersions[project]
-                        //def fullProjectName = "${project}-${env.TYPE}"
-                        
-                        // 使用 find 尋找該專案目錄下所有 target 裡的 jar/war
-                        // 排除掉不必要的 sources 或 javadoc
-                        def files = sh(
-                            script: "find ./${project} -name 'target' -type d -exec find {} -maxdepth 1 -type f \\( -name '*.jar' -o -name '*.war' \\) ! -name '*-sources.jar' ! -name '*-javadoc.jar' \\; ",
-                            returnStdout: true
-                        ).trim().split('\n')
-        
-                        for (filePath in files) {
-                            if (!filePath) continue
-                            
-                            def fileName = filePath.split('/').last()
-                            // 從檔名推斷 artifactId (例如 cbr-app-0.0.1.jar -> artifactId 就是 cbr-app)
-                            
-                            def artifactId = fileName.replaceAll("-${env.TAG}.*", "")
-                            def ext = fileName.endsWith('.war') ? 'war' : 'jar'
-        
-                            sh """
-                                mvn deploy:deploy-file -DgroupId=mid.ai \
-                                    -DartifactId=${artifactId} \
-                                    -Dversion="${env.TAG}-SNAPSHOT" \
-                                    -Dpackaging=${ext} \
-                                    -Dfile=${filePath} \
-                                    -Durl=${NEXUS_URL}/repository/maven-snapshots/ \
-                                    -DrepositoryId=serverid \
-                                    -DgeneratePom=true \
-                                    -Dmaven.wagon.http.ssl.insecure=true
-                            """
-                        }
-                    }
-                }
-            }
-        }
+https://scsbtw.webex.com/scsbtw/j.php?MTID=m30175ee2e7f3fd7c0a4faadf9e93aeed
+2026年4月1日星期三 上午 09:00 | 1 小時 | （UTC+08:00）台北
+會議號： 2516 795 3389
+密碼： jP,m9737
 
 
-
-    }
-
-    
-}
-[INFO] try-app ............................................ SUCCESS [ 13.863 s]
-[INFO] try-bat ............................................ FAILURE [  4.031 s]
-[INFO] mds ................................................ SKIPPED
-[INFO] mds-service ........................................ SKIPPED
-[INFO] mds-app 0.0.1-SNAPSHOT ............................. SKIPPED
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD FAILURE
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 09:25 min
-[INFO] Finished at: 2026-03-27T14:09:28+08:00
-[INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:compile (default-compile) on project try-bat: Compilation failure
-[ERROR] /datam/jenkins/workspace/Pipeline_Sample/mid-ai-b/try/try-bat/src/main/java/com/scsb/ncbs/treasury/batch/configuration/TreasurySftpConfiguration.java:[11,96] error: EFT_CONFIG_PREFIX has private access in TreasurySftpConfiguration
-[ERROR] -> [Help 1]
-[ERROR] 
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR] 
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
-[ERROR] 
-[ERROR] After correcting the problems, you can resume the build with the command
-[ERROR]   mvn <goals> -rf :try-bat
-[Pipeline] }
-[Pipeline] // script
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Publish to Nexus)
-Stage "Publish to Nexus" skipped due to earlier failure(s)
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 1
-Finished: FAILURE
+登入密碼 (請妥適保管勿外流)
+Pukii#03036306
