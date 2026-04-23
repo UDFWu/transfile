@@ -1,32 +1,45 @@
-+ mvn -q -DforceStdout help:evaluate -Dexpression=project.version -pl :cbr-app
-[ERROR] [ERROR] Some problems were encountered while processing the POMs:
-[ERROR] Non-resolvable import POM: Could not transfer artifact com.ibm.ncbs:mid-boot-dependencies:pom:1.0.0-P2-20250226 from/to nexus (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/): Failed to transfer file: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/com/ibm/ncbs/mid-boot-dependencies/1.0.0-P2-20250226/mid-boot-dependencies-1.0.0-P2-20250226.pom. Return code is: 402 , ReasonPhrase:Invalid license. @ line 67, column 25
-[ERROR] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is missing. @ line 78, column 21
-[ERROR] 'dependencies.dependency.version' for com.ibm.cbmp:cbmp-fabric-foundation:jar is missing. @ line 83, column 21
-[ERROR] 'dependencies.dependency.version' for com.ibm.ncbs:mid-foundation-core:jar is missing. @ line 87, column 21
-[ERROR] 'dependencies.dependency.version' for org.springdoc:springdoc-openapi-ui:jar is missing. @ line 91, column 21
-[ERROR] 'dependencies.dependency.version' for org.junit.jupiter:junit-jupiter-api:jar is missing. @ line 97, column 21
-[ERROR] 'dependencies.dependency.version' for org.mockito:mockito-core:jar is missing. @ line 102, column 21
-[ERROR] 'dependencies.dependency.version' for org.mockito:mockito-junit-jupiter:jar is missing. @ line 107, column 21
-[ERROR] 'dependencies.dependency.version' for org.mockito:mockito-inline:jar is missing. @ line 112, column 21
- @ 
-[ERROR] The build could not read 1 project -> [Help 1]
-[ERROR]   
-[ERROR]   The project com.ibm.ncbs:ncbs-mid-parent:0.0.1-SNAPSHOT (/datam/jenkins/workspace/Pipeline_Sample/Sample-ncbs-mid-repo-p2-B1/pom.xml) has 9 errors
-[ERROR]     Non-resolvable import POM: Could not transfer artifact com.ibm.ncbs:mid-boot-dependencies:pom:1.0.0-P2-20250226 from/to nexus (https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/): Failed to transfer file: https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public/com/ibm/ncbs/mid-boot-dependencies/1.0.0-P2-20250226/mid-boot-dependencies-1.0.0-P2-20250226.pom. Return code is: 402 , ReasonPhrase:Invalid license. @ line 67, column 25 -> [Help 2]
-[ERROR]     'dependencies.dependency.version' for org.projectlombok:lombok:jar is missing. @ line 78, column 21
-[ERROR]     'dependencies.dependency.version' for com.ibm.cbmp:cbmp-fabric-foundation:jar is missing. @ line 83, column 21
-[ERROR]     'dependencies.dependency.version' for com.ibm.ncbs:mid-foundation-core:jar is missing. @ line 87, column 21
-[ERROR]     'dependencies.dependency.version' for org.springdoc:springdoc-openapi-ui:jar is missing. @ line 91, column 21
-[ERROR]     'dependencies.dependency.version' for org.junit.jupiter:junit-jupiter-api:jar is missing. @ line 97, column 21
-[ERROR]     'dependencies.dependency.version' for org.mockito:mockito-core:jar is missing. @ line 102, column 21
-[ERROR]     'dependencies.dependency.version' for org.mockito:mockito-junit-jupiter:jar is missing. @ line 107, column 21
-[ERROR]     'dependencies.dependency.version' for org.mockito:mockito-inline:jar is missing. @ line 112, column 21
+stage('git clone'){
+		    steps{
+				echo 'git clone'
+				echo '------------------------------'
+				withCredentials([usernamePassword(credentialsId: 'JENKINS_BTSS_DEV_GITLAB_ACC', passwordVariable: 'ACCPASS', usernameVariable: 'ACCUSER')]) {
+					sh '''
+						git config --global http.sslVerify false
+						git config --global https.sslVerify false
+						git clone --branch SIT_PHASE2 https://$ACCUSER:$ACCPASS@ddpsg01.cbsd.scsb.com.tw/ncbs_brh/brh_btss.git SCSBS
+						ls -al 
+						ls -al ./SCSBS
+					'''
+				}
+				withCredentials([usernamePassword(credentialsId: 'JENKINS_BTSS_DEV_GITLAB_ACC2', passwordVariable: 'ACCPASS', usernameVariable: 'ACCUSER')]) {
+					sh '''
+						git config --global http.sslVerify false
+						git config --global https.sslVerify false
+						git clone --branch SIT_PHASE2 https://$ACCUSER:$ACCPASS@ddpsg01.cbsd.scsb.com.tw/ncbs_brh/brh_btsv.git SCSBV
+				 		ls -al 
+				 		ls -al ./SCSBV
+				 	'''
+				}
+				echo '------------------------------'
+		    }
+		    post{
+				failure {
+					echo 'git clone 失敗'
+				}
+				success {
+					echo 'git clone 成功'            	
+				} 
+		    }
+		}
+		
+		[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 0.049 s
+[INFO] Finished at: 2026-04-23T17:10:38+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] The goal you specified requires a project to execute but there is no POM in this directory (/datam/jenkins/workspace/ncbs_brh/Vulnerability_Scan_SCSB_S2_Latest-btsv/SCSBS). Please verify you invoked Maven from the correct directory. -> [Help 1]
 [ERROR] 
 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
 [ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR] 
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/ProjectBuildingException
-[ERROR] [Help 2] http://cwiki.apache.org/confluence/display/MAVEN/UnresolvableModelException
-[Pipeline] }
