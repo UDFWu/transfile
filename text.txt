@@ -158,7 +158,8 @@ pipeline {
     }
     
 }
-
++ cd VA_ebank-backend/ebank-backend/project/scsb.ebank.front
+/datam/jenkins/workspace/open_ebank/VA_ebank-backend@tmp/durable-0b6e90fe/script.sh: line 2: cd: VA_ebank-backend/ebank-backend/project/scsb.ebank.front: No such file or directory
 /ebank-backend/project/scsb.ebank.front 底下有這些模組
 
 scsb.ebank.front.aply
