@@ -1,45 +1,160 @@
-stage('git clone'){
-		    steps{
-				echo 'git clone'
+pipeline {
+    agent any
+    
+    tools{
+        jdk 'Java 17'
+        gradle 'gradle-7.6.1'
+    }
+    
+    environment {
+        GIT_REPO_FRONTEND_URL = "git@ddpsg01.cbsd.scsb.com.tw:open_ebank/ebank-frontend.git"
+        GIT_REPO_BACKEND_URL = "git@ddpsg01.cbsd.scsb.com.tw:open_ebank/ebank-backend.git"
+        NEXUS_URL = "https://ddpsn01.cbsd.scsb.com.tw"
+        RESOURCE_PATH="${WORKSPACE}/${JOB_BASE_NAME}/project/scsb.ebank.front/scsb.ebank.front.${TxnID}/src/main/resources"
+        TOMCAT_PATH = '/ap/temp/war'
+    }
+    stages {
+        stage('Check Jenkins Enviroment Variables') {
+			steps {
+				echo 'Check Jenkins Enviroment Variables'
 				echo '------------------------------'
-				withCredentials([usernamePassword(credentialsId: 'JENKINS_BTSS_DEV_GITLAB_ACC', passwordVariable: 'ACCPASS', usernameVariable: 'ACCUSER')]) {
+				sh 'pwd'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+				echo sh(script: 'env|sort', returnStdout: true)
+				echo '------------------------------'
+				sh 'java -version'
+				echo '------------------------------'
+				sh 'git --version'
+				echo '------------------------------'
+				sh 'df -h' //Show Disk space
+				echo '------------------------------'
+				sh 'node -v' 
+				echo '------------------------------'
+				sh 'npm -v'
+				echo '------------------------------'
+				sh 'gradle -v'
+				echo '------------------------------'
+			    
+			}
+			post {
+				failure {
+					echo 'Check Jenkins Enviroment Variables 失敗'
+				}
+				success {
+					echo 'Check Jenkins Enviroment Variables 成功'            	
+				}
+			}
+		}
+        stage('WORKSPACE Init') {
+			steps {
+				echo 'WORKSPACE Init'
+				echo '------------------------------'
+				sh 'rm -rf *'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'WORKSPACE Init 失敗'
+				}
+				success {
+					echo 'WORKSPACE Init 成功'            	
+				}
+			}
+		}
+		stage('Git Clone From Gitlab Repository') {
+		    steps{
+				echo 'Git Clone From Gitlab Repository'
+				echo '------------------------------'
+				withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
 					sh '''
-						git config --global http.sslVerify false
-						git config --global https.sslVerify false
-						git clone --branch SIT_PHASE2 https://$ACCUSER:$ACCPASS@ddpsg01.cbsd.scsb.com.tw/ncbs_brh/brh_btss.git SCSBS
-						ls -al 
-						ls -al ./SCSBS
+					    git clone --branch ${GIT_FRONT_TAGS} ${GIT_REPO_FRONTEND_URL}
+					    git clone --branch ${GIT_BACK_TAGS} ${GIT_REPO_BACKEND_URL}
+						ls -al
+						pwd
 					'''
 				}
-				withCredentials([usernamePassword(credentialsId: 'JENKINS_BTSS_DEV_GITLAB_ACC2', passwordVariable: 'ACCPASS', usernameVariable: 'ACCUSER')]) {
-					sh '''
-						git config --global http.sslVerify false
-						git config --global https.sslVerify false
-						git clone --branch SIT_PHASE2 https://$ACCUSER:$ACCPASS@ddpsg01.cbsd.scsb.com.tw/ncbs_brh/brh_btsv.git SCSBV
-				 		ls -al 
-				 		ls -al ./SCSBV
-				 	'''
-				}
-				echo '------------------------------'
 		    }
 		    post{
 				failure {
-					echo 'git clone 失敗'
+					echo 'Git Clone From Gitlab Repository 失敗'
 				}
 				success {
-					echo 'git clone 成功'            	
+					echo 'Git Clone From Gitlab Repository 成功'            	
 				} 
 		    }
 		}
-		
-		[INFO] Scanning for projects...
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD FAILURE
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 0.049 s
-[INFO] Finished at: 2026-04-23T17:10:38+08:00
-[INFO] ------------------------------------------------------------------------
-[ERROR] The goal you specified requires a project to execute but there is no POM in this directory (/datam/jenkins/workspace/ncbs_brh/Vulnerability_Scan_SCSB_S2_Latest-btsv/SCSBS). Please verify you invoked Maven from the correct directory. -> [Help 1]
-[ERROR] 
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+		stage('NPM Install Modules & Webpack'){
+		    steps{
+		        echo 'NPM Install Modules & Webpack'
+		        echo '------------------------------'
+		        sh '''
+		            npm config set registry https://ddpsn01.cbsd.scsb.com.tw/repository/npm-group/
+		            cd ebank-frontend/project/
+		            npm install
+		            npm run bundle-prod-${TxnID}
+		        '''
+		    }
+		    post{
+				failure {
+					echo 'NPM Install Modules & Webpack 失敗'
+				}
+				success {
+					echo 'NPM Install Modules & Webpack 成功'            	
+				} 
+		    }
+		}
+		stage('Copy HTML To Backend Project'){
+		    steps{
+		        echo 'Copy HTML To Backend Project'
+		        echo '------------------------------'
+		        sh '''
+		            cd ebank-frontend/project/dist/prod
+		            mv static ${RESOURCE_PATH}
+		            mv templates ${RESOURCE_PATH}
+				'''
+				echo '------------------------------'
+		    }
+		    post{
+		       failure {
+					echo 'Copy HTML To Backend Project 失敗'
+				}
+				success {
+					echo 'Copy HTML To Backend Project 成功'
+				} 
+		    }
+		}
+		stage('Gradle Build Backend Packing'){
+		    steps{
+		        echo 'Gradle Build Backend Packing'
+		        echo '------------------------------'
+		        
+		        sh '''
+		            cd ${JOB_BASE_NAME}/project/scsb.ebank.front
+    				gradle scsb.ebank.front.${TxnID}:build_${Mode} -Pcicd=true
+    				
+    				mv ./scsb.ebank.front.${TxnID}/build/publications/mavenPomOnly/pom-default.xml ./scsb.ebank.front.${TxnID}/build/libs/
+    				mv ./scsb.ebank.front.${TxnID}/build/libs/scsb.ebank.front.${TxnID}-0.1.0.war ./scsb.ebank.front.${TxnID}/build/libs/scsb.ebank.front.${TxnID}-${GIT_BACK_TAGS}.war
+    				ls -l scsb.ebank.front.${TxnID}/build/libs/
+    				
+    				sed -i "s/warver/${GIT_BACK_TAGS}/g" ./scsb.ebank.front.${TxnID}/build/libs/pom-default.xml
+    				cat ./scsb.ebank.front.${TxnID}/build/libs/pom-default.xml
+				'''
+				
+				echo '------------------------------'				
+		    }
+		    post{
+		       failure {
+					echo 'Gradle Build Backend Packing 失敗'
+				}
+				success {
+					echo 'Gradle Build Backend Packing 成功'
+				} 
+		    }
+		}
+    }
+    
+}
