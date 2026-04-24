@@ -158,3 +158,20 @@ pipeline {
     }
     
 }
+
+/ebank-backend/project/scsb.ebank.front 底下有這些模組
+
+scsb.ebank.front.aply
+scsb.ebank.front.card
+scsb.ebank.front.crft
+scsb.ebank.front.fode
+scsb.ebank.front.fun
+scsb.ebank.front.ibap
+scsb.ebank.front.ibhm
+scsb.ebank.front.info
+scsb.ebank.front.loan
+scsb.ebank.front.main
+scsb.ebank.front.ofwb
+scsb.ebank.front.oter
+scsb.ebank.front.pafe
+scsb.ebank.front.twde
