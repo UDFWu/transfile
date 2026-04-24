@@ -1,0 +1,238 @@
+plugins {
+  id 'java'
+  id 'java-library'
+}
+
+// 複製所有共用得設定檔
+task exportCommonConfig(type: Copy){
+
+  delete "$buildDir/libs"
+
+  duplicatesStrategy 'INCLUDE'
+
+  // 專案列表
+  def projectList = ['scsb.ebank.database', 'scsb.ebank.eai', 'scsb.ebank.common', 'scsb.ebank.front.main']
+  projectList.each {
+    projectName -> {
+      from(project(":${projectName}").file('src/main/resources')){
+        include ("**/*")
+      }
+      into "$buildDir/libs/config"
+    }
+  }
+}
+ 
+jar{
+  enabled = false
+}
+
+allprojects {
+
+  	apply plugin: 'java'
+  	apply plugin: 'java-library'
+  	apply plugin: 'war'
+  	apply plugin: 'maven-publish'
+
+	group = 'scsb.ebank.front'
+	version = '1.0.0'
+	sourceCompatibility = '17'
+	targetCompatibility = '17'
+	ext['spring-security.version']='5.8.11'
+	compileJava.options.encoding = 'UTF-8'
+	compileTestJava.options.encoding = 'UTF-8'
+	
+    repositories {
+    	mavenLocal()
+    	if (project.hasProperty("cicd") && project.cicd == "dev") {
+	        maven {
+				name = "nexus"
+				url = uri("https://ddpsn01.cbsd.scsb.com.tw/repository/maven-public")
+			}
+    	} else if (project.hasProperty("cicd") && project.cicd == "pro") {
+	        maven {
+				name = "nexus"
+				url = uri("https://sdpsn01.cbss.scsb.com.tw/repository/maven-public")
+			}
+    	} else {
+	        mavenCentral()
+    	}    	
+    }
+
+    dependencies {
+    	
+        // librarys
+        implementation fileTree(dir: '../../libs', include: ['*.jar'])
+        
+        implementation platform('scsb.ebank:ebank-ap-bom:1.0')
+    	
+        // spring boot web base
+        implementation 'org.springframework.boot:spring-boot-starter'
+        implementation ('org.springframework.boot:spring-boot-starter-web'){
+          exclude group: 'org.springframework', module: 'spring-web'
+        }
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation ('org.springframework.boot:spring-boot-starter-security'){
+          exclude group: 'org.springframework', module: 'spring-web'
+        }
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-mustache'
+        implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+        // apache poi tool (Excel)
+        implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'
+        implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+        implementation group: 'org.apache.poi', name: 'poi-ooxml-schemas', version: '4.1.2'
+        implementation group: 'org.apache.poi', name: 'poi-scratchpad', version: '4.1.2'
+        
+        // spring boot cache module + ehcache (JSR107)
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
+        implementation group: 'org.ehcache', name: 'ehcache', version: '3.10.0'
+        implementation group: 'javax.cache', name: 'cache-api', version: '1.1.1'
+        
+        // development tool (apache, jwt, cache, lombok...etc)
+        implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+        implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
+        implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+        implementation group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.6.5'
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+        implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
+        
+        // spring boot testing modules using junit5, AssertJ, Hamcrest,
+        // and a number of other useful libraries, exclude JUnit 4
+        testImplementation('org.springframework.boot:spring-boot-starter-test') {
+          exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+        }
+        
+        implementation 'commons-net:commons-net:3.9.0'
+        
+        // open api code dependencies 
+        implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+        implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
+        implementation 'com.google.code.gson:gson:2.9.1'
+        implementation 'io.gsonfire:gson-fire:1.8.5'
+        implementation 'javax.ws.rs:jsr311-api:1.1.1'
+        implementation 'javax.ws.rs:javax.ws.rs-api:2.1.1'
+        implementation 'org.openapitools:jackson-databind-nullable:0.2.4'
+    	
+        compileOnly 'org.projectlombok:lombok:1.18.24'
+        annotationProcessor 'org.projectlombok:lombok:1.18.24'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+        testImplementation('org.springframework.boot:spring-boot-starter-test') {
+            exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+        }
+
+        // 這一行通常子專案才會有用，這樣會每個都依賴 main
+        // 可以讓特定子專案自己加這行
+        // implementation project(":scsb.ebank.front.main")
+
+        // WAR 專案排除內嵌 Tomcat（僅適用 war plugin）
+        providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat:2.7.18'
+    }
+    
+  	task clearDist() {
+	  delete "$buildDir/libs"
+	}
+	
+	def envList = []
+	
+	// creating build tasks by runtime environment profiles, e.g. application-dev.yml or application-sit.yml
+	fileTree("src/main/resources") {
+	  include "application-*.yml"
+	}.each {
+	  file ->
+	    def propertyName = file.name
+	  String envName = propertyName.substring(12, propertyName.lastIndexOf(".yml"))
+	  envList.add('-' + envName)
+	  task "build_${envName}"(dependsOn: ['build']) {
+	    group = 'build'
+	    description = "Assembles and tests this project for ${envName}"
+	  }
+	  task "bootRun_${envName}"(dependsOn: ['bootRun']) {
+	    group = 'application'
+	    description = "Runs this project as a Spring Boot application for ${envName}"
+	  }
+	}
+	
+	test {
+	  useJUnitPlatform()
+	}
+	
+	// reslove environment by build task name e.g. dev/test/prod
+	ext.getRuntimeEnvironment = {
+	  ->
+	  try {
+	    def envName = ''
+	    def taskName = getTaskName().split('_')
+	    if (taskName == null ||
+	      (taskName?.length == 1 && taskName?.getAt(0) == 'bootRun') ||
+	      (taskName?.length == 1 && taskName?.getAt(0) == 'build')) {
+	      println '[WARN] Set envName = dev, first task > ' + project.gradle.startParameter.taskNames
+	      envName = 'dev'
+	    } else {
+	      println '>> RuntimeEnv: ' + taskName
+	      println '>> RuntimeEnv.len: ' + taskName?.length
+	      envName = taskName?.last()
+	      println '>> RuntimeEnv.last: ' + envName
+	    }
+	    return envName
+	  } catch (ignored) {
+	    return null;
+	  }
+	}
+	
+	// reslove first execute task name
+	ext.getTaskName = {
+	  ->
+	  return project.gradle.startParameter.taskNames[0] ? project.gradle.startParameter.taskNames[0] : ''
+	}
+	
+	
+	war {
+	  enabled = true
+	  
+	  dependsOn clearDist
+	  
+	  archiveFileName = "${archiveBaseName.get()}-${archiveVersion.get()}.${archiveExtension.get()}"
+	  
+	  // 建立MANIFEST
+	  manifest {
+	    attributes 'Built-By': System.getProperty('user.name'),
+	               'Built-On': new Date()
+	  }
+	
+	  destinationDirectory = file("$buildDir/libs")
+	}
+	
+	jar {
+	  enabled = false
+	}
+	
+	publishing {
+	    publications {	
+	        mavenPomOnly(MavenPublication) {
+	        	groupId = 'com.scsb.ebank.front'
+	            //artifactId = 'ibap'
+	            version = '${version}'
+	            pom.withXml {
+				    def root = asNode()
+				    def packagingNode = root.get('packaging')
+				
+				    if (packagingNode.isEmpty()) {
+				        // 沒有 packaging 就加
+				        root.appendNode('packaging', 'war')
+				    } else {
+				        // 有就修改現有的值
+				        packagingNode[0].value = 'war'
+				    }
+				}
+	        }
+	    }
+	}
+	
+	tasks.named('build') {
+    	dependsOn 'generatePomFileForMavenPomOnlyPublication'	
+	}
+}
