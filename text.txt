@@ -1,50 +1,198 @@
-stage('Build APP Image') {
-             when {
-                 expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
-             }
-
-             steps {
-                 script {
-                     withCredentials([usernamePassword(credentialsId: 'harbor-user', passwordVariable: 'HARBOR_PASSWORD', usernameVariable: 'HARBOR_USER')]) {
-                         // 先登入 Harbor，爲了拉取 base image
-                         sh "podman login ${CONTAINER_REGISTRY} -u '${HARBOR_USER}' -p '${HARBOR_PASSWORD}'"
-                         for (project in deployProjects) {
-                             echo "Building ${project}-${env.TYPE} image"
-
-                             sh """
-                                 podman images | grep ${project}-${env.TYPE} | awk '{print \$3}' | xargs podman rmi --force || true
-                                 cd ${env.WORKSPACE}/${project}/${project}-${env.TYPE}
-                                 podman build --build-arg CONTAINER_REGISTRY=${CONTAINER_REGISTRY} -f ./Dockerfile -t ${CONTAINER_REGISTRY}/${env.HARBOR_PROJECT}/${project}-${env.TYPE}:${env.TAG} .
-                             """
-                         }
-                     }
-                 }
-             }
-         }
-
-         stage('Release APP Image') {
-             when {
-                 expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
-             }
-
-             steps {
-                 script {
-                     // 上傳 image 到 Harbor
-                     for (project in deployProjects) {
-                         echo "Releaseing ${project}-${env.TYPE} image"
-
-                         //取得 RepoDigest
-                         def repoDigest = sh(returnStdout: true, script: "podman inspect -f '{{index .RepoDigests 0}}' ${CONTAINER_REGISTRY}/${env.HARBOR_PROJECT}/${project}-${env.TYPE}:${env.TAG}").trim()
-                         // 上傳 repoDigest 到 Harbor
-                         sh "podman push ${repoDigest}"
-                         // 上傳 image 到 Harbor
-                         sh "podman push ${CONTAINER_REGISTRY}/${env.HARBOR_PROJECT}/${project}-${env.TYPE}:${env.TAG}"
-                         withCredentials([file(credentialsId: 'cosign-private-key', variable: 'COSIGN_PRIVATE_KEY'), string(credentialsId: 'cosign-password', variable: 'COSIGN_PASSWORD')]) {
-                             println(repoDigest)
-                             // 使用 cosign 簽名
-                             sh "cosign sign --key '${COSIGN_PRIVATE_KEY}' --tlog-upload=false --allow-insecure-registry=true ${repoDigest}"
-                         }
-                     }
-                 }
-             }
-         }
+[INFO] Analysis Started
+[INFO] Finished Archive Analyzer (8 seconds)
+[INFO] Finished File Name Analyzer (0 seconds)
+[INFO] Finished Jar Analyzer (2 seconds)
+[ERROR] ----------------------------------------------------
+[ERROR] .NET Assembly Analyzer could not be initialized and at least one 'exe' or 'dll' was scanned. The 'dotnet' executable could not be found on the path; either disable the Assembly Analyzer or add the path to dotnet core in the configuration.
+[ERROR] The dotnet 8.0 core runtime or SDK is required to analyze assemblies
+[ERROR] ----------------------------------------------------
+[INFO] Finished Dependency Merging Analyzer (0 seconds)
+[INFO] Finished Hint Analyzer (0 seconds)
+[INFO] Finished Version Filter Analyzer (0 seconds)
+[INFO] Created CPE Index (2 seconds)
+[INFO] Finished CPE Analyzer (4 seconds)
+[INFO] Finished False Positive Analyzer (0 seconds)
+[INFO] Finished NVD CVE Analyzer (0 seconds)
+[INFO] Finished RetireJS Analyzer (3 seconds)
+[INFO] Finished Vulnerability Suppression Analyzer (0 seconds)
+[INFO] Finished Known Exploited Vulnerability Analyzer (0 seconds)
+[INFO] Finished Dependency Bundling Analyzer (0 seconds)
+[INFO] Finished Unused Suppression Rule Analyzer (0 seconds)
+[INFO] Analysis Complete (19 seconds)
+[INFO] Writing HTML report to: /datam/jenkins/workspace/ncbs_mid/ncbs-mid-repo-p2/ncbs-mid-repo-p2-B1/./dependency-check-report.html
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build APP Image)
+[Pipeline] tool
+[Pipeline] envVarsForTool
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $HARBOR_PASSWORD
+[Pipeline] {
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [HARBOR_PASSWORD]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ podman login docph01.cbsd.scsb.com.tw -u 'robot$jenkins' -p ****
+time="2026-04-27T10:50:03+08:00" level=warning msg="$REGISTRY_AUTH_FILE points to ~/.docker/config.json, but the file format is not fully compatible; use the Docker-compatible file path option instead"
+Login Succeeded!
+[Pipeline] echo
+Building dep-app image
+[Pipeline] sh
++ podman images
++ grep dep-app
++ awk '{print $3}'
++ xargs podman rmi --force
+Untagged: docph01.cbsd.scsb.com.tw/mid/dep-app:9.0.0
+Deleted: 195e1dd65526cc10d059345fd3be185e184e3756264ed6f83d27de8e10ba4de9
+Deleted: 2a91dadfc081db0eb098abe850c3a6626e3fb130f83e094a5c370f5f29fe11d8
++ cd /datam/jenkins/workspace/ncbs_mid/ncbs-mid-repo-p2/ncbs-mid-repo-p2-B1/dep/dep-app
++ podman build --build-arg CONTAINER_REGISTRY=docph01.cbsd.scsb.com.tw -f ./Dockerfile -t docph01.cbsd.scsb.com.tw/mid/dep-app:9.0.0 .
+time="2026-04-27T10:50:05+08:00" level=warning msg="missing \"RELEASE_VERSION\" build argument. Try adding \"--build-arg RELEASE_VERSION=<VALUE>\" to the command line"
+time="2026-04-27T10:50:05+08:00" level=warning msg="missing \"RELEASE_TAG\" build argument. Try adding \"--build-arg RELEASE_TAG=<VALUE>\" to the command line"
+time="2026-04-27T10:50:05+08:00" level=warning msg="missing \"RELEASE_TIMESTAMP\" build argument. Try adding \"--build-arg RELEASE_TIMESTAMP=<VALUE>\" to the command line"
+STEP 1/7: FROM docph01.cbsd.scsb.com.tw/base-image/ubi8-openjdk-11:1.21-1.1733300800
+STEP 2/7: ARG RELEASE_VERSION
+--> Using cache 743e1215d76803c53c32760a84d3f5e9c3d86f3fb9a2f3151bcb9fd8ca72e930
+--> 743e1215d768
+STEP 3/7: ARG RELEASE_TAG
+--> Using cache 52d07586960b239dc5378bc238aeb695374ab0a656adfcb0888a2980faa01883
+--> 52d07586960b
+STEP 4/7: ARG RELEASE_TIMESTAMP
+--> Using cache b1c37d8ea5be301c74779c561418eb26c5496d93f76684c2da9ffc7b6e4e3fcd
+--> b1c37d8ea5be
+STEP 5/7: ENV TZ=Asia/Taipei     RELEASE-VERSION=${RELEASE_VERSION}     RELEASE-TAG=${RELEASE_TAG}     RELEASE-TIMESTAMP=${RELEASE_TIMESTAMP}
+--> Using cache 518464f50e51bab752da65717a2a652a740e4bfae24608cdd9890a0eef842f38
+--> 518464f50e51
+STEP 6/7: COPY target/dep-app-0.0.1-SNAPSHOT.jar /opt/dep-app-0.0.1-SNAPSHOT-DOCKER.jar
+--> 5db36f208ae7
+STEP 7/7: ENTRYPOINT ["java","-jar","/opt/dep-app-0.0.1-SNAPSHOT-DOCKER.jar"]
+COMMIT docph01.cbsd.scsb.com.tw/mid/dep-app:9.0.0
+--> 27d881142785
+Successfully tagged docph01.cbsd.scsb.com.tw/mid/dep-app:9.0.0
+27d88114278546753552727ae33c5c2bb1cefef03f26c0399a0b14abddb5a542
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Release APP Image)
+[Pipeline] tool
+[Pipeline] envVarsForTool
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] echo
+Releaseing dep-app image
+[Pipeline] sh
++ podman inspect -f '{{index .RepoDigests 0}}' docph01.cbsd.scsb.com.tw/mid/dep-app:9.0.0
+[Pipeline] sh
++ podman push docph01.cbsd.scsb.com.tw/mid/dep-app@sha256:2dd1012a87a8350ab616387182084e312644f26127aecd559e45f8a366832789
+Getting image source signatures
+Copying blob sha256:268ce24af5730c153c72f2954ebd34e0af73c5b49d6a3912b4ae16a7fdfa580c
+Copying blob sha256:cb973d48271cfb4bad03e3ef5f9e1513164b6aff04e4180207657d5aa2b3cd6b
+Copying blob sha256:2434836a970e082ff45b3510dc46a714c6e153172c2b84b73b610be781cae6de
+Copying config sha256:27d88114278546753552727ae33c5c2bb1cefef03f26c0399a0b14abddb5a542
+Writing manifest to image destination
+[Pipeline] sh
++ podman push docph01.cbsd.scsb.com.tw/mid/dep-app:9.0.0
+Getting image source signatures
+Copying blob sha256:268ce24af5730c153c72f2954ebd34e0af73c5b49d6a3912b4ae16a7fdfa580c
+Copying blob sha256:cb973d48271cfb4bad03e3ef5f9e1513164b6aff04e4180207657d5aa2b3cd6b
+Copying blob sha256:2434836a970e082ff45b3510dc46a714c6e153172c2b84b73b610be781cae6de
+Copying config sha256:27d88114278546753552727ae33c5c2bb1cefef03f26c0399a0b14abddb5a542
+Writing manifest to image destination
+[Pipeline] withCredentials
+Masking supported pattern matches of $COSIGN_PRIVATE_KEY or $COSIGN_PASSWORD
+[Pipeline] {
+[Pipeline] echo
+docph01.cbsd.scsb.com.tw/mid/dep-app@sha256:2dd1012a87a8350ab616387182084e312644f26127aecd559e45f8a366832789
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [COSIGN_PRIVATE_KEY]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ cosign sign --key **** --tlog-upload=false --allow-insecure-registry=true docph01.cbsd.scsb.com.tw/mid/dep-app@sha256:2dd1012a87a8350ab616387182084e312644f26127aecd559e45f8a366832789
+Pushing signature to: docph01.cbsd.scsb.com.tw/mid/dep-app
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Trivy scan APP image)
+[Pipeline] tool
+[Pipeline] envVarsForTool
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ mkdir -p reports
+[Pipeline] sh
++ trivy image --skip-db-update --skip-java-db-update --offline-scan --skip-check-update --format template --template @/usr/local/share/trivy/templates/html.tpl -o reports/mid-dep-app-report.html docph01.cbsd.scsb.com.tw/mid/dep-app:9.0.0
+2026-04-27T10:50:13+08:00	INFO	[vuln] Vulnerability scanning is enabled
+2026-04-27T10:50:13+08:00	INFO	[secret] Secret scanning is enabled
+2026-04-27T10:50:13+08:00	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2026-04-27T10:50:13+08:00	INFO	[secret] Please see also https://aquasecurity.github.io/trivy/v0.55/docs/scanner/secret#recommendation for faster secret detection
+2026-04-27T10:50:15+08:00	INFO	Detected OS	family="redhat" version="8.10"
+2026-04-27T10:50:15+08:00	INFO	[redhat] Detecting RHEL/CentOS vulnerabilities...	os_version="8" pkg_num=190
+2026-04-27T10:50:15+08:00	INFO	Number of language-specific files	num=1
+2026-04-27T10:50:15+08:00	INFO	[jar] Detecting vulnerabilities...
+2026-04-27T10:50:15+08:00	WARN	Using severities from other vendors for some vulnerabilities. Read https://aquasecurity.github.io/trivy/v0.55/docs/scanner/vulnerability#severity-selection for details.
+[Pipeline] publishHTML
+[htmlpublisher] Archiving HTML reports...
+[htmlpublisher] Archiving at BUILD level /datam/jenkins/workspace/ncbs_mid/ncbs-mid-repo-p2/ncbs-mid-repo-p2-B1/reports to /datam/jenkins/jobs/ncbs_mid/jobs/ncbs-mid-repo-p2/jobs/ncbs-mid-repo-p2-B1/builds/2614/htmlreports/dep-app_20Report
+[htmlpublisher] Copying recursive using current thread
+[Pipeline] sh
++ podman logout docph01.cbsd.scsb.com.tw
+time="2026-04-27T10:50:15+08:00" level=warning msg="$REGISTRY_AUTH_FILE points to ~/.docker/config.json, but the file format is not fully compatible; use the Docker-compatible file path option instead"
+Removed login credentials for docph01.cbsd.scsb.com.tw
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Clone OCP YAML Repository)
+[Pipeline] tool
+[Pipeline] envVarsForTool
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ rm -rf ./batch-scripts ./cbr ./cmn ./dep ./dependency-check-report.html ./gla ./len ./lombok.config ./MAVEN.md ./mds ./mid-batch-scripts ./pom.xml ./README.md ./rem ./remb ./remm ./rems ./reports ./sgw ./try ./xau
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] checkout
+The recommended git tool is: NONE
+using credential gitlab-user
+ > git rev-parse --resolve-git-dir /datam/jenkins/workspace/ncbs_mid/ncbs-mid-repo-p2/ncbs-mid-repo-p2-B1/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-ocp-repo.git # timeout=10
+Fetching upstream changes from https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-ocp-repo.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.43.5'
+using GIT_ASKPASS to set credentials Gitlab user
+ > git fetch --tags --force --progress -- https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-ocp-repo.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/sit^{commit} # timeout=10
+Checking out Revision f595cbd5649954ff798b040413beb1718c4914aa (refs/remotes/origin/sit)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f f595cbd5649954ff798b040413beb1718c4914aa # timeout=10
+Commit message: "Merge pull request #29 from scsb-ncbs-team/feautre_update_yaml"
+ > git rev-list --no-walk f595cbd5649954ff798b040413beb1718c4914aa # timeout=10
