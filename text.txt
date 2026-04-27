@@ -1,183 +1,50 @@
-pipeline {
-    agent any
-    
-    tools{
-        jdk 'Java 17'
-        gradle 'gradle-7.6.1'
-    }
-    
-    environment {
-        GIT_REPO_FRONTEND_URL = "git@ddpsg01.cbsd.scsb.com.tw:open_ebank/ebank-frontend.git"
-        GIT_REPO_BACKEND_URL = "git@ddpsg01.cbsd.scsb.com.tw:open_ebank/ebank-backend.git"
-        NEXUS_URL = "https://ddpsn01.cbsd.scsb.com.tw"
-        RESOURCE_PATH="${WORKSPACE}/${JOB_BASE_NAME}/project/scsb.ebank.front/scsb.ebank.front.${TxnID}/src/main/resources"
-        TOMCAT_PATH = '/ap/temp/war'
-    }
-    stages {
-        stage('Check Jenkins Enviroment Variables') {
-			steps {
-				echo 'Check Jenkins Enviroment Variables'
-				echo '------------------------------'
-				sh 'pwd'
-				echo '------------------------------'
-				sh 'ls -al'
-				echo '------------------------------'
-				echo sh(script: 'env|sort', returnStdout: true)
-				echo '------------------------------'
-				sh 'java -version'
-				echo '------------------------------'
-				sh 'git --version'
-				echo '------------------------------'
-				sh 'df -h' //Show Disk space
-				echo '------------------------------'
-				sh 'node -v' 
-				echo '------------------------------'
-				sh 'npm -v'
-				echo '------------------------------'
-				sh 'gradle -v'
-				echo '------------------------------'
-			    
-			}
-			post {
-				failure {
-					echo 'Check Jenkins Enviroment Variables 失敗'
-				}
-				success {
-					echo 'Check Jenkins Enviroment Variables 成功'            	
-				}
-			}
-		}
-        stage('WORKSPACE Init') {
-			steps {
-				echo 'WORKSPACE Init'
-				echo '------------------------------'
-				sh 'rm -rf *'
-				echo '------------------------------'
-				sh 'ls -al'
-				echo '------------------------------'
-			}
-			post {
-				failure {
-					echo 'WORKSPACE Init 失敗'
-				}
-				success {
-					echo 'WORKSPACE Init 成功'            	
-				}
-			}
-		}
-		stage('Git Clone From Gitlab Repository') {
-		    steps{
-				echo 'Git Clone From Gitlab Repository'
-				echo '------------------------------'
-				withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user',gitToolName: 'git-tool')]) {
-					sh '''
-					    git clone --branch ${GIT_FRONT_TAGS} ${GIT_REPO_FRONTEND_URL}
-					    git clone --branch ${GIT_BACK_TAGS} ${GIT_REPO_BACKEND_URL}
-						ls -al
-						pwd
-					'''
-				}
-		    }
-		    post{
-				failure {
-					echo 'Git Clone From Gitlab Repository 失敗'
-				}
-				success {
-					echo 'Git Clone From Gitlab Repository 成功'            	
-				} 
-		    }
-		}
-		stage('NPM Install Modules & Webpack'){
-		    steps{
-		        echo 'NPM Install Modules & Webpack'
-		        echo '------------------------------'
-		        sh '''
-		            npm config set registry https://ddpsn01.cbsd.scsb.com.tw/repository/npm-group/
-		            cd ebank-frontend/project/
-		            npm install
-		            npm run bundle-prod-${TxnID}
-		        '''
-		    }
-		    post{
-				failure {
-					echo 'NPM Install Modules & Webpack 失敗'
-				}
-				success {
-					echo 'NPM Install Modules & Webpack 成功'            	
-				} 
-		    }
-		}
-		stage('Copy HTML To Backend Project'){
-		    steps{
-		        echo 'Copy HTML To Backend Project'
-		        echo '------------------------------'
-		        sh '''
-		            cd ebank-frontend/project/dist/prod
-		            mv static ${RESOURCE_PATH}
-		            mv templates ${RESOURCE_PATH}
-				'''
-				echo '------------------------------'
-		    }
-		    post{
-		       failure {
-					echo 'Copy HTML To Backend Project 失敗'
-				}
-				success {
-					echo 'Copy HTML To Backend Project 成功'
-				} 
-		    }
-		}
-		stage('Gradle Build Backend Packing'){
-		    steps{
-		        echo 'Gradle Build Backend Packing'
-		        echo '------------------------------'
-		        
-		        sh '''
-		            cd ${JOB_BASE_NAME}/project/scsb.ebank.front
-    				gradle scsb.ebank.front.${TxnID}:build_${Mode} -Pcicd=true
-    				
-    				mv ./scsb.ebank.front.${TxnID}/build/publications/mavenPomOnly/pom-default.xml ./scsb.ebank.front.${TxnID}/build/libs/
-    				mv ./scsb.ebank.front.${TxnID}/build/libs/scsb.ebank.front.${TxnID}-0.1.0.war ./scsb.ebank.front.${TxnID}/build/libs/scsb.ebank.front.${TxnID}-${GIT_BACK_TAGS}.war
-    				ls -l scsb.ebank.front.${TxnID}/build/libs/
-    				
-    				sed -i "s/warver/${GIT_BACK_TAGS}/g" ./scsb.ebank.front.${TxnID}/build/libs/pom-default.xml
-    				cat ./scsb.ebank.front.${TxnID}/build/libs/pom-default.xml
-				'''
-				
-				echo '------------------------------'				
-		    }
-		    post{
-		       failure {
-					echo 'Gradle Build Backend Packing 失敗'
-				}
-				success {
-					echo 'Gradle Build Backend Packing 成功'
-				} 
-		    }
-		}
-    }
-    
-}
+stage('Build APP Image') {
+             when {
+                 expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+             }
 
-實際路徑
-/datam/jenkins/workspace/open_ebank/VA_ebank-backend on built-in :/ebank-backend/project/scsb.ebank.front/
+             steps {
+                 script {
+                     withCredentials([usernamePassword(credentialsId: 'harbor-user', passwordVariable: 'HARBOR_PASSWORD', usernameVariable: 'HARBOR_USER')]) {
+                         // 先登入 Harbor，爲了拉取 base image
+                         sh "podman login ${CONTAINER_REGISTRY} -u '${HARBOR_USER}' -p '${HARBOR_PASSWORD}'"
+                         for (project in deployProjects) {
+                             echo "Building ${project}-${env.TYPE} image"
 
+                             sh """
+                                 podman images | grep ${project}-${env.TYPE} | awk '{print \$3}' | xargs podman rmi --force || true
+                                 cd ${env.WORKSPACE}/${project}/${project}-${env.TYPE}
+                                 podman build --build-arg CONTAINER_REGISTRY=${CONTAINER_REGISTRY} -f ./Dockerfile -t ${CONTAINER_REGISTRY}/${env.HARBOR_PROJECT}/${project}-${env.TYPE}:${env.TAG} .
+                             """
+                         }
+                     }
+                 }
+             }
+         }
 
-+ cd VA_ebank-backend/ebank-backend/project/scsb.ebank.front
-/datam/jenkins/workspace/open_ebank/VA_ebank-backend@tmp/durable-0b6e90fe/script.sh: line 2: cd: VA_ebank-backend/ebank-backend/project/scsb.ebank.front: No such file or directory
-/ebank-backend/project/scsb.ebank.front 底下有這些模組
+         stage('Release APP Image') {
+             when {
+                 expression { env.TYPE == 'app' || env.TYPE == 'rpt' }
+             }
 
-scsb.ebank.front.aply
-scsb.ebank.front.card
-scsb.ebank.front.crft
-scsb.ebank.front.fode
-scsb.ebank.front.fun
-scsb.ebank.front.ibap
-scsb.ebank.front.ibhm
-scsb.ebank.front.info
-scsb.ebank.front.loan
-scsb.ebank.front.main
-scsb.ebank.front.ofwb
-scsb.ebank.front.oter
-scsb.ebank.front.pafe
-scsb.ebank.front.twde
+             steps {
+                 script {
+                     // 上傳 image 到 Harbor
+                     for (project in deployProjects) {
+                         echo "Releaseing ${project}-${env.TYPE} image"
+
+                         //取得 RepoDigest
+                         def repoDigest = sh(returnStdout: true, script: "podman inspect -f '{{index .RepoDigests 0}}' ${CONTAINER_REGISTRY}/${env.HARBOR_PROJECT}/${project}-${env.TYPE}:${env.TAG}").trim()
+                         // 上傳 repoDigest 到 Harbor
+                         sh "podman push ${repoDigest}"
+                         // 上傳 image 到 Harbor
+                         sh "podman push ${CONTAINER_REGISTRY}/${env.HARBOR_PROJECT}/${project}-${env.TYPE}:${env.TAG}"
+                         withCredentials([file(credentialsId: 'cosign-private-key', variable: 'COSIGN_PRIVATE_KEY'), string(credentialsId: 'cosign-password', variable: 'COSIGN_PASSWORD')]) {
+                             println(repoDigest)
+                             // 使用 cosign 簽名
+                             sh "cosign sign --key '${COSIGN_PRIVATE_KEY}' --tlog-upload=false --allow-insecure-registry=true ${repoDigest}"
+                         }
+                     }
+                 }
+             }
+         }
