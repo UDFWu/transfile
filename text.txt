@@ -40,3 +40,29 @@ FATAL ERROR: MarkCompactCollector: young object promotion failed Allocation fail
 Post stage
 [Pipeline] echo
 npm build 失敗
+
+
+stage('npm build'){
+		    steps{
+		        echo 'npm build'
+		        echo '------------------------------'
+				dir("SCSBV"){
+					sh 'ls -al'
+					echo '------------------------------'
+					sh 'npm run "build test Linux"'
+					echo '------------------------------'
+					sh 'find ./vue -name "*.map" -type f -delete'
+					echo '------------------------------'
+					sh 'ls -al ./vue'
+					echo '------------------------------'
+				}
+		    }
+		    post{
+		       failure {
+					echo 'npm build 失敗'
+				}
+				success {
+					echo 'npm build 成功'            	
+				} 
+		    }
+		}
