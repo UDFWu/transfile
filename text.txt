@@ -49,7 +49,9 @@ stage('npm build'){
 				dir("SCSBV"){
 					sh 'ls -al'
 					echo '------------------------------'
-					sh 'npm run "build test Linux"'
+					withEnv(["NODE_OPTIONS=--max-old-space-size=8192"]) {
+                sh 'npm run "build test Linux"'
+            }
 					echo '------------------------------'
 					sh 'find ./vue -name "*.map" -type f -delete'
 					echo '------------------------------'
@@ -66,3 +68,5 @@ stage('npm build'){
 				} 
 		    }
 		}
+		
+		
