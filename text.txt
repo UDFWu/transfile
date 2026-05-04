@@ -1,72 +1,17 @@
-<--- Last few GCs --->
-
-[896653:0x636e440]   688442 ms: Scavenge 16261.1 (16595.1) -> 16259.4 (16595.6) MB, 21.58 / 0.00 ms  (average mu = 0.648, current mu = 0.586) allocation failure; 
-[896653:0x636e440]   688494 ms: Scavenge 16282.4 (16611.8) -> 16280.7 (16612.5) MB, 21.96 / 0.00 ms  (average mu = 0.648, current mu = 0.586) allocation failure; 
-[896653:0x636e440]   688541 ms: Scavenge 16299.6 (16621.2) -> 16298.0 (16626.7) MB, 30.97 / 0.00 ms  (average mu = 0.648, current mu = 0.586) allocation failure; 
-
-
-<--- JS stacktrace --->
-
-FATAL ERROR: MarkCompactCollector: young object promotion failed Allocation failed - JavaScript heap out of memory
------ Native stack trace -----
-
- 1: 0xb8d0a3 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [node]
- 2: 0xf06250 v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [node]
- 3: 0xf06537 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [node]
- 4: 0x11180d5  [node]
- 5: 0x1154d64 v8::internal::EvacuateNewSpaceVisitor::Visit(v8::internal::HeapObject, int) [node]
- 6: 0x1162a96 v8::internal::Evacuator::RawEvacuatePage(v8::internal::MemoryChunk*, long*) [node]
- 7: 0x1163203 v8::internal::Evacuator::EvacuatePage(v8::internal::MemoryChunk*) [node]
- 8: 0x1163537 v8::internal::PageEvacuationJob::Run(v8::JobDelegate*) [node]
- 9: 0x1d81c65 v8::platform::DefaultJobState::Join() [node]
-10: 0x1d81e33 v8::platform::DefaultJobHandle::Join() [node]
-11: 0x1166cb2 v8::internal::MarkCompactCollector::EvacuatePagesInParallel() [node]
-12: 0x117b804 v8::internal::MarkCompactCollector::Evacuate() [node]
-13: 0x117c33e v8::internal::MarkCompactCollector::CollectGarbage() [node]
-14: 0x112a226 v8::internal::Heap::MarkCompact() [node]
-15: 0x112f87d v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::internal::GarbageCollectionReason, char const*) [node]
-16: 0x112fd6c v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [node]
-17: 0x1106071 v8::internal::HeapAllocator::AllocateRawWithLightRetrySlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [node]
-18: 0x1107205 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [node]
-19: 0x10e3926 v8::internal::Factory::AllocateRaw(int, v8::internal::AllocationType, v8::internal::AllocationAlignment) [node]
-20: 0x10d5554 v8::internal::FactoryBase<v8::internal::Factory>::AllocateRawWithImmortalMap(int, v8::internal::AllocationType, v8::internal::Map, v8::internal::AllocationAlignment) [node]
-21: 0x10d8867 v8::internal::FactoryBase<v8::internal::Factory>::NewRawTwoByteString(int, v8::internal::AllocationType) [node]
-22: 0x1429175 v8::internal::String::SlowFlatten(v8::internal::Isolate*, v8::internal::Handle<v8::internal::ConsString>, v8::internal::AllocationType) [node]
-23: 0x152c78c v8::internal::RegExpImpl::IrregexpExec(v8::internal::Isolate*, v8::internal::Handle<v8::internal::JSRegExp>, v8::internal::Handle<v8::internal::String>, int, v8::internal::Handle<v8::internal::RegExpMatchInfo>, v8::internal::RegExp::ExecQuirks) [node]
-24: 0x155357d v8::internal::Runtime_RegExpExec(int, unsigned long*, v8::internal::Isolate*) [node]
-25: 0x1979ef6  [node]
-[Pipeline] }
-[Pipeline] // dir
-Post stage
-[Pipeline] echo
-npm build 失敗
-
-
-stage('npm build'){
-		    steps{
-		        echo 'npm build'
-		        echo '------------------------------'
-				dir("SCSBV"){
-					sh 'ls -al'
-					echo '------------------------------'
-					withEnv(["NODE_OPTIONS=--max-old-space-size=8192"]) {
-                sh 'npm run "build test Linux"'
-            }
-					echo '------------------------------'
-					sh 'find ./vue -name "*.map" -type f -delete'
-					echo '------------------------------'
-					sh 'ls -al ./vue'
-					echo '------------------------------'
-				}
-		    }
-		    post{
-		       failure {
-					echo 'npm build 失敗'
-				}
-				success {
-					echo 'npm build 成功'            	
-				} 
-		    }
-		}
-		
-		
+stage('Build APP Code') {
+             steps {
+                 script {
+                    sh """
+                        mvn -B -q -U clean install \\
+                        -pl :${project}-${env.TYPE} \\
+                        -am -Dnexus-url=${NEXUS_URL} \\
+                        -Dmaven.test.skip=true \\
+                        -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \\
+                        -Dmaven.wagon.http.ssl.insecure=true \\
+                        -DreleaseTag=${env.TAG} \\
+                        -DreleaseNotes=${env.NOTES}
+                    """
+                     
+                 }
+             }
+         }
