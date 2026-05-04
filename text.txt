@@ -1,17 +1,54 @@
-stage('Build APP Code') {
-             steps {
-                 script {
+pipeline {
+    agent any
+
+    options {
+        // 保存較少的建置紀錄，避免這個檢查工具本身佔用太多空間
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+        stage('Scan Orphaned Workspaces') {
+            steps {
+                script {
+                    // 定義 Jenkins 根路徑
+                    def jenkinsHome = "/datam/jenkins"
+                    
+                    echo "開始掃描 Jenkins 孤兒工作區..."
+                    echo "Jenkins Home: ${jenkinsHome}"
+
+                    // 使用 Shell 腳本進行比對邏輯
+                    // 1. 進入 workspace 目錄
+                    // 2. 遍歷資料夾
+                    // 3. 檢查 jobs 目錄下是否有對應名稱的配置資料夾
                     sh """
-                        mvn -B -q -U clean install \\
-                        -pl :${project}-${env.TYPE} \\
-                        -am -Dnexus-url=${NEXUS_URL} \\
-                        -Dmaven.test.skip=true \\
-                        -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \\
-                        -Dmaven.wagon.http.ssl.insecure=true \\
-                        -DreleaseTag=${env.TAG} \\
-                        -DreleaseNotes=${env.NOTES}
+                    cd ${jenkinsHome}/workspace
+                    
+                    echo "--------------------------------------------------"
+                    echo "以下為『孤兒資料夾』清單 (存在於 workspace 但不存在於 jobs):"
+                    echo "--------------------------------------------------"
+                    
+                    found_orphan=false
+                    
+                    for dir in *; do
+                        # 排除非目錄檔案
+                        if [ -d "\$dir" ]; then
+                            # 如果在 jobs 目錄下找不到同名的資料夾，則判定為孤兒
+                            if [ ! -d "../jobs/\$dir" ]; then
+                                # 取得該資料夾大小，方便評估空間佔用
+                                size=\$(du -sh "\$dir" | cut -f1)
+                                echo "[孤兒] 名稱: \$dir  (佔用空間: \$size)"
+                                found_orphan=true
+                            fi
+                        fi
+                    done
+                    
+                    if [ "\$found_orphan" = false ]; then
+                        echo "恭喜！沒有發現任何孤兒資料夾。"
+                    fi
+                    echo "--------------------------------------------------"
                     """
-                     
-                 }
-             }
-         }
+                }
+            }
+        }
+    }
+}
