@@ -1,4 +1,6 @@
-scsblz-prod-azure-je-kv.vault.azure.net
-puk-prod-azure-je-aoai-01.openai.azure.com
+登入驗證 https://login.microsoftonline.com
+Azure 管理 API https://management.azure.com
+Azure 核心管理 https://management.core.windows.net
+Microsoft Graph https://graph.microsoft.com
 
 您先開放這兩個，我剛剛確認過了 下面的endpoint是data plane用的，這次專案只用到這兩個service
