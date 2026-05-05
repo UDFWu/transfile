@@ -1,6 +1,13 @@
-登入驗證 https://login.microsoftonline.com
-Azure 管理 API https://management.azure.com
-Azure 核心管理 https://management.core.windows.net
-Microsoft Graph https://graph.microsoft.com
+login.microsoft.com
+login.microsoftonline.com
+login.live.com
+*.aadcdn.msftauth.net
+*.aadcdn.msftauthimages.net
+*.aadcdn.msauthimages.net
+*.logincdn.msftauth.net
+*.msauth.net
+*.aadcdn.microsoftonline-p.com
+*.microsoftonline-p.com
 
-您先開放這兩個，我剛剛確認過了 下面的endpoint是data plane用的，這次專案只用到這兩個service
+不好意思 那如同jacky傳的那篇文件
+這些針對entra id 的url也幫我設定在白名單上
