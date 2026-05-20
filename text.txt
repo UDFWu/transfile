@@ -1,13 +1,19 @@
-login.microsoft.com
-login.microsoftonline.com
-login.live.com
-*.aadcdn.msftauth.net
-*.aadcdn.msftauthimages.net
-*.aadcdn.msauthimages.net
-*.logincdn.msftauth.net
-*.msauth.net
-*.aadcdn.microsoftonline-p.com
-*.microsoftonline-p.com
+D:\JDK\zulujdk17.0.9\bin\java.exe -Dmaven.multiModuleProjectDirectory=D:\repos_github\BomHelper -Djansi.passthrough=true -Dmaven.home=D:\idea\plugins\maven\lib\maven3 -Dclassworlds.conf=D:\idea\plugins\maven\lib\maven3\bin\m2.conf -Dmaven.ext.class.path=D:\idea\plugins\maven\lib\maven-event-listener.jar -javaagent:D:\idea\lib\idea_rt.jar=52644:D:\idea\bin -Dfile.encoding=UTF-8 -classpath D:\idea\plugins\maven\lib\maven3\boot\plexus-classworlds-2.8.0.jar;D:\idea\plugins\maven\lib\maven3\boot\plexus-classworlds.license org.codehaus.classworlds.Launcher -Didea.version=2024.2.3 com.scsb.bomhelper.BomHelperApplication
+Picked up JAVA_TOOL_OPTIONS: -agentlib:jvmhook
+Picked up _JAVA_OPTIONS: -Xrunjvmhook -Xbootclasspath/a:"C:\Program Files (x86)\Micro Focus\UFT One\bin\java_shared\classes\jasmine.jar"
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.077 s
+[INFO] Finished at: 2026-05-20T17:16:52+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] The goal you specified requires a project to execute but there is no POM in this directory (D:\repos_github\BomHelper). Please verify you invoked Maven from the correct directory. -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MissingProjectException
 
-不好意思 那如同jacky傳的那篇文件
-這些針對entra id 的url也幫我設定在白名單上
+Process finished with exit code 1
