@@ -1,3 +1,59 @@
-https://repo.grails.org/repo/core/
-https://repo.grails.org/repo/plugins/
-https://repo.grails.org/repo/grails-core/
+Could not resolve all artifacts for configuration ':classpath'.
+   > Could not find org.grails:grails-datastore-web:7.0.8.RELEASE.
+     Searched in the following locations:
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/grails/grails-datastore-web/7.0.8.RELEASE/grails-datastore-web-7.0.8.RELEASE.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/grails/grails-datastore-web/7.0.8.RELEASE/grails-datastore-web-7.0.8.RELEASE.jar
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/grails/grails-datastore-web/7.0.8.RELEASE/grails-datastore-web-7.0.8.RELEASE.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/grails/grails-datastore-web/7.0.8.RELEASE/grails-datastore-web-7.0.8.RELEASE.jar
+     Required by:
+         project : > org.grails.plugins:hibernate5:7.0.5
+   > Could not find org.grails:grails-datastore-gorm-support:7.0.8.RELEASE.
+     Searched in the following locations:
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/grails/grails-datastore-gorm-support/7.0.8.RELEASE/grails-datastore-gorm-support-7.0.8.RELEASE.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/grails/grails-datastore-gorm-support/7.0.8.RELEASE/grails-datastore-gorm-support-7.0.8.RELEASE.jar
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/grails/grails-datastore-gorm-support/7.0.8.RELEASE/grails-datastore-gorm-support-7.0.8.RELEASE.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/grails/grails-datastore-gorm-support/7.0.8.RELEASE/grails-datastore-gorm-support-7.0.8.RELEASE.jar
+     Required by:
+         project : > org.grails.plugins:hibernate5:7.0.5
+   > Could not find org.ysb33r.gradle:grolifant:0.10.
+     Searched in the following locations:
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/ysb33r/gradle/grolifant/0.10/grolifant-0.10.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/ysb33r/gradle/grolifant/0.10/grolifant-0.10.jar
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/ysb33r/gradle/grolifant/0.10/grolifant-0.10.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/ysb33r/gradle/grolifant/0.10/grolifant-0.10.jar
+     Required by:
+         project : > gradle.plugin.com.github.erdi.webdriver-binaries:webdriver-binaries-gradle-plugin:2.0
+   > Could not find org.gradle:gradle-tooling-api:5.0.
+     Searched in the following locations:
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/gradle/gradle-tooling-api/5.0/gradle-tooling-api-5.0.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/gradle/gradle-tooling-api/5.0/gradle-tooling-api-5.0.jar
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/gradle/gradle-tooling-api/5.0/gradle-tooling-api-5.0.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/gradle/gradle-tooling-api/5.0/gradle-tooling-api-5.0.jar
+     Required by:
+         project : > org.grails:grails-gradle-plugin:4.0.12 > org.grails:grails-shell:4.0.10
+   > Could not find org.codehaus.groovy.modules.http-builder:http-builder:0.7.2.
+     Searched in the following locations:
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/codehaus/groovy/modules/http-builder/http-builder/0.7.2/http-builder-0.7.2.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/codehaus/groovy/modules/http-builder/http-builder/0.7.2/http-builder-0.7.2.jar
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/codehaus/groovy/modules/http-builder/http-builder/0.7.2/http-builder-0.7.2.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/codehaus/groovy/modules/http-builder/http-builder/0.7.2/http-builder-0.7.2.jar
+     Required by:
+         project : > org.grails:grails-gradle-plugin:4.0.12 > com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5
+   > Could not find org.grails:grails-datastore-gorm:7.0.8.RELEASE.
+     Searched in the following locations:
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/grails/grails-datastore-gorm/7.0.8.RELEASE/grails-datastore-gorm-7.0.8.RELEASE.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-gradle-plugin/org/grails/grails-datastore-gorm/7.0.8.RELEASE/grails-datastore-gorm-7.0.8.RELEASE.jar
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/grails/grails-datastore-gorm/7.0.8.RELEASE/grails-datastore-gorm-7.0.8.RELEASE.pom
+       - https://ddpsn01.cbsd.scsb.com.tw/repository/maven-grails-plugins/org/grails/grails-datastore-gorm/7.0.8.RELEASE/grails-datastore-gorm-7.0.8.RELEASE.jar
+     Required by:
+         project : > org.grails.plugins:hibernate5:7.0.5 > org.grails:grails-datastore-gorm-hibernate5:7.0.5
+------
+
+	相對應的jar檔下載url 如下,再請幫忙看看,感謝
+	
+'https://repo.grails.org/artifactory/core/org/grails/grails-datastore-web/7.0.8.RELEASE/grails-datastore-web-7.0.8.RELEASE.pom'.
+'https://repo.grails.org/artifactory/core/org/grails/grails-datastore-gorm-support/7.0.8.RELEASE/grails-datastore-gorm-support-7.0.8.RELEASE.pom'.
+'https://repo.grails.org/artifactory/core/org/ysb33r/gradle/grolifant/0.10/grolifant-0.10.pom'.
+'https://repo.grails.org/artifactory/core/org/gradle/gradle-tooling-api/5.0/gradle-tooling-api-5.0.pom'.
+'https://repo.grails.org/artifactory/core/org/codehaus/groovy/modules/http-builder/http-builder/0.7.2/http-builder-0.7.2.pom'.
+'https://repo.grails.org/artifactory/core/org/grails/grails-datastore-gorm/7.0.8.RELEASE/grails-datastore-gorm-7.0.8.RELEASE.pom'.
