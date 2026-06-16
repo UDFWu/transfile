@@ -1,95 +1,22 @@
-pipeline {
-	agent any
-	tools {
-		jdk 'Java 8'
-		//path 寫死優先權比指定JDK還高 沒用
-	}
-    environment {
-        CURRENT_DATE = sh(returnStdout: true, script: "date +'%Y%m%d_%H%M%S'").trim()
-        nexus_credentialsId = 'nexus-user'
-        ARTIFACT_ID      = "startWeb"                       // 產物 ID
-        ARTIFACT_VERSION = "0.1"                          // 專案版本
-        WAR_PATH         = "build/libs/startWeb.war"         // 產出 WAR 檔相對路徑
+maven-release\com\pershing\scsb-pershing-base\0.1\scsb-pershing-base-0.1.pom
 
-    }
+--
+Required fields are marked with an asterisk.
 
-    stages {
-		stage('check env') {
-	    	tools {
-		        jdk 'Java 8'
-		        //path 寫死優先權比指定JDK還高 沒用
-	        }
-			steps {
-				echo 'check env'
-				echo '------------------------------'
-				echo sh(script: 'env|sort', returnStdout: true)
-				echo '------------------------------'
-				sh 'java -version'
-				echo '------------------------------'
-				sh '/usr/lib/jvm/java-1.8.0-openjdk/bin/java -version'
-				echo '------------------------------'
-				sh 'gradle -version'
-				echo '------------------------------'
-				sh 'git --version'
-				echo '------------------------------'
-				sh 'df -h'
-				echo '------------------------------'
-                sh 'ls -la'
-				echo '------------------------------'
-			}
-			post {
-				failure {
-					echo 'check env 失敗'
-				}
-				success {
-					echo 'check env 成功'            	
-				}
-			}
-		}
-        stage('WORKSPACE init') {
-			steps {
-				echo 'WORKSPACE init'
-				echo '------------------------------'
-				sh 'rm -rf *'
-				echo '------------------------------'
-				sh 'ls -al'
-				echo '------------------------------'
-			}
-			post {
-				failure {
-					echo 'WORKSPACE init 失敗'
-				}
-				success {
-					echo 'WORKSPACE init 成功'            	
-				}
-			}
-		}
-		stage('git clone'){
-		    steps{
-				echo 'git clone'
-				echo '------------------------------'
-                withCredentials([gitUsernamePassword(credentialsId: 'gitlab-user', gitToolName: 'git-tool')]) {
-                    sh """
-                        git clone --branch dev git@ddpsg01.cbsd.scsb.com.tw:open_each/edda-scsb-start-web.git clone_folder
-                        ls -al
-                        ls -al ./clone_folder
-                        pwd
-                    """
-                }
-				echo '------------------------------'
-				sh 'ls -al'
-		    }
-		    post{
-				failure {
-					echo 'git clone 失敗'
-				}
-				success {
-					echo 'git clone 成功'            	
-				} 
-		    }
-		}
-		
+Choose Assets/Components for maven-releases Repository
 
-    }
+File
+未選擇任何檔案Choose FileNo file selected
+Classifier
+Extension
+Add another asset
+Component coordinates
+Group ID
+Artifact ID
+Version
 
-}
+ 
+Generate a POM file with these coordinates
+Packaging
+Component attributes
+Tag
