@@ -1,48 +1,25 @@
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:50:43
+Executing pre-compile tasks…
+Internal caches are corrupted or have outdated format, forcing project rebuild: backward reference index will be updated to actual version
+Cleaning output directories…
+Running 'before' tasks
+Checking sources
+Copying resources... [BomHelper]
+Parsing java… [BomHelper]
+Writing classes… [BomHelper]
+Errors occurred while compiling module 'BomHelper'
+javac 17.0.9 was used to compile java sources
+Finished, saving caches…
+Compilation failed: errors: 99; warnings: 0
+Executing post-compile tasks…
+Synchronizing output directories…
+2026/6/22 下午 02:04 - Build completed with 99 errors and 0 warnings in 5 sec, 824 ms
+
+
+D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\service\GitLabService.java:112:33
 java: cannot find symbol
-  symbol:   method getId()
-  location: variable g of type com.scsb.bomhelper.dto.gitlab.GitLabGroup
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:51:25
-java: incompatible types: inference variable T has incompatible bounds
-    equality constraints: java.lang.String
-    lower bounds: java.lang.Object
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:53:43
+  symbol:   method getPageSize()
+  location: variable properties of type com.scsb.bomhelper.config.GitLabProperties
+D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\service\GitLabService.java:145:33
 java: cannot find symbol
-  symbol:   method getId()
-  location: variable p of type com.scsb.bomhelper.dto.gitlab.GitLabProject
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:54:25
-java: incompatible types: inference variable T has incompatible bounds
-    equality constraints: java.lang.String
-    lower bounds: java.lang.Object
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:62:43
-java: cannot find symbol
-  symbol:   method getIsAdmin()
-  location: variable gitLabUser of type com.scsb.bomhelper.dto.gitlab.GitLabUser
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:77:26
-java: cannot find symbol
-  symbol:   method getUsername()
-  location: variable gitLabUser of type com.scsb.bomhelper.dto.gitlab.GitLabUser
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:87:26
-java: cannot find symbol
-  symbol:   method getState()
-  location: variable gitLabUser of type com.scsb.bomhelper.dto.gitlab.GitLabUser
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:87:85
-java: cannot find symbol
-  symbol:   method getState()
-  location: variable gitLabUser of type com.scsb.bomhelper.dto.gitlab.GitLabUser
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:92:26
-java: cannot find symbol
-  symbol:   method getName()
-  location: variable gitLabUser of type com.scsb.bomhelper.dto.gitlab.GitLabUser
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:92:57
-java: cannot find symbol
-  symbol:   method getName()
-  location: variable gitLabUser of type com.scsb.bomhelper.dto.gitlab.GitLabUser
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:92:80
-java: cannot find symbol
-  symbol:   method getUsername()
-  location: variable gitLabUser of type com.scsb.bomhelper.dto.gitlab.GitLabUser
-D:\repos_github\BomHelper\BomHelper\src\main\java\com\scsb\bomhelper\security\GitLabUserPrincipal.java:101:46
-java: cannot find symbol
-  symbol:   method getIsAdmin()
-  location: variable gitLabUser of type com.scsb.bomhelper.dto.gitlab.GitLabUser
+  symbol:   method getPageSize()
+  location: variable properties of type com.scsb.bomhelper.config.GitLabProperties
