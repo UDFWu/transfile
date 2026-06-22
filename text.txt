@@ -1,22 +1,28 @@
-maven-release\com\pershing\scsb-pershing-base\0.1\scsb-pershing-base-0.1.pom
-
---
-Required fields are marked with an asterisk.
-
-Choose Assets/Components for maven-releases Repository
-
-File
-未選擇任何檔案Choose FileNo file selected
-Classifier
-Extension
-Add another asset
-Component coordinates
-Group ID
-Artifact ID
-Version
-
- 
-Generate a POM file with these coordinates
-Packaging
-Component attributes
-Tag
+"C:\Program Files\Java\jdk-17\bin\java.exe" -Dmaven.multiModuleProjectDirectory=D:\repos_github\BomHelper\BomHelper -Djansi.passthrough=true -Dmaven.home=C:\Users\67164.HQSCSB\.m2\wrapper\dists\apache-maven-3.9.14-bin\1cb7fhup6b5n3bed6kckbrnspv\apache-maven-3.9.14 -Dclassworlds.conf=C:\Users\67164.HQSCSB\.m2\wrapper\dists\apache-maven-3.9.14-bin\1cb7fhup6b5n3bed6kckbrnspv\apache-maven-3.9.14\bin\m2.conf -Dmaven.ext.class.path=D:\idea\plugins\maven\lib\maven-event-listener.jar -javaagent:D:\idea\lib\idea_rt.jar=50840:D:\idea\bin -Dfile.encoding=UTF-8 -classpath C:\Users\67164.HQSCSB\.m2\wrapper\dists\apache-maven-3.9.14-bin\1cb7fhup6b5n3bed6kckbrnspv\apache-maven-3.9.14\boot\plexus-classworlds-2.9.0.jar;C:\Users\67164.HQSCSB\.m2\wrapper\dists\apache-maven-3.9.14-bin\1cb7fhup6b5n3bed6kckbrnspv\apache-maven-3.9.14\boot\plexus-classworlds.license org.codehaus.classworlds.Launcher -Didea.version=2024.2.3
+Picked up JAVA_TOOL_OPTIONS: -agentlib:jvmhook
+Picked up _JAVA_OPTIONS: -Xrunjvmhook -Xbootclasspath/a:"C:\Program Files (x86)\Micro Focus\UFT One\bin\java_shared\classes\jasmine.jar"
+Failed to load native library:jansi-2.4.2-150353dcf8f66774-jansi.dll. osinfo: Windows/x86_64
+java.lang.UnsatisfiedLinkError: C:\Users\67164.HQSCSB\AppData\Local\Temp\jansi-2.4.2-150353dcf8f66774-jansi.dll: 存取被拒。
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.scsb:BomHelper:jar:0.0.1-SNAPSHOT
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.springframework.boot:spring-boot-starter-data-jpa:jar -> duplicate declaration of version (?) @ line 56, column 21
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.h2database:h2:jar -> duplicate declaration of version (?) @ line 60, column 21
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.445 s
+[INFO] Finished at: 2026-06-22T09:48:47+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] No goals have been specified for this build. You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: pre-clean, clean, post-clean, validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-site, site, post-site, site-deploy. -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/NoGoalSpecifiedException
