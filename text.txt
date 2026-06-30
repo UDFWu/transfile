@@ -1,1 +1,297 @@
-keytool -importcert -alias gitlab-cbsd -keystore "C:\你的JDK路徑\lib\security\cacerts" -file "C:\路徑\gitlab.cer"
+Stage "WORKSPACE init" skipped due to earlier failure(s)
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: a50f060e-e79a-48ff-8c1f-870668bfe938
+groovy.lang.MissingPropertyException: No such property: CATALINA_HOME for class: groovy.lang.Binding
+	at groovy.lang.Binding.getVariable(Binding.java:63)
+	at PluginClassLoader for script-security//org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SandboxInterceptor.onGetProperty(SandboxInterceptor.java:285)
+	at PluginClassLoader for script-security//org.kohsuke.groovy.sandbox.impl.Checker$7.call(Checker.java:375)
+	at PluginClassLoader for script-security//org.kohsuke.groovy.sandbox.impl.Checker.checkedGetProperty(Checker.java:379)
+	at PluginClassLoader for script-security//org.kohsuke.groovy.sandbox.impl.Checker.checkedGetProperty(Checker.java:355)
+	at PluginClassLoader for script-security//org.kohsuke.groovy.sandbox.impl.Checker.checkedGetProperty(Checker.java:355)
+	at PluginClassLoader for workflow-cps//com.cloudbees.groovy.cps.sandbox.SandboxInvoker.getProperty(SandboxInvoker.java:29)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.LoggingInvoker.getProperty(LoggingInvoker.java:133)
+	at PluginClassLoader for workflow-cps//com.cloudbees.groovy.cps.impl.PropertyAccessBlock.rawGet(PropertyAccessBlock.java:20)
+	at WorkflowScript.run(WorkflowScript:74)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.delegateAndExecute(ModelInterpreter.groovy:137)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.executeSingleStage(ModelInterpreter.groovy:666)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.catchRequiredContextForNode(ModelInterpreter.groovy:395)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.catchRequiredContextForNode(ModelInterpreter.groovy:393)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.executeSingleStage(ModelInterpreter.groovy:665)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.evaluateStage(ModelInterpreter.groovy:288)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.toolsBlock(ModelInterpreter.groovy:539)
+	at ___cps.transform___(Native Method)
+	at PluginClassLoader for workflow-cps//com.cloudbees.groovy.cps.impl.PropertyishBlock$ContinuationImpl.get(PropertyishBlock.java:73)
+	at PluginClassLoader for workflow-cps//com.cloudbees.groovy.cps.LValueBlock$GetAdapter.receive(LValueBlock.java:30)
+	at PluginClassLoader for workflow-cps//com.cloudbees.groovy.cps.impl.PropertyishBlock$ContinuationImpl.fixName(PropertyishBlock.java:65)
+	at jdk.internal.reflect.GeneratedMethodAccessor348.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at PluginClassLoader for workflow-cps//com.cloudbees.groovy.cps.impl.ContinuationPtr$ContinuationImpl.receive(ContinuationPtr.java:72)
+	at PluginClassLoader for workflow-cps//com.cloudbees.groovy.cps.impl.ConstantBlock.eval(ConstantBlock.java:21)
+	at PluginClassLoader for workflow-cps//com.cloudbees.groovy.cps.Next.step(Next.java:83)
+	at PluginClassLoader for workflow-cps//com.cloudbees.groovy.cps.Continuable.run0(Continuable.java:147)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.SandboxContinuable.access$001(SandboxContinuable.java:17)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.SandboxContinuable.run0(SandboxContinuable.java:49)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsThread.runNextChunk(CpsThread.java:180)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsThreadGroup.run(CpsThreadGroup.java:423)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsThreadGroup$2.call(CpsThreadGroup.java:331)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsThreadGroup$2.call(CpsThreadGroup.java:295)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsVmExecutorService.lambda$wrap$4(CpsVmExecutorService.java:140)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at hudson.remoting.SingleLaneExecutorService$1.run(SingleLaneExecutorService.java:139)
+	at jenkins.util.ContextResettingExecutorService$1.run(ContextResettingExecutorService.java:28)
+	at jenkins.security.ImpersonatingExecutorService$1.run(ImpersonatingExecutorService.java:68)
+	at jenkins.util.ErrorLoggingExecutorService.lambda$wrap$0(ErrorLoggingExecutorService.java:51)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsVmExecutorService$1.call(CpsVmExecutorService.java:53)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsVmExecutorService$1.call(CpsVmExecutorService.java:50)
+	at org.codehaus.groovy.runtime.GroovyCategorySupport$ThreadCategoryInfo.use(GroovyCategorySupport.java:136)
+	at org.codehaus.groovy.runtime.GroovyCategorySupport.use(GroovyCategorySupport.java:275)
+	at PluginClassLoader for workflow-cps//org.jenkinsci.plugins.workflow.cps.CpsVmExecutorService.lambda$categoryThreadFactory$0(CpsVmExecutorService.java:50)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Finished: FAILURE
+
+
+
+pipeline {
+    agent any
+
+    tools {
+        // Jenkins「Manage Jenkins → Tools」設好的
+        jdk 'Java 17'
+        // ant "apache-ant-1.7.0"
+    }
+
+    parameters {
+        string(name: 'GIT_TAG', description: '請輸入版本號')
+    }
+
+    environment {
+        // --- Jenkins(Linux) ---
+        JENKINS_RSA     = '/var/lib/jenkins/.ssh/jenkinsAgent_rsa'        // 連 AP 機用的 SSH 私鑰（部署階段用）
+
+        JAVA_HOME       = 'usr/lib/jvm/java-1.8.0-openjdk'
+        PATH            = "${JAVA_HOME}/bin:${env.PATH}"
+
+        // --- agent 上的建置工具（Linux 路徑；依管理員提供填寫）---
+        ANT_BIN         = '__請填寫_AGENT上ANT路徑__'                      // 例 /opt/apache-ant-1.10.14/bin/ant
+        BUILD_TOMCAT    = '__請填寫_AGENT上TOMCAT9路徑__'                  // 給 javac classpath，例 /opt/apache-tomcat-9.0.104
+
+        // --- GitLab ---
+        // ⚠️ GIT_URL 不含 https://，下方用 https://帳密@${GIT_URL} 自動補上
+        GIT_URL         = 'ddpsg01.cbsd.scsb.com.tw/open_autotrade/autotrade.git'
+        // GIT_URL = '10.21.109.110/open_autotrade/autotrade.git'
+        GIT_REPO_DIR    = 'autotrade'                                     // clone 出來的資料夾（= repo 名，落在 workspace 下）
+        APP_SUBDIR      = 'proj_autofx'                                   // autofx 在 repo 內的子目錄（build.xml 所在）
+        PROJECT_PATH    = "${GIT_REPO_DIR}/${APP_SUBDIR}"                 // 相對 workspace（ant build 工作目錄）
+        DIST_SUBPATH    = "${GIT_REPO_DIR}/${APP_SUBDIR}/dist"            // WAR 產出（相對 workspace）
+
+        // --- Nexus ---
+        NEXUS_URL       = 'https://10.21.114.105'
+        WAR_NAME        = 'autofx.war'
+        RELEASE_TAG     = "${params.GIT_TAG}"
+        NEXUS_REPO_PATH = "repository/raw-hosted/com/scsb/autotrade/${params.GIT_TAG}"
+        ARTIFACT_URL    = "${NEXUS_URL}/${NEXUS_REPO_PATH}/${WAR_NAME}"
+
+        // --- 目標 AP 機（Windows；部署目標，與 build 分離）---
+        AP_SERVER       = 'atadmin@10.10.8.70'
+    }
+
+// export PATH="${JAVA_HOME}/bin:$PATH"
+
+    stages {
+
+        stage('check env') {
+			steps {
+				echo 'check env'
+				echo '------------------------------'
+				sh 'pwd'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+				echo sh(script: 'env|sort', returnStdout: true)
+				echo '------------------------------'
+				sh '''
+                    java -version
+                '''
+				echo '------------------------------'
+				// sh 'ant -version'
+				echo '------------------------------'
+				sh 'git --version'
+				echo '------------------------------'
+				sh 'df -h' //Show Disk space
+				echo '------------------------------'
+                sh 'echo "$JAVA_HOME=[$JAVA_HOME]"'
+                sh 'echo "PATH=[$PATH]"'
+                sh 'command -v java'
+                sh 'readlink -f "$JAVA_HOME/bin/java"'
+                sh '"$JAVA_HOME/bin/java" -version'
+                echo '"CATALINA_HOME=$CATALINA_HOME"'
+                echo '"CATALINA_BASE=$CATALINA_BASE"'
+                // sh 'ls -l "$JAVA_HOME/bin/javac"'        // 不存在 → 就是 tool 路徑設錯（情況 A）
+                // sh '"$JAVA_HOME/bin/javac" -version'
+                // sh 'which java; echo $PATH'
+			}
+			post {
+				failure {
+					echo 'check env 失敗'
+				}
+				success {
+					echo 'check env 成功'            	
+				}
+			}
+		}
+
+        stage('WORKSPACE init') {
+			steps {
+				echo 'WORKSPACE init'
+				echo '------------------------------'
+				sh 'rm -rf *'
+				echo '------------------------------'
+				sh 'ls -al'
+				echo '------------------------------'
+			}
+			post {
+				failure {
+					echo 'WORKSPACE init 失敗'
+				}
+				success {
+					echo 'WORKSPACE init 成功'            	
+				}
+			}
+		}
+
+        // stage('check git tag') {
+ 		//     steps {
+ 		// 		script {
+		// 			withCredentials([usernamePassword(credentialsId: 'gitlab-user', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]){
+                        
+		// 				def check_tag = sh(script: "git -c http.sslVerify=false ls-remote --tags https://${GIT_USER}:${GIT_PASS}@${GIT_URL} | grep ${params.GIT_TAG} | awk '{print \$1}'", returnStdout: true).trim()
+						
+		// 				if (!params.GIT_TAG?.trim()) {
+		// 					error("*** Build failed, Tag can't no be empty.")
+		// 				} else if (!check_tag) {
+		// 					error('*** Tag does not exist.')
+		// 				} else {
+		// 					//input "Are you sure to deploy ${env.SpringTag} version?"
+		// 				}
+		// 			}
+		// 		}
+ 		// 	}
+ 		// }
+
+        // stage('git clone') {                         // 在 agent workspace clone 指定 tag
+        //     steps {
+        //         withCredentials([usernamePassword(credentialsId: 'gitlab-user',
+        //                          usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+        //             sh """
+        //                 rm -rf "${GIT_REPO_DIR}"
+        //                 git -c http.sslVerify=false clone --branch ${params.GIT_TAG} --single-branch https://${GIT_USER}:${GIT_PASS}@${GIT_URL}
+        //                 ls -al
+        //                 pwd
+        //             """
+        //         }
+        //     }
+        //     post {
+        //         failure { echo 'git clone 失敗' }
+        //         success { echo 'git clone 成功' }
+        //     }
+        // }
+
+        // // "${ANT_BIN}" -DTOMCAT_HOME="${BUILD_TOMCAT}" -DWAR_HOME="${WORKSPACE}/${DIST_SUBPATH}" clean build
+
+        // stage('ant build (WAR)') {                   // 在 workspace 內子目錄 ant clean build
+        //     steps {
+        //         sh """
+        //             export PATH="${JAVA_HOME}/bin:$PATH"
+        //             cd "${PROJECT_PATH}"
+        //             ant -DWAR_HOME="${WORKSPACE}/${DIST_SUBPATH}" clean build
+        //             test -f "${WORKSPACE}/${DIST_SUBPATH}/${WAR_NAME}"
+        //         """
+        //     }
+        //     post {
+        //         failure { echo 'ant build 失敗' }
+        //         success { echo 'ant build 成功' }
+        //     }
+        // }
+
+//         // ──（若公司強制）安全掃描 ───────────────────────────────────────────────
+//         // 在此（build 之後、upload 之前）加 Nexus IQ（nexusPolicyEvaluation）與
+//         // Checkmarx（CxScanBuilder）掃描 stage；設定值與範本片段見 docs/08。
+//         // 先與 CICD 團隊確認 autofx 是否強制，再決定是否補上。
+//         // ────────────────────────────────────────────────────────────────────
+
+//         stage('upload WAR to Nexus') {               // curl 上傳 WAR（在 agent 上跑）
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: 'nexus-user',
+//                                  usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+//                     sh '''
+//                         curl -v -k -u "${NEXUS_USER}:${NEXUS_PASS}" --upload-file "${DIST_SUBPATH}/${WAR_NAME}" "${ARTIFACT_URL}"
+//                     '''
+//                 }
+//             }
+//             post {
+//                 failure { echo 'upload to Nexus 失敗' }
+//                 success { echo 'upload to Nexus 成功' }
+//             }
+//         }
+
+//         stage('deploy to AP (stop -> swap -> start)') {
+//             steps {
+//                 // 確保 AP 機 host key 已在 known_hosts（純 Linux 端 sh，正常縮排）
+//                 sh '''
+//                     H=$(echo ${AP_SERVER} | cut -d@ -f2)
+//                     if ! ssh-keygen -F "$H" >/dev/null 2>&1; then
+//                         ssh-keyscan -p 22 -H "$H" >> /var/lib/jenkins/.ssh/known_hosts
+//                     fi
+//                 '''
+//                 // 部署細節收在 AP 機本機 C:\deploy\deploy_autofx.bat（與 ssh-to-Windows 版共用同一支）
+//                 // 參數順序：<TAG> <ARTIFACT_URL> <NEXUS_USER> <NEXUS_PASS>
+//                 withCredentials([usernamePassword(credentialsId: 'nexus-user',
+//                                  usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+//                     sh '''
+//                         ssh -t -i ${JENKINS_RSA} ${AP_SERVER} "C:\\deploy\\deploy_autofx.bat ${RELEASE_TAG} ${ARTIFACT_URL} ${NEXUS_USER} ${NEXUS_PASS}"
+//                     '''
+//                 }
+//             }
+//             post {
+//                 failure { echo '部署失敗（必要時用 AP 機 C:\\deploy\\backup 回滾）' }
+//                 success { echo '部署成功' }
+//             }
+//         }
+
+//         stage('health check') {                      // CI 視角的二次確認（軟性）
+//             steps {
+//                 // ↓ heredoc：以下到 EOF 須頂格（連到 Windows AP 機的 cmd）
+//                 sh '''
+// ssh -t -i ${JENKINS_RSA} ${AP_SERVER} <<EOF
+// chcp 65001
+// timeout /t 60 /nobreak
+// netstat -ano | findstr ":51988"
+// curl -k -s -o NUL -w "HTTP=%{http_code}" https://localhost:8443/autofx
+// EOF
+// '''
+//             }
+//             post {
+//                 failure { echo 'health check 失敗' }
+//                 success { echo 'health check 成功' }
+//             }
+//         }
+    }
+
+    // post {
+    //     success { echo "部署完成：autofx ${params.GIT_TAG} → UAT" }
+    //     failure { echo "部署失敗：看紅字 stage；必要時用 AP 機 C:\\deploy\\backup\\autofx_${params.GIT_TAG}.war 回滾後重啟。" }
+    // }
+}
