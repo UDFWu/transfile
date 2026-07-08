@@ -1,1 +1,2 @@
+2026-07-08T15:31:10.222+08:00  WARN 12340 --- [BomHelperApp] [nio-8080-exec-2] c.s.b.s.GitLabAuthenticationProvider     : GitLab 認證失敗：GitLab 認證發生未預期錯誤：I/O error on POST request for "https://ddpsg01.cbsd.scsb.com.tw/oauth/token": PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
 
