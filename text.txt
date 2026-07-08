@@ -1,4 +1,1 @@
-keytool -importcert -alias my-gitlab-cert -keystore <您的JAVA_HOME路徑>/lib/security/cacerts -file gitlab.crt
-
-
-depoly - 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
+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
