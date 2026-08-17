@@ -1,1 +1,1 @@
-https://biz-eats.uber.com/public/redeem-employee-invite?action=redeem-employee-invite&confirmation_token=JG4X0YKUF&decentralized=true&organization_name=%E4%B8%8A%E6%B5%B7%E5%95%86%E6%A5%AD%E5%84%B2%E8%93%84%E9%8A%80%E8%A1%8C+%E7%A6%8F%E5%A7%94%E5%B0%88%E6%A1%88&show_pp=true&show_tier_disclaimer=false&skip_logout=true&uuid=73945443-0552-40cc-9f35-b85a598d6589&source_id=email
+https://biz.uber.com/public/find-my-org?email=jhwu3%40scsb.com.tw&hasPendingInvites=false&token=LGponGLFgSaC
