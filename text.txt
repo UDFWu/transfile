@@ -1,78 +1,128 @@
-INSERT ALL
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (1, 'B99010', 'P13新壽2B', TO_DATE('2024/08/28', 'YYYY/MM/DD'), TO_DATE('2034/08/28', 'YYYY/MM/DD'), 0.0350, 0.0350, 99.9860, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (2, 'B99207', 'P14三商1', TO_DATE('2025/04/24', 'YYYY/MM/DD'), TO_DATE('2035/04/24', 'YYYY/MM/DD'), 0.0380, 0.0383, 99.7734, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (3, 'B99209', 'P14三商2B', TO_DATE('2025/08/06', 'YYYY/MM/DD'), TO_DATE('2035/08/06', 'YYYY/MM/DD'), 0.0380, 0.0383, 99.7537, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (4, 'B99211', 'P14三商4A', TO_DATE('2025/12/30', 'YYYY/MM/DD'), TO_DATE('2035/12/30', 'YYYY/MM/DD'), 0.0380, 0.0383, 99.7458, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (5, 'B99412', 'P14南山1A', TO_DATE('2025/04/29', 'YYYY/MM/DD'), TO_DATE('2035/04/29', 'YYYY/MM/DD'), 0.0375, 0.0375, 99.9978, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (6, 'B99414', 'P14南山2A', TO_DATE('2025/06/04', 'YYYY/MM/DD'), TO_DATE('2035/06/04', 'YYYY/MM/DD'), 0.0375, 0.0377, 99.8399, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (7, 'B99416', 'P14南山3A', TO_DATE('2025/11/25', 'YYYY/MM/DD'), TO_DATE('2035/11/25', 'YYYY/MM/DD'), 0.0375, 0.0377, 99.8247, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (8, 'B99417', 'P14南山3B', TO_DATE('2025/11/25', 'YYYY/MM/DD'), TO_DATE('2040/11/25', 'YYYY/MM/DD'), 0.0388, 0.0388, 99.9824, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (9, 'B99503', 'P12富壽1A', TO_DATE('2023/09/05', 'YYYY/MM/DD'), TO_DATE('2033/09/05', 'YYYY/MM/DD'), 0.0370, 0.0354, 100.9992, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (10, 'B99505', 'P12富壽2A', TO_DATE('2023/11/07', 'YYYY/MM/DD'), TO_DATE('2033/11/07', 'YYYY/MM/DD'), 0.0370, 0.0370, 99.9834, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (11, 'B99509', 'P13富壽2A', TO_DATE('2024/10/23', 'YYYY/MM/DD'), TO_DATE('2034/10/23', 'YYYY/MM/DD'), 0.0370, 0.0367, 100.1994, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (12, 'B99513', 'P14富壽2A', TO_DATE('2025/08/27', 'YYYY/MM/DD'), TO_DATE('2035/08/27', 'YYYY/MM/DD'), 0.0370, 0.0372, 99.8287, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (13, 'B99514', 'P14富壽2B', TO_DATE('2025/08/27', 'YYYY/MM/DD'), TO_DATE('2040/08/27', 'YYYY/MM/DD'), 0.0385, 0.0385, 99.9832, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (14, 'B99515', 'P14富壽3A', TO_DATE('2025/12/16', 'YYYY/MM/DD'), TO_DATE('2035/12/16', 'YYYY/MM/DD'), 0.0370, 0.0372, 99.8251, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (15, 'B99603', 'P12國壽1A', TO_DATE('2023/08/01', 'YYYY/MM/DD'), TO_DATE('2033/08/01', 'YYYY/MM/DD'), 0.0370, 0.0367, 100.1751, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (16, 'B99704', 'P14台壽1A', TO_DATE('2025/08/26', 'YYYY/MM/DD'), TO_DATE('2035/08/26', 'YYYY/MM/DD'), 0.0375, 0.0377, 99.8287, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (17, 'B9AK03', 'P13凱基壽1A', TO_DATE('2024/09/13', 'YYYY/MM/DD'), TO_DATE('2034/09/13', 'YYYY/MM/DD'), 0.0375, 0.0376, 99.9123, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (18, 'B9AK05', 'P15凱基壽1A', TO_DATE('2026/01/26', 'YYYY/MM/DD'), TO_DATE('2036/01/26', 'YYYY/MM/DD'), 0.0375, 0.0377, 99.8270, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-  INTO MIDAPP.LEN_BOND_TAIWAN_INFO 
-    (LIST_ID, BOND_CODE, BOND_SHORT_NAME, ISSUE_DATE, MATURITY_DATE, COUPON_RATE, REF_YIELD_RATE, REF_PRICE, EVALUATION_DATE, CREATED_USER_ID, CREATED_TIMESTAMP, UPDATED_USER_ID, UPDATED_TIMESTAMP) 
-  VALUES 
-    (19, 'B9AV01', 'P14全球壽1', TO_DATE('2025/05/23', 'YYYY/MM/DD'), TO_DATE('2035/05/23', 'YYYY/MM/DD'), 0.0420, 0.0425, 99.6213, TO_DATE('2026/04/15', 'YYYY/MM/DD'), 'SYSADMIN', SYSTIMESTAMP, 'SYSADMIN', SYSTIMESTAMP)
-SELECT * FROM DUAL;
+pipeline {
+    agent any
+
+    tools {
+        oc 'OpenShift CLI'
+    }
+
+    environment {
+        APP_GIT_REPO_URL = ''
+        NEXUS_URL = ''
+        CICDAPISERVICE_URL = ''
+    }
+    
+    options {
+	    buildDiscarder(logRotator(numToKeepStr: '2'))
+	}
+
+    stages {
+        
+        stage('Clone App Repository') {
+            steps {
+                echo "----- Clone App Repository -----"
+                cleanWs()
+                checkout scmGit(
+                        branches: [[name: "*/sit"]],
+                        browser: github("${APP_GIT_REPO_URL}"),
+                        extensions: [],
+                        userRemoteConfigs: [[credentialsId: 'gitlab-user', url: "${APP_GIT_REPO_URL}"]]
+                )
+            }
+            post {
+                failure {
+                    echo '----- Clone App Repository failure -----'
+                }
+                success {
+                    echo '----- Clone App Repository success -----'
+                }
+            }
+        }
+        
+        
+        stage('Checkmarx scan') {
+            steps {
+                script {
+                    try {
+                        step([$class: 'CxScanBuilder',
+                        comment: 'NCBS-MID', //請填入子系統別
+                        credentialsId: 'checkmarx-server',
+                        sourceEncoding: '1',
+                        excludeFolders: '',
+                        excludeOpenSourceFolders: '',
+                        exclusionsSetting: 'global',
+                        highThreshold: 0, //高風險限制
+                        mediumThreshold: 0, //中風險限制
+                        lowThreshold: 0, //低風險限制
+                        vulnerabilityThresholdResult: 'UNSTABLE', //設定pipeline偵測到超過閥值時失敗
+                        waitForResultsEnabled: true, //等待掃描結果回傳
+                        vulnerabilityThresholdEnabled: false, //設定風險閥值開啟
+                        fullScanCycle: 0, //每間隔多少次執行一次完整掃描
+                        groupId: '6',
+                        projectName: 'CICD',
+                        preset: '36', sastEnabled: true, serverUrl: 'http://10.10.2.164/',
+                        generatePdfReport: true, generateXmlReport: false,
+                        osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz', osaInstallBeforeScan: false,
+                        scaReportFormat: 'PDF',
+                        filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*, !**/.hg/**/*, !**/.git/**/*, !**/.bzr/**/*, !**/bin/**/*,!**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr, !**/*.iws, !**/*.bak, !**/*.tmp, !**/*.aac, !**/*.aif, !**/*.iff, !**/*.m3u, !**/*.mid, !**/*.mp3,!**/*.mpa, !**/*.ra, !**/*.wav, !**/*.wma, !**/*.3g2, !**/*.3gp, !**/*.asf, !**/*.asx, !**/*.avi, !**/*.flv, !**/*.mov, !**/*.mp4, !**/*.mpg, !**/*.rm, !**/*.swf, !**/*.vob, !**/*.wmv,!**/*.bmp, !**/*.gif, !**/*.jpg, !**/*.png, !**/*.psd, !**/*.tif, !**/*.swf, !**/*.jar, !**/*.zip, !**/*.rar, !**/*.exe, !**/*.dll, !**/*.pdb, !**/*.7z,  !**/*.gz, !**/*.tar.gz,!**/*.tar, !**/*.gz, !**/*.ahtm, !**/*.ahtml, !**/*.fhtml, !**/*.hdm, !**/*.hdml, !**/*.hsql, !**/*.ht, !**/*.hta, !**/*.htc, !**/*.htd, !**/*.war, !**/*.ear,!**/*.htmls,!**/*.ihtml, !**/*.mht, !**/*.mhtm, !**/*.mhtml, !**/*.ssi, !**/*.stm, !**/*.stml, !**/*.ttml, !**/*.txn, !**/*.xhtm, !**/*.xhtml, !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*'''
+                        ])
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error("Checkmarx scan failed: ${e.message}")
+                    }
+                }
+            }
+        }
+
+         stage('Build APP Code') {
+            steps {
+                 echo "----- Build APP Code -----"
+                 script {
+                    sh """
+                        mvn -B -q -U clean install \\
+                        -Dmaven.test.skip=true \\
+                        -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \\
+                        -Dmaven.wagon.http.ssl.insecure=true \\
+                        -DreleaseTag=9.0.0 \\
+                        -DreleaseNotes=1.0.0-notes
+                    """
+                     
+                 }
+            }
+            post {
+                failure {
+                    echo '----- Build APP Code failure -----'
+                }
+                success {
+                    echo '----- Build APP Code success -----'
+                }
+            }
+         }
+         
+        //此步驟為 Sonatype 套件風險掃描, 不影響原流程, 如有問題可以先註解掉
+        stage('Nexus Evaluate') { 
+            steps {
+                nexusPolicyEvaluation (
+                    advancedProperties: '', //預設空白
+                    enableDebugLogging: true, //是否開啟Debug log
+                    failBuildOnNetworkError: true, //如果連不上IQ Server 是否中斷 build
+                    iqApplication: 'ncbs-mid-repo-p2', //指定哪一個 IQ Server application 做掃描 (請對應 Gitlab project) 
+                    iqInstanceId: 'sonatype-dev',
+                    iqScanPatterns: [[scanPattern: '**/*']], //要掃描的檔案路徑(這裡指掃描所有Target下面的 Jar file)
+                    iqStage: 'build',
+                    jobCredentialsId: 'sonatype-lifecycle-scan' 
+                )
+            }
+            post {
+                failure {
+                    echo '掃描失敗。'
+                }
+                success {
+                    echo '掃描成功。'
+                }
+            }
+        }
+        
+        
+      
+    }
+}
