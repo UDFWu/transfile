@@ -6,9 +6,9 @@ pipeline {
     }
 
     environment {
-        APP_GIT_REPO_URL = ''
-        NEXUS_URL = ''
-        CICDAPISERVICE_URL = ''
+        APP_GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git'
+        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
+        CICDAPISERVICE_URL = 'http://ddpsg01.cbsd.scsb.com.tw:5001'
     }
     
     options {
