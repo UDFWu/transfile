@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -6,123 +7,301 @@ pipeline {
     }
 
     environment {
-        APP_GIT_REPO_URL = 'https://ddpsg01.cbsd.scsb.com.tw/ncbs_mid/ncbs-mid-repo-p2.git'
-        NEXUS_URL = 'https://ddpsn01.cbsd.scsb.com.tw'
-        CICDAPISERVICE_URL = 'http://ddpsg01.cbsd.scsb.com.tw:5001'
+        APP_GIT_REPO_URL = 'https://ddpsg01.abc.com.tw/abc_mid/abc-mid-repo-p2.git'
+        NEXUS_URL = 'https://ddpsn01.abc.com.tw'
+        CICDAPISERVICE_URL = 'http://ddpsg01.abc.com.tw:5001'
+
+        IQ_SERVER_URL = 'https://ddpsn01.abc.com.tw'
+        REPORT_DIR = 'reports'
+        REPORT_EMAIL = 'jhwu3@abc.com.tw'
     }
-    
+
     options {
-	    buildDiscarder(logRotator(numToKeepStr: '2'))
-	}
+        buildDiscarder(logRotator(numToKeepStr: '2'))
+        skipDefaultCheckout(true)
+    }
 
     stages {
-        
+
         stage('Clone App Repository') {
             steps {
                 echo "----- Clone App Repository -----"
+
                 cleanWs()
+
                 checkout scmGit(
-                        branches: [[name: "*/sit"]],
-                        browser: github("${APP_GIT_REPO_URL}"),
-                        extensions: [],
-                        userRemoteConfigs: [[credentialsId: 'gitlab-user', url: "${APP_GIT_REPO_URL}"]]
+                    branches: [[name: "*/sit"]],
+                    browser: github("${APP_GIT_REPO_URL}"),
+                    extensions: [],
+                    userRemoteConfigs: [[
+                        credentialsId: 'gitlab-user',
+                        url: "${APP_GIT_REPO_URL}"
+                    ]]
                 )
-            }
-            post {
-                failure {
-                    echo '----- Clone App Repository failure -----'
-                }
-                success {
-                    echo '----- Clone App Repository success -----'
-                }
+
+                sh '''
+                    mkdir -p reports/checkmarx
+                    mkdir -p reports/sonatype
+                '''
             }
         }
-        
-        
+
         stage('Checkmarx scan') {
             steps {
                 script {
                     try {
-                        step([$class: 'CxScanBuilder',
-                        comment: 'NCBS-MID', //請填入子系統別
-                        credentialsId: 'checkmarx-server',
-                        sourceEncoding: '1',
-                        excludeFolders: '',
-                        excludeOpenSourceFolders: '',
-                        exclusionsSetting: 'global',
-                        highThreshold: 0, //高風險限制
-                        mediumThreshold: 0, //中風險限制
-                        lowThreshold: 0, //低風險限制
-                        vulnerabilityThresholdResult: 'UNSTABLE', //設定pipeline偵測到超過閥值時失敗
-                        waitForResultsEnabled: true, //等待掃描結果回傳
-                        vulnerabilityThresholdEnabled: false, //設定風險閥值開啟
-                        fullScanCycle: 0, //每間隔多少次執行一次完整掃描
-                        groupId: '6',
-                        projectName: 'CICD',
-                        preset: '36', sastEnabled: true, serverUrl: 'http://10.10.2.164/',
-                        generatePdfReport: true, generateXmlReport: false,
-                        osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz', osaInstallBeforeScan: false,
-                        scaReportFormat: 'PDF',
-                        filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*, !**/.hg/**/*, !**/.git/**/*, !**/.bzr/**/*, !**/bin/**/*,!**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr, !**/*.iws, !**/*.bak, !**/*.tmp, !**/*.aac, !**/*.aif, !**/*.iff, !**/*.m3u, !**/*.mid, !**/*.mp3,!**/*.mpa, !**/*.ra, !**/*.wav, !**/*.wma, !**/*.3g2, !**/*.3gp, !**/*.asf, !**/*.asx, !**/*.avi, !**/*.flv, !**/*.mov, !**/*.mp4, !**/*.mpg, !**/*.rm, !**/*.swf, !**/*.vob, !**/*.wmv,!**/*.bmp, !**/*.gif, !**/*.jpg, !**/*.png, !**/*.psd, !**/*.tif, !**/*.swf, !**/*.jar, !**/*.zip, !**/*.rar, !**/*.exe, !**/*.dll, !**/*.pdb, !**/*.7z,  !**/*.gz, !**/*.tar.gz,!**/*.tar, !**/*.gz, !**/*.ahtm, !**/*.ahtml, !**/*.fhtml, !**/*.hdm, !**/*.hdml, !**/*.hsql, !**/*.ht, !**/*.hta, !**/*.htc, !**/*.htd, !**/*.war, !**/*.ear,!**/*.htmls,!**/*.ihtml, !**/*.mht, !**/*.mhtm, !**/*.mhtml, !**/*.ssi, !**/*.stm, !**/*.stml, !**/*.ttml, !**/*.txn, !**/*.xhtm, !**/*.xhtml, !**/*.class, !**/*.iml, !Checkmarx/Reports/*.*'''
+                        step([
+                            $class: 'CxScanBuilder',
+                            comment: 'abc-MID',
+                            credentialsId: 'checkmarx-server',
+                            sourceEncoding: '1',
+                            excludeFolders: '',
+                            excludeOpenSourceFolders: '',
+                            exclusionsSetting: 'global',
+
+                            highThreshold: 0,
+                            mediumThreshold: 0,
+                            lowThreshold: 0,
+
+                            vulnerabilityThresholdResult: 'UNSTABLE',
+                            waitForResultsEnabled: true,
+                            vulnerabilityThresholdEnabled: false,
+
+                            fullScanCycle: 0,
+                            groupId: '6',
+                            projectName: 'CICD',
+                            preset: '36',
+                            sastEnabled: true,
+                            serverUrl: 'http://10.10.2.164/',
+
+                            generatePdfReport: true,
+                            generateXmlReport: false,
+
+                            osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz',
+                            osaInstallBeforeScan: false,
+                            scaReportFormat: 'PDF',
+
+                            filterPattern: '''!**/.git/**/*, !**/bin/**/*, !**/obj/**/*'''
                         ])
+
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         error("Checkmarx scan failed: ${e.message}")
                     }
                 }
             }
+
+            post {
+                always {
+                    echo "----- Collect Checkmarx Report -----"
+
+                    sh '''
+                        mkdir -p reports/checkmarx
+
+                        echo "Searching Checkmarx PDF in Workspace..."
+
+                        find . -type f -iname "*.pdf" \
+                            -not -path "./reports/*" \
+                            -not -path "./.git/*" \
+                            -print
+
+                        # 僅搜尋 Checkmarx 常見報告路徑
+                        find . -type f -iname "*.pdf" \
+                            -not -path "./reports/*" \
+                            -not -path "./.git/*" \
+                            \\( -ipath "*/Checkmarx/Reports/*" \
+                            -o -iname "*checkmarx*" \
+                            -o -iname "*cxscan*" \\) \
+                            -exec cp -n {} reports/checkmarx/ \\;
+
+                        if ! find reports/checkmarx -type f \
+                            -iname "*.pdf" | grep -q .; then
+                            echo "WARNING: Checkmarx PDF not found in Workspace."
+                            echo "Check Jenkins Checkmarx Scan Results."
+                        fi
+                    '''
+                }
+            }
         }
 
-         stage('Build APP Code') {
+        stage('Build APP Code') {
             steps {
-                 echo "----- Build APP Code -----"
-                 script {
-                    sh """
-                        mvn -B -q -U clean install \\
-                        -Dmaven.test.skip=true \\
-                        -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \\
-                        -Dmaven.wagon.http.ssl.insecure=true \\
-                        -DreleaseTag=9.0.0 \\
+                echo "----- Build APP Code -----"
+
+                sh '''
+                    mvn -B -q -U clean install \
+                        -Dmaven.test.skip=true \
+                        -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT \
+                        -Dmaven.wagon.http.ssl.insecure=true \
+                        -DreleaseTag=9.0.0 \
                         -DreleaseNotes=1.0.0-notes
-                    """
-                     
-                 }
+                '''
             }
-            post {
-                failure {
-                    echo '----- Build APP Code failure -----'
-                }
-                success {
-                    echo '----- Build APP Code success -----'
-                }
-            }
-         }
-         
-        //此步驟為 Sonatype 套件風險掃描, 不影響原流程, 如有問題可以先註解掉
-        stage('Nexus Evaluate') { 
+        }
+
+        stage('Nexus Evaluate') {
             steps {
-                nexusPolicyEvaluation (
-                    advancedProperties: '', //預設空白
-                    enableDebugLogging: true, //是否開啟Debug log
-                    failBuildOnNetworkError: true, //如果連不上IQ Server 是否中斷 build
-                    iqApplication: 'ncbs-mid-repo-p2', //指定哪一個 IQ Server application 做掃描 (請對應 Gitlab project) 
-                    iqInstanceId: 'sonatype-dev',
-                    iqScanPatterns: [[scanPattern: '**/*']], //要掃描的檔案路徑(這裡指掃描所有Target下面的 Jar file)
-                    iqStage: 'build',
-                    jobCredentialsId: 'sonatype-lifecycle-scan' 
-                )
-            }
-            post {
-                failure {
-                    echo '掃描失敗。'
-                }
-                success {
-                    echo '掃描成功。'
+                script {
+                    def evaluation = nexusPolicyEvaluation(
+                        advancedProperties: '',
+                        enableDebugLogging: true,
+                        failBuildOnNetworkError: true,
+                        iqApplication: 'abc-mid-repo-p2',
+                        iqInstanceId: 'sonatype-dev',
+                        iqScanPatterns: [[scanPattern: '**/*']],
+                        iqStage: 'build',
+                        jobCredentialsId: 'sonatype-lifecycle-scan'
+                    )
+
+                    // 官方 Plugin 回傳評估結果中的報告 URL
+                    def reportUrl = evaluation?.applicationCompositionReportUrl
+
+                    if (!reportUrl) {
+                        error("Sonatype evaluation did not return report URL")
+                    }
+
+                    echo "Sonatype report URL: ${reportUrl}"
+
+                    // 將報告 URL 暫存，供下一個 Stage 使用
+                    writeFile(
+                        file: 'reports/sonatype/report-url.txt',
+                        text: reportUrl.toString() + '\n'
+                    )
                 }
             }
         }
-        
-        
-      
+
+        stage('Download Sonatype Report') {
+            steps {
+                script {
+                    def reportUrl = readFile(
+                        'reports/sonatype/report-url.txt'
+                    ).trim()
+
+                    // 取得本次掃描對應的 PDF URL
+                    def uri = new java.net.URI(reportUrl)
+                    def baseUri = new java.net.URI(
+                        "${env.IQ_SERVER_URL}/"
+                    )
+
+                    if (uri.isAbsolute()) {
+                        if (uri.scheme != baseUri.scheme ||
+                            uri.host != baseUri.host ||
+                            uri.port != baseUri.port) {
+                            error("Unexpected Sonatype report host")
+                        }
+                    }
+
+                    def resolved = baseUri.resolve(uri)
+
+                    def pdfPath = resolved.path
+                    if (!pdfPath.endsWith('/pdf')) {
+                        pdfPath = pdfPath.replaceAll('/$', '') + '/pdf'
+                    }
+
+                    def pdfUrl = new java.net.URI(
+                        resolved.scheme,
+                        resolved.userInfo,
+                        resolved.host,
+                        resolved.port,
+                        pdfPath,
+                        null,
+                        null
+                    ).toString()
+
+                    echo "Downloading Sonatype PDF..."
+
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: 'sonatype-lifecycle-scan',
+                            usernameVariable: 'IQ_USER',
+                            passwordVariable: 'IQ_PASSWORD'
+                        )
+                    ]) {
+                        withEnv(["SONATYPE_PDF_URL=${pdfUrl}"]) {
+                            sh '''
+                                set +x
+                                mkdir -p reports/sonatype
+
+                                curl --fail --show-error --silent \
+                                    --location \
+                                    --proto '=https' \
+                                    --proto-redir '=https' \
+                                    --max-redirs 3 \
+                                    --user "$IQ_USER:$IQ_PASSWORD" \
+                                    "$SONATYPE_PDF_URL" \
+                                    --output reports/sonatype/sonatype-report.pdf
+
+                                # 確認下載的確實是 PDF
+                                head -c 5 reports/sonatype/sonatype-report.pdf \
+                                    | grep -q '%PDF-' || {
+                                        echo "ERROR: Downloaded file is not a PDF"
+                                        exit 1
+                                    }
+
+                                echo "Sonatype PDF downloaded successfully."
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                echo "----- Archive Security Reports -----"
+
+                archiveArtifacts(
+                    artifacts: 'reports/**/*',
+                    allowEmptyArchive: true,
+                    fingerprint: true
+                )
+
+                echo "----- Send Security Reports Email -----"
+
+                def reportFiles = findFiles(glob: 'reports/**/*.pdf')
+                def reportNames = reportFiles.collect {
+                    it.path
+                }.join('\n')
+
+                if (!reportNames) {
+                    reportNames = 'No PDF reports available.'
+                }
+
+                emailext(
+                    to: "${env.REPORT_EMAIL}",
+                    subject: "[Jenkins] Security Scan - ${env.JOB_NAME} #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
+                    mimeType: 'text/html',
+                    body: """
+                        <h2>Jenkins Security Scan Report</h2>
+
+                        <p><b>Project:</b> ${env.JOB_NAME}</p>
+                        <p><b>Build:</b> #${env.BUILD_NUMBER}</p>
+                        <p><b>Status:</b> ${currentBuild.currentResult}</p>
+
+                        <h3>Security Scanners</h3>
+                        <ul>
+                            <li>Checkmarx SAST</li>
+                            <li>Sonatype Lifecycle</li>
+                        </ul>
+
+                        <p>Available PDF reports are attached.</p>
+                        <p>Missing reports should be checked in Jenkins.</p>
+
+                        <p>
+                            <a href="${env.BUILD_URL}artifact/reports/">
+                                View Archived Reports
+                            </a>
+                        </p>
+                    """,
+                    attachmentsPattern: 'reports/**/*.pdf',
+                    attachLog: false
+                )
+
+                echo "----- Email Step Completed -----"
+            }
+        }
     }
 }
