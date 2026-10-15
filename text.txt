@@ -1,3 +1,2 @@
-triggers {
-    cron('TZ=Asia/Taipei\n0 6 * * 1')
-}
+Spread load evenly by using ‘H 4 * * 1’ rather than ‘0 4 * * 1’
+Would last have run at Monday, October 12, 2026 at 4:00:04 AM Taipei Standard Time; would next run at Monday, October 19, 2026 at 4:00:04 AM Taipei Standard Time.
