@@ -1,2 +1,59 @@
-Spread load evenly by using ‘H 4 * * 1’ rather than ‘0 4 * * 1’
-Would last have run at Monday, October 12, 2026 at 4:00:04 AM Taipei Standard Time; would next run at Monday, October 19, 2026 at 4:00:04 AM Taipei Standard Time.
+Post stage
+[Pipeline] echo
+掃描失敗。
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+hudson.remoting.ProxyException: java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672)
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:554)
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:602)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
+	at java.base/java.net.Socket.connect(Socket.java:633)
+	at PluginClassLoader for nexus-jenkins-plugin//org.apache.http.conn.ssl.SSLConnectionSocketFactory.connectSocket(SSLConnectionSocketFactory.java:368)
+	at PluginClassLoader for nexus-jenkins-plugin//org.apache.http.impl.conn.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:142)
+Caused: hudson.remoting.ProxyException: org.apache.http.conn.HttpHostConnectException: Connect to 10.21.114.100:443 [/10.21.114.100] failed: Connection refused
+	at PluginClassLoader for nexus-jenkins-plugin//org.apache.http.impl.conn.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:156)
+	at PluginClassLoader for nexus-jenkins-plugin//org.apache.http.impl.conn.PoolingHttpClientConnectionManager.connect(PoolingHttpClientConnectionManager.java:376)
+	at PluginClassLoader for nexus-jenkins-plugin//org.apache.http.impl.execchain.MainClientExec.establishRoute(MainClientExec.java:393)
+	at PluginClassLoader for nexus-jenkins-plugin//org.apache.http.impl.execchain.MainClientExec.execute(MainClientExec.java:236)
+	at PluginClassLoader for nexus-jenkins-plugin//org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:186)
+	at PluginClassLoader for nexus-jenkins-plugin//org.apache.http.impl.execchain.RetryExec.execute(RetryExec.java:89)
+	at PluginClassLoader for nexus-jenkins-plugin//org.apache.http.impl.execchain.RedirectExec.execute(RedirectExec.java:110)
+	at PluginClassLoader for nexus-jenkins-plugin//org.apache.http.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:185)
+	at PluginClassLoader for nexus-jenkins-plugin//org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:72)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.client.utils.AbstractClientBuilder$RequestBuilder.execute(AbstractClientBuilder.java:172)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.client.utils.AbstractClientBuilder$RequestBuilder.get(AbstractClientBuilder.java:105)
+	at PluginClassLoader for nexus-jenkins-plugin//com.sonatype.insight.brain.client.ConfigurationClient.validateServerVersion(ConfigurationClient.java:218)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.client.iq.impl.DefaultIqClient.validateServerVersion(DefaultIqClient.java:120)
+Also:   hudson.remoting.ProxyException: org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 0ace7616-18ff-45fc-8fcf-cfee64d6c11d
+Caused: hudson.remoting.ProxyException: org.sonatype.nexus.ci.client.exception.IqClientException: Could not validate the IQ Server version.
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.client.iq.impl.DefaultIqClient.validateServerVersion(DefaultIqClient.java:123)
+	at org.sonatype.nexus.ci.client.iq.IqClient$validateServerVersion.call(Unknown Source)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:116)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:128)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy:203)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.IqPolicyEvaluatorCallable.call(IqPolicyEvaluatorCallable.groovy)
+	at java_util_concurrent_Callable$call$868.call(Unknown Source)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:116)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:120)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy:54)
+	at PluginClassLoader for nexus-jenkins-plugin//org.sonatype.nexus.ci.iq.PolicyEvaluatorExecution.run(PolicyEvaluatorExecution.groovy)
+	at PluginClassLoader for workflow-step-api//org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution.lambda$start$0(SynchronousNonBlockingStepExecution.java:47)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Finished: FAILURE
