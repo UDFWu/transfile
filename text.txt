@@ -1,58 +1,73 @@
-+ mvn -B -q -U clean install -Dmaven.test.skip=true -Dmid-entity-generator.version=1.0.1-P2-SNAPSHOT -Dmaven.wagon.http.ssl.insecure=true -DreleaseTag=9.0.0 -DreleaseNotes=1.0.0-notes
-Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
-WARNING: A Java agent has been loaded dynamically (/var/lib/jenkins/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.10/byte-buddy-agent-1.18.10.jar)
-WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
-WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
-WARNING: Dynamic loading of agents will be disallowed by default in a future release
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-[ERROR] An exception has occurred in the compiler (21.0.5). Please file a bug against the Java compiler via the Java bug reporting page (https://bugreport.java.com) after checking the Bug Database (https://bugs.java.com) for duplicates. Include your program, the following diagnostic, and the parameters passed to the Java compiler in your report. Thank you.
-java.nio.file.NoSuchFileException: /var/lib/jenkins/.m2/repository/com/ibm/ncbs/ncbs-mid-jasypt-h2/2.0.0/ncbs-mid-jasypt-h2-2.0.0.jar
-	at java.base/sun.nio.fs.UnixException.translateToIOException(UnixException.java:92)
-	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:106)
-	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
-	at java.base/sun.nio.fs.UnixPath.toRealPath(UnixPath.java:834)
-	at jdk.zipfs/jdk.nio.zipfs.ZipFileSystemProvider.lambda$removeFileSystem$0(ZipFileSystemProvider.java:324)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
-	at jdk.zipfs/jdk.nio.zipfs.ZipFileSystemProvider.removeFileSystem(ZipFileSystemProvider.java:326)
-	at jdk.zipfs/jdk.nio.zipfs.ZipFileSystem.close(ZipFileSystem.java:526)
-	at jdk.compiler/com.sun.tools.javac.file.JavacFileManager$ArchiveContainer.close(JavacFileManager.java:657)
-	at jdk.compiler/com.sun.tools.javac.file.JavacFileManager.close(JavacFileManager.java:735)
-	at jdk.compiler/com.sun.tools.javac.main.DelegatingJavaFileManager.close(DelegatingJavaFileManager.java:151)
-	at jdk.compiler/com.sun.tools.javac.main.Main.compile(Main.java:182)
-	at jdk.compiler/com.sun.tools.javac.Main.compile(Main.java:64)
-	at jdk.compiler/com.sun.tools.javac.Main.main(Main.java:50)
+CREATE TABLE EXPVOUCHER.BOND_VALUATION (
+	BOND_CD VARCHAR2(8),
+	BOND_SHORT_NAME VARCHAR2(10),
+	ISSUE_DT VARCHAR2(12),
+	EXPIRE_DT VARCHAR2(20),
+	INT_RATE NUMBER(5,4),
+	YIELD_RATE NUMBER(5,4),
+	PERCENTAGE_PAR NUMBER(7,4),
+	EVALUATE_DT DATE,
+	SNAPSHOT_DT DATE,
+	UPDATE_DATE TIMESTAMP
+);
+CREATE INDEX BOND_VALUATION_IX1 ON EXPVOUCHER.BOND_VALUATION (BOND_CD);
 
-Error: Could not find or load main class com.scsb.ncbs.core.swagger.SwaggerGeneratorApplication
-Caused by: java.lang.ClassNotFoundException: com.scsb.ncbs.core.swagger.SwaggerGeneratorApplication
-[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.5.13:start (pre-integration-test) on project dep-app: Failed to connect to MBean server at port 45681: Spring application did not start before the configured timeout (30000ms -> [Help 1]
-[ERROR] 
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR] 
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
-[ERROR] 
-[ERROR] After correcting the problems, you can resume the build with the command
-[ERROR]   mvn <goals> -rf :dep-app
-[Pipeline] }
-[Pipeline] // script
-Post stage
-[Pipeline] echo
------ Build APP Code failure -----
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] stage
-[Pipeline] { (Nexus Evaluate)
-Stage "Nexus Evaluate" skipped due to earlier failure(s)
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // node
-[Pipeline] End of Pipeline
-ERROR: script returned exit code 1
+
+
+CREATE TABLE "MIDAPP"."LEN_BOND_TAIWAN_INFO" 
+   (	"LIST_ID" NUMBER(19,0) NOT NULL ENABLE, 
+	"BOND_CODE" VARCHAR2(20) NOT NULL ENABLE, 
+	"BOND_SHORT_NAME" VARCHAR2(100), 
+	"ISSUE_DATE" DATE, 
+	"MATURITY_DATE" DATE, 
+	"COUPON_RATE" NUMBER(11,7), 
+	"REF_YIELD_RATE" NUMBER(11,7), 
+	"REF_PRICE" NUMBER(11,7), 
+	"EVALUATION_DATE" DATE, 
+	"CREATED_USER_ID" VARCHAR2(20) NOT NULL ENABLE, 
+	"CREATED_TIMESTAMP" TIMESTAMP (6) DEFAULT SYSTIMESTAMP NOT NULL ENABLE, 
+	"UPDATED_USER_ID" VARCHAR2(20) NOT NULL ENABLE, 
+	"UPDATED_TIMESTAMP" TIMESTAMP (6) DEFAULT SYSTIMESTAMP NOT NULL ENABLE, 
+	"PUBLISH_DATE" DATE, 
+	"BOND_PLEDGE_MARK" VARCHAR2(1), 
+	"BOND_TYPE" VARCHAR2(1)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "MIDAPP_TS" ;
+  CREATE UNIQUE INDEX "MIDAPP"."PK_LEN_BOND_TAIWAN_INFO" ON "MIDAPP"."LEN_BOND_TAIWAN_INFO" ("LIST_ID") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "MIDAPP_TS" ;
+ALTER TABLE "MIDAPP"."LEN_BOND_TAIWAN_INFO" ADD CONSTRAINT "PK_LEN_BOND_TAIWAN_INFO" PRIMARY KEY ("LIST_ID")
+  USING INDEX "MIDAPP"."PK_LEN_BOND_TAIWAN_INFO"  ENABLE;
+
+CREATE UNIQUE INDEX "MIDAPP"."PK_LEN_BOND_TAIWAN_INFO" ON "MIDAPP"."LEN_BOND_TAIWAN_INFO" ("LIST_ID") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "MIDAPP_TS" ;
+
+COMMENT ON TABLE MIDAPP.LEN_BOND_TAIWAN_INFO IS '新台幣壽險次順位債券參考評價檔';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.LIST_ID IS '流水號';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.BOND_CODE IS '債券代號';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.BOND_SHORT_NAME IS '債券簡稱';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.ISSUE_DATE IS '發行日';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.MATURITY_DATE IS '到期日';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.COUPON_RATE IS '票面利率';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.REF_YIELD_RATE IS '參考殖利率';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.REF_PRICE IS '參考百元價';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.EVALUATION_DATE IS '評價日期';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.CREATED_USER_ID IS '建立人員ID';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.CREATED_TIMESTAMP IS '資料建立日期';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.UPDATED_USER_ID IS '最後異動人員ID';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.UPDATED_TIMESTAMP IS '資料異動日期';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.PUBLISH_DATE IS '公告日期';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.BOND_PLEDGE_MARK IS '是否可質押註記 Y/N';
+COMMENT ON COLUMN MIDAPP.LEN_BOND_TAIWAN_INFO.BOND_TYPE IS '債券種類';
