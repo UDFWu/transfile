@@ -1,17 +1,4 @@
-2026-10-29 17:23:50.797 [WARN ] [mid-app-datasource:housekeeper] com.zaxxer.hikari.pool.HikariPool.run:825 - mid-app-datasource - Thread starvation or clock leap detected (housekeeper delta=48s678ms842µs900ns).
-2026-10-29 17:23:50.829 [DEBUG] [main] p6spy.statement.logSQL:58 - SELECT * FROM EXPVOUCHER.BOND_VALUATION b WHERE TRUNC(b.SNAPSHOT_DT) = '2026-07-31T00:00:00.000+0800' [jdbc:oracle:thin:@10.21.110.110:1523/ODPDBD.cbsd.scsb.com.tw] [connectionId: 18] [elapsed: 9ms]
-2026-10-29 17:23:50.867 [WARN ] [main] o.h.e.jdbc.spi.SqlExceptionHelper.logExceptions:145 - SQL Error: 17132, SQLState: 99999
-2026-10-29 17:23:50.867 [ERROR] [main] o.h.e.jdbc.spi.SqlExceptionHelper.logExceptions:150 - 要求的轉換無效
-2026-10-29 17:23:50.883 [DEBUG] [main] p6spy.rollback.logSQL:58 -  [jdbc:oracle:thin:@10.21.110.110:1521/T24SIT.cbsd.scsb.com.tw] [connectionId: 17] [elapsed: 8ms]
-2026-10-29 17:23:50.899 [ERROR] [main] o.s.batch.core.step.AbstractStep.execute:260 - Encountered an error executing step LEN_IMPORT_BOND_TAIWAN_INFO in job LEN_IMPORT_BOND_TAIWAN_INFO
-org.springframework.orm.jpa.JpaSystemException: Could not extract column [4] from JDBC ResultSet [要求的轉換無效] [n/a]
-
-呼叫 :
-List<LenBondValuationEntity> bondValuationList = bondValuationRepository.findBySnapshotDate(jobParameter.getRunDate());
-
-
-repository :
-
-    @Query(value = "SELECT * FROM EXPVOUCHER.BOND_VALUATION b WHERE TRUNC(b.SNAPSHOT_DT) = :date",
-            nativeQuery = true)
-    List<LenBondValuationEntity> findBySnapshotDate(@Param("date") LocalDate date);
+uatFiles/dep/dep-app/src/main/java/com/scsb/ncbs/dep/controller/billbond/BillBondAccountController.java 
+的第 42 行中的 arg 內的資料可能是敏感的。通過位於 uatFiles/dep/dep
+app/src/main/java/com/scsb/ncbs/dep/controller/billbond/BillBondAccountController.java 的第 42 行中的arg 
+中的API 來暴露上述敏感資訊。 
